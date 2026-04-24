@@ -1,0 +1,91 @@
+export type UserRole = 'participant' | 'judge' | 'admin';
+export type SubmissionStatus = 'draft' | 'submitted' | 'under_review' | 'reviewed';
+export type TeamMemberRole = 'leader' | 'member';
+
+export interface Profile {
+  id: string;
+  name: string;
+  email: string | null;
+  avatar_url: string | null;
+  role: UserRole;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  hackathon: string;
+  invite_code: string;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  team_members?: TeamMember[];
+}
+
+export interface TeamMember {
+  team_id: string;
+  user_id: string;
+  role: TeamMemberRole;
+  joined_at: string;
+  profiles?: Pick<Profile, 'name' | 'avatar_url' | 'email'>;
+}
+
+export interface Submission {
+  id: string;
+  team_id: string;
+  title: string;
+  summary: string;
+  description: string | null;
+  category: string;
+  technologies: string[];
+  github_url: string | null;
+  demo_url: string | null;
+  docs_url: string | null;
+  demo_video_url: string | null;
+  status: SubmissionStatus;
+  submitted_at: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+  teams?: Pick<Team, 'name' | 'hackathon'>;
+}
+
+export interface JudgeReview {
+  id: string;
+  submission_id: string;
+  judge_id: string;
+  score_innovation: number | null;
+  score_technical: number | null;
+  score_presentation: number | null;
+  score_impact: number | null;
+  feedback: string | null;
+  is_complete: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JudgeAssignment {
+  judge_id: string;
+  submission_id: string;
+  assigned_at: string;
+  submissions?: Submission;
+}
+
+export interface AnalyticsData {
+  total_submissions: number;
+  submitted_count: number;
+  reviewed_count: number;
+  total_teams: number;
+  category_breakdown: Record<string, number>;
+  avg_scores: {
+    innovation: number;
+    technical: number;
+    presentation: number;
+    impact: number;
+  };
+}
+
+export interface PaginationParams { limit: number; offset: number; }
+export interface ApiSuccess<T> { data: T; meta?: Record<string, unknown>; }
+export interface ApiError { error: string; code?: string; }

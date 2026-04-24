@@ -1,0 +1,67 @@
+import { NextRequest } from 'next/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { withAuth } from '@/lib/middleware/withAuth';
+import { successResponse, Errors } from '@/lib/utils/response';
+import { getTeamById, updateTeam } from '@/services/teamService';
+import { sanitizeString, isValidUUID } from '@/lib/utils/validate';
+import { logger } from '@/lib/utils/logger';
+
+type Ctx = { params: { id: string } };
+
+/**
+ * GET /api/teams/:id
+ * Public — returns team details with members.
+ */
+export async function GET(_req: NextRequest, { params }: Ctx) {
+  try {
+    if (!isValidUUID(params.id)) return Errors.BAD_REQUEST('Invalid team ID');
+
+    const supabase = createSupabaseServerClient();
+    const team = await getTeamById(supabase, params.id);
+
+    if (!team) return Errors.NOT_FOUND('Team');
+
+    return successResponse(team);
+  } catch (err) {
+    logger.error('GET /api/teams/[id]', { error: String(err), id: params.id });
+    return Errors.INTERNAL();
+  }
+}
+
+/**
+ * PUT /api/teams/:id
+ * Authenticated — only the team leader can update the team name.
+ *
+ * Body: { name: string }
+ */
+export const PUT = withAuth(async (req, { user, params }) => {
+  try {
+    const id = params!.id;
+    if (!isValidUUID(id)) return Errors.BAD_REQUEST('Invalid team ID');
+
+    const supabase = createSupabaseServerClient();
+
+    // Verify the requester is a leader of this team
+    const { data: membership } = await supabase
+      .from('team_members')
+      .select('role')
+      .eq('team_id', id)
+      .eq('user_id', user.id)
+      .single();
+
+    if (!membership)               return Errors.FORBIDDEN();
+    if (membership.role !== 'leader') return Errors.FORBIDDEN();
+
+    const body = await req.json();
+    const name = sanitizeString(body.name, 100);
+    if (!name) return Errors.BAD_REQUEST('name must be 1–100 characters');
+
+    const team = await updateTeam(supabase, id, name);
+    logger.info('PUT /api/teams/[id]', { teamId: id, userId: user.id });
+    return successResponse(team);
+
+  } catch (err) {
+    logger.error('PUT /api/teams/[id]', { error: String(err) });
+    return Errors.INTERNAL();
+  }
+});

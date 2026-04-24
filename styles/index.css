@@ -1,0 +1,77 @@
+:root {
+  --foreground: #e2e8f0;
+  --background: #020817;
+  --muted: #94a3b8;
+}
+
+body {
+  color: var(--foreground);
+  background: linear-gradient(
+    135deg,
+    #020817 0%,
+    #050d24 35%,
+    #04091d 70%,
+    #020817 100%
+  );
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+
+/* Fix black text across the app */
+
+.text-muted-foreground {
+  color: #94a3b8 !important;
+}
+
+.text-foreground {
+  color: #e2e8f0 !important;
+}
+
+
+/* Headings */
+
+h1,h2,h3,h4,h5 {
+  color: #f8fafc;
+}
+
+
+/* Paragraph readability */
+
+p {
+  color: #cbd5f5;
+  line-height: 1.7;
+}
+
+
+/* Glass card improvement */
+
+.glass-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(14px);
+  border-radius: 18px;
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+
+/* Kaggle-style readable writeups */
+
+.prose {
+  line-height: 1.75;
+}
+
+.prose strong {
+  color: #ffffff;
+}
+
+.prose a {
+  color: #60a5fa;
+}
+
+.glass-card:hover {
+  box-shadow:
+  0 20px 60px rgba(0,0,0,0.4),
+  0 0 40px rgba(59,130,246,0.15);
+}

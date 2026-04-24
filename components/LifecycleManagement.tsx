@@ -1,0 +1,62 @@
+"use client"
+
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
+import { Users, FileText, Scale, Trophy, Image } from "lucide-react"
+
+type Phase = "Registration" | "Submission" | "Judging" | "Results" | "Gallery"
+
+const phases = [
+  { name: "Registration", icon: Users, color: "from-blue-500 to-cyan-500", route: "/team" },
+  { name: "Submission", icon: FileText, color: "from-cyan-500 to-teal-500", route: "/SubmissionForm" },
+  { name: "Judging", icon: Scale, color: "from-teal-500 to-green-500", route: "/judging" },
+  { name: "Results", icon: Trophy, color: "from-green-500 to-yellow-500", route: "/submission-result" },
+  { name: "Gallery", icon: Image, color: "from-yellow-500 to-orange-500", route: "/gallery" },
+]
+
+export function LifecycleManagement() {
+
+  const router = useRouter()
+  const [activePhase, setActivePhase] = useState<Phase>("Submission")
+
+  const handlePhaseClick = (phase: Phase, route: string) => {
+    setActivePhase(phase)
+    router.push(route)
+  }
+
+  return (
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
+
+      <h2 className="text-xl text-white mb-4">
+        Lifecycle Management
+      </h2>
+
+      <div className="grid md:grid-cols-5 gap-4">
+
+        {phases.map((phase) => {
+
+          const Icon = phase.icon
+
+          return (
+            <motion.button
+              key={phase.name}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handlePhaseClick(phase.name as Phase, phase.route)}
+              className={`p-4 rounded-lg border border-white/10 text-white transition-all ${
+                activePhase === phase.name
+                  ? "bg-gradient-to-r " + phase.color
+                  : "bg-white/5 hover:bg-white/10"
+              }`}
+            >
+              <Icon className="mx-auto mb-2" />
+              {phase.name}
+            </motion.button>
+          )
+        })}
+
+      </div>
+    </div>
+  )
+}
