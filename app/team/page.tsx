@@ -2,6 +2,7 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import dynamic from "next/dynamic"
 
 import { useAuth } from "@/components/AuthProvider"
 
@@ -9,7 +10,11 @@ import AppShell from "@/components/ui/AppShell"
 import GlassCard from "@/components/ui/GlassCard"
 
 import Image from "next/image"
-import { TeamManagement } from "@/components/TeamManagement"
+
+const TeamManagement = dynamic(
+  () => import("@/components/TeamManagement").then((m) => m.TeamManagement),
+  { ssr: false }
+)
 
 export default function TeamPage(){
 

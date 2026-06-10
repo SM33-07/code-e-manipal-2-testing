@@ -86,6 +86,28 @@ export interface AnalyticsData {
   };
 }
 
+export type UpdateProfileInput = Partial<Pick<Profile, 'name' | 'avatar_url'>>;
+
+export interface RankedSubmission {
+  id: string;
+  title: string;
+  summary: string;
+  category: string;
+  status: string;
+  submitted_at: string | null;
+  created_at: string;
+  teams: { id: string; name: string; hackathon: string } | null;
+  computed: {
+    avg_innovation: number;
+    avg_technical: number;
+    avg_presentation: number;
+    avg_impact: number;
+    total_score: number;
+    review_count: number;
+    rank: number;
+  };
+}
+
 export interface PaginationParams { limit: number; offset: number; }
 export interface ApiSuccess<T> { data: T; meta?: Record<string, unknown>; }
 export interface ApiError { error: string; code?: string; }

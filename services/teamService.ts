@@ -51,3 +51,35 @@ export async function joinTeamByInviteCode(supabase: SupabaseClient, inviteCode:
   if (error) throw error;
   return team;
 }
+
+export async function updateTeam(supabase: SupabaseClient, id: string, name: string) {
+  const { data, error } = await supabase
+    .from('teams')
+    .update({ name })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as Team;
+}
+
+export async function getTeamMembers(supabase: SupabaseClient, teamId: string) {
+  const { data, error } = await supabase
+    .from('team_members')
+    .select('*, profiles(name, avatar_url, email)')
+    .eq('team_id', teamId);
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function removeTeamMember(supabase: SupabaseClient, teamId: string, userId: string) {
+  const { error } = await supabase
+    .from('team_members')
+    .delete()
+    .eq('team_id', teamId)
+    .eq('user_id', userId);
+
+  if (error) throw error;
+}

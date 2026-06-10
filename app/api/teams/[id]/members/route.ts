@@ -12,16 +12,17 @@ type Ctx = { params: { id: string } };
  * GET /api/teams/:id/members
  * Public — lists all members of a team with their profiles.
  */
-export async function GET(_req: NextRequest, { params }: Ctx) {
+export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params;
   try {
-    if (!isValidUUID(params.id)) return Errors.BAD_REQUEST('Invalid team ID');
+    if (!isValidUUID(id)) return Errors.BAD_REQUEST('Invalid team ID');
 
-    const supabase = createSupabaseServerClient();
-    const members  = await getTeamMembers(supabase, params.id);
+    const supabase = await createSupabaseServerClient();
+    const members  = await getTeamMembers(supabase, id);
 
     return successResponse(members);
   } catch (err) {
-    logger.error('GET /api/teams/[id]/members', { error: String(err), id: params.id });
+    logger.error('GET /api/teams/[id]/members', { error: String(err), id });
     return Errors.INTERNAL();
   }
 }
@@ -47,7 +48,7 @@ export const DELETE = withAuth(async (req, { user, params }) => {
 
     if (!isValidUUID(targetUserId)) return Errors.BAD_REQUEST('Invalid target_user_id');
 
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
 
     // Fetch the requester's membership
     const { data: myMembership } = await supabase

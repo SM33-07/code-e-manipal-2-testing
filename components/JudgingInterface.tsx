@@ -12,18 +12,15 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 
 import {
   ArrowLeft,
   Save,
   Lightbulb,
   Code,
-  CheckSquare,
   Video,
-  Map,
+  Target,
 } from "lucide-react";
 
 import {
@@ -37,7 +34,7 @@ import { calculateWeightedScore } from "@/utils/scoring";
 
 interface JudgingInterfaceProps {
   submission: Submission;
-  judgeName: string;
+  judgeId: string;
   existingScore?: Score;
   onSave: (score: Score) => void;
   onBack: () => void;
@@ -45,20 +42,21 @@ interface JudgingInterfaceProps {
 
 export function JudgingInterface({
   submission,
-  judgeName,
+  judgeId,
   existingScore,
   onSave,
   onBack,
 }: JudgingInterfaceProps) {
   const [criteria, setCriteria] = useState<Criteria>(
     existingScore?.criteria || {
-      innovation: 50,
-      technical: 50,
-      completeness: 50,
-      presentation: 50,
-      reflection: 50,
+      innovation: 5,
+      technical: 5,
+      presentation: 5,
+      impact: 5,
     }
   );
+
+  const [feedback, setFeedback] = useState(existingScore?.feedback || "");
 
   const weightedScore = calculateWeightedScore(criteria);
 
@@ -69,9 +67,10 @@ export function JudgingInterface({
   const handleSave = () => {
     const score: Score = {
       submissionId: submission.id,
-      judgeName,
+      judgeId,
       criteria,
-      timestamp: new Date(),
+      feedback: feedback.trim(),
+      isComplete: true,
     };
 
     onSave(score);
@@ -83,38 +82,34 @@ export function JudgingInterface({
       icon: Lightbulb,
       color: "text-yellow-400",
       label: "Innovation",
+      desc: "Novelty and originality of the solution.",
     },
     {
       key: "technical" as keyof Criteria,
       icon: Code,
       color: "text-blue-400",
       label: "Technical Implementation",
-    },
-    {
-      key: "completeness" as keyof Criteria,
-      icon: CheckSquare,
-      color: "text-green-400",
-      label: "Completeness",
+      desc: "Quality of code, architecture, and complexity.",
     },
     {
       key: "presentation" as keyof Criteria,
       icon: Video,
       color: "text-purple-400",
       label: "Presentation",
+      desc: "Clarity and quality of the demo and write-up.",
     },
     {
-      key: "reflection" as keyof Criteria,
-      icon: Map,
-      color: "text-pink-400",
-      label: "Reflection & Roadmap",
+      key: "impact" as keyof Criteria,
+      icon: Target,
+      color: "text-green-400",
+      label: "Impact",
+      desc: "Potential real-world impact and scalability.",
     },
   ];
 
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-5xl mx-auto">
-
-        {/* Back Button */}
 
         <Button
           variant="ghost"
@@ -127,27 +122,22 @@ export function JudgingInterface({
 
         <div className="grid lg:grid-cols-2 gap-6">
 
-          {/* Submission Details */}
+          {/* Submission Details (blind — no team name) */}
 
           <Card className="bg-white/5 border-white/10 backdrop-blur-sm h-fit">
-
             <CardHeader>
               <CardTitle className="text-white text-2xl">
                 {submission.title}
               </CardTitle>
-
               <CardDescription className="text-gray-400">
-                Blind Judging Submission Details
+                Blind Judging — Team info hidden
               </CardDescription>
             </CardHeader>
-
             <CardContent className="space-y-4">
-
               <div>
                 <h3 className="text-sm font-semibold text-gray-300 mb-2">
                   Description
                 </h3>
-
                 <p className="text-gray-400 text-sm">
                   {submission.description}
                 </p>
@@ -159,7 +149,6 @@ export function JudgingInterface({
                 <h3 className="text-sm font-semibold text-gray-300 mb-2">
                   Write-up
                 </h3>
-
                 <p className="text-gray-400 text-sm">
                   {submission.writeup}
                 </p>
@@ -171,7 +160,6 @@ export function JudgingInterface({
                 <h3 className="text-sm font-semibold text-gray-300 mb-2">
                   Reflection
                 </h3>
-
                 <p className="text-gray-400 text-sm">
                   {submission.reflection}
                 </p>
@@ -183,113 +171,100 @@ export function JudgingInterface({
                 <h3 className="text-sm font-semibold text-gray-300 mb-2">
                   Demo
                 </h3>
-
                 <a
                   href={submission.demoUrl}
                   target="_blank"
                   className="text-blue-400 hover:text-blue-300 underline text-sm"
                 >
-                  View Demo Video
+                  View Demo
                 </a>
               </div>
-
             </CardContent>
-
           </Card>
 
           {/* Scoring Panel */}
 
           <div className="space-y-6">
-
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-
               <CardHeader>
-
                 <CardTitle className="text-white">
                   Judging Rubric
                 </CardTitle>
-
                 <CardDescription className="text-gray-400">
-                  Score each criterion from 0–100
+                  Score each criterion from 1 (worst) to 10 (best)
                 </CardDescription>
-
               </CardHeader>
-
               <CardContent className="space-y-6">
-
-                {criteriaConfig.map(({ key, icon: Icon, color, label }) => (
-
-                  <div key={key} className="space-y-3">
-
-                    <div className="flex items-start justify-between">
-
-                      <div className="flex gap-2">
-
+                {criteriaConfig.map(({ key, icon: Icon, color, label, desc }) => (
+                  <div key={key} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
                         <Icon className={`w-5 h-5 ${color}`} />
-
-                        <div>
-
-                          <Label className="text-white font-semibold">
-                            {label}
-                          </Label>
-
-                          <Badge
-                            variant="secondary"
-                            className="ml-2 bg-blue-500/20 text-blue-300 border-0"
-                          >
-                            {(WEIGHTS[key] * 100).toFixed(0)}%
-                          </Badge>
-
-                        </div>
-
+                        <Label className="text-white font-semibold">
+                          {label}
+                        </Label>
+                        <span className="text-xs text-white/40">
+                          ({(WEIGHTS[key] * 100).toFixed(0)}%)
+                        </span>
                       </div>
-
                       <span className="text-white font-bold text-lg">
                         {criteria[key]}
                       </span>
-
                     </div>
-
-                    <Slider
-                      value={[criteria[key]]}
-                      onValueChange={(value) =>
-                        updateCriterion(key, value[0])
-                      }
-                      max={100}
-                      step={1}
-                    />
-
+                    <p className="text-xs text-white/40 mb-1">{desc}</p>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-white/30">1</span>
+                      <input
+                        type="range"
+                        min={1}
+                        max={10}
+                        step={1}
+                        value={criteria[key]}
+                        onChange={(e) => updateCriterion(key, Number(e.target.value))}
+                        className="flex-1 accent-purple-500"
+                      />
+                      <span className="text-xs text-white/30">10</span>
+                    </div>
                   </div>
                 ))}
-
               </CardContent>
+            </Card>
 
+            {/* Feedback */}
+
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white text-sm">
+                  Feedback (optional)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <textarea
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  placeholder="Write your feedback for the team..."
+                  rows={4}
+                  className="w-full bg-black/40 border border-white/10 text-white rounded-lg p-3 text-sm resize-none"
+                />
+              </CardContent>
             </Card>
 
             {/* Weighted Score */}
 
             <Card className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-blue-500/30 backdrop-blur-sm">
-
               <CardContent className="pt-6">
-
                 <div className="text-center">
-
                   <p className="text-gray-300 text-sm mb-2">
                     Weighted Final Score
                   </p>
-
                   <p className="text-5xl font-bold text-white">
                     {weightedScore.toFixed(2)}
                   </p>
-
                   <p className="text-gray-400 text-xs mt-2">
-                    Out of 100
+                    Out of 10
                   </p>
-
                 </div>
-
               </CardContent>
-
             </Card>
 
             <Button
@@ -297,13 +272,11 @@ export function JudgingInterface({
               className="w-full bg-green-600 hover:bg-green-700"
             >
               <Save className="w-4 h-4 mr-2" />
-              Save Score
+              Submit Score
             </Button>
-
           </div>
 
         </div>
-
       </div>
     </div>
   );

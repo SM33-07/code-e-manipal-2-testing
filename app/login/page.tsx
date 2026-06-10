@@ -8,9 +8,6 @@ import { useAuth } from "@/components/AuthProvider";
 import AppShell from "@/components/ui/AppShell";
 import GlassCard from "@/components/ui/GlassCard";
 
-import { AnimatedBackground } from "@/components/AnimatedBackground";
-import { GradientOrbs } from "@/components/GradientOrbs";
-
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -103,9 +100,6 @@ export default function LoginPage() {
   return(
 
     <AppShell>
-
-      <AnimatedBackground/>
-      <GradientOrbs/>
 
       <div className="flex items-center justify-center min-h-screen">
 

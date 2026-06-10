@@ -17,7 +17,7 @@ export const GET = withAuth(async (_req, { user, params }) => {
     const id = params!.id;
     if (!isValidUUID(id)) return Errors.BAD_REQUEST('Invalid review ID');
 
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const review   = await getReviewById(supabase, id, user.id);
 
     if (!review) return Errors.NOT_FOUND('Review');
@@ -42,7 +42,7 @@ export const PUT = withAuth(async (req, { user, params }) => {
     const id = params!.id;
     if (!isValidUUID(id)) return Errors.BAD_REQUEST('Invalid review ID');
 
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const existing = await getReviewById(supabase, id, user.id);
 
     if (!existing) return Errors.NOT_FOUND('Review');

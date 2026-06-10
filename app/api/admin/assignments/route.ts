@@ -17,29 +17,51 @@ import { logger } from '@/lib/utils/logger';
  */
 export const GET = withAuth(async (req) => {
   try {
-    const supabase = createSupabaseServerClient();
     const judgeId  = req.nextUrl.searchParams.get('judge_id');
 
-    let query = supabase
+    const supabase = await createSupabaseServerClient();
+
+    // Fetch assignments
+    let assignQuery = supabase
       .from('judge_assignments')
-      .select(`
-        *,
-        submissions(id, title, category, status),
-        profiles:judge_id(id, name, email, avatar_url)
-      `)
+      .select('*')
       .order('assigned_at', { ascending: false });
 
     if (judgeId) {
       if (!isValidUUID(judgeId)) return Errors.BAD_REQUEST('Invalid judge_id');
-      query = query.eq('judge_id', judgeId);
+      assignQuery = assignQuery.eq('judge_id', judgeId);
     }
 
-    const { data, error } = await query;
-    if (error) throw error;
+    const { data: assignments, error: assignErr } = await assignQuery;
+    if (assignErr) throw assignErr;
+
+    // Fetch related submissions
+    const subIds = [...new Set(assignments.map(a => a.submission_id))];
+    const { data: submissions } = await supabase
+      .from('submissions')
+      .select('id, title, category, status')
+      .in('id', subIds.length ? subIds : ['none']);
+
+    // Fetch related judge profiles
+    const judgeIds = [...new Set(assignments.map(a => a.judge_id))];
+    const { data: judges } = await supabase
+      .from('profiles')
+      .select('id, name, email, avatar_url')
+      .in('id', judgeIds.length ? judgeIds : ['none']);
+
+    // Join in-memory
+    const subMap = new Map((submissions ?? []).map(s => [s.id, s]));
+    const judgeMap = new Map((judges ?? []).map(j => [j.id, j]));
+    const data = assignments.map(a => ({
+      ...a,
+      submissions: subMap.get(a.submission_id) ?? null,
+      profiles: judgeMap.get(a.judge_id) ?? null,
+    }));
 
     return successResponse(data);
   } catch (err) {
-    logger.error('GET /api/admin/assignments', { error: String(err) });
+    console.error('GET /api/admin/assignments error:', err);
+    logger.error('GET /api/admin/assignments', { error: err instanceof Error ? err.message : JSON.stringify(err) });
     return Errors.INTERNAL();
   }
 }, 'admin');
@@ -60,9 +82,8 @@ export const POST = withAuth(async (req) => {
 
     // ── Auto assign ───────────────────────────────────────────
     if (action === 'auto_assign') {
-      // Use admin client so it bypasses RLS for bulk upsert
-      const adminClient = createSupabaseAdminClient();
-      const count = await autoAssignAllJudges(adminClient);
+      const supabase = await createSupabaseServerClient();
+      const count = await autoAssignAllJudges(supabase);
 
       logger.info('POST /api/admin/assignments (auto_assign)', { assigned: count });
       return successResponse({ action: 'auto_assign', assigned: count });
@@ -78,7 +99,7 @@ export const POST = withAuth(async (req) => {
       return Errors.BAD_REQUEST('A valid submission_id is required');
     }
 
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
 
     // Verify the user is actually a judge (or admin)
     const { data: profile } = await supabase
@@ -106,7 +127,8 @@ export const POST = withAuth(async (req) => {
     return successResponse({ action: 'assign', judge_id, submission_id }, undefined, 201);
 
   } catch (err) {
-    logger.error('POST /api/admin/assignments', { error: String(err) });
+    console.error('POST /api/admin/assignments error:', err);
+    logger.error('POST /api/admin/assignments', { error: err instanceof Error ? err.message : JSON.stringify(err) });
     return Errors.INTERNAL();
   }
 }, 'admin');

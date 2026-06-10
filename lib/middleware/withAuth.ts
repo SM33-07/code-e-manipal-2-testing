@@ -8,7 +8,7 @@ export type AuthContext = { user: User; profile: Profile; params?: Record<string
 export type AuthHandler = (req: NextRequest, ctx: AuthContext) => Promise<NextResponse>;
 
 export function withAuth(handler: AuthHandler, requiredRole?: UserRole) {
-  return async (req: NextRequest, context?: { params?: Record<string, string> }) => {
+  return async (req: NextRequest, context?: { params?: Record<string, string> | Promise<Record<string, string>> }) => {
     try {
       const supabase = await createSupabaseServerClient();
       const { data: { user }, error } = await supabase.auth.getUser();
@@ -24,7 +24,9 @@ export function withAuth(handler: AuthHandler, requiredRole?: UserRole) {
         return Errors.FORBIDDEN();
       }
 
-      return handler(req, { user, profile, params: context?.params });
+      // Resolve params in case Next.js 16 passes it as a Promise
+      const resolvedParams = context?.params instanceof Promise ? await context.params : context?.params;
+      return handler(req, { user, profile, params: resolvedParams });
     } catch {
       return Errors.INTERNAL();
     }

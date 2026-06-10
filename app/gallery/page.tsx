@@ -7,17 +7,11 @@ import FeaturedProjects from "@/components/FeaturedProjects"
 import VideoCarousel from "@/components/VideoCarousel"
 import ProjectGrid from "@/components/ProjectGrid"
 
-import { AnimatedBackground } from "@/components/AnimatedBackground"
-import { GradientOrbs } from "@/components/GradientOrbs"
 import GlassCard from "@/components/ui/GlassCard"
 
 export default function Gallery() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-
-      {/* Global animated backgrounds */}
-      <AnimatedBackground />
-      <GradientOrbs />
 
       {/* Page Content */}
       <div className="relative z-10">

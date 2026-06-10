@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import {
   Send, Loader2, Code2, Users, FileText, Link, Video,
@@ -291,7 +291,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
   // Mount animation
-  useState(() => { setTimeout(() => setMounted(true), 50); });
+  useEffect(() => { setTimeout(() => setMounted(true), 50); }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>

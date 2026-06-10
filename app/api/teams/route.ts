@@ -16,7 +16,7 @@ import { logger } from '@/lib/utils/logger';
  */
 export const GET = withAuth(async (_req, { user }) => {
   try {
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const team = await getTeamByUserId(supabase, user.id);
 
     if (!team) return Errors.NOT_FOUND('Team');
@@ -40,7 +40,7 @@ export const POST = withAuth(async (req, { user }) => {
     const body = await req.json();
     const { action } = body;
 
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
 
     // ── Prevent joining/creating a second team ────────────────
     const existingTeam = await getTeamByUserId(supabase, user.id);

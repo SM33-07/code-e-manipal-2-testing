@@ -9,15 +9,13 @@ import {
 // ─── GET ONE ───────────────────────────
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await ctx.params;
   try {
     const supabase = await createSupabaseServerClient();
 
-    const submission = await getSubmissionById(
-      supabase,
-      params.id
-    );
+    const submission = await getSubmissionById(supabase, id);
 
     return successResponse(submission);
   } catch (err) {
@@ -33,17 +31,14 @@ export async function GET(
 // ─── UPDATE ────────────────────────────
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await ctx.params;
   try {
     const body = await req.json();
     const supabase = await createSupabaseServerClient();
 
-    const updated = await updateSubmission(
-      supabase,
-      params.id,
-      body
-    );
+    const updated = await updateSubmission(supabase, id, body);
 
     return successResponse(updated);
   } catch (err) {
@@ -59,12 +54,13 @@ export async function PUT(
 // ─── DELETE ────────────────────────────
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await ctx.params;
   try {
     const supabase = await createSupabaseServerClient();
 
-    await deleteSubmission(supabase, params.id);
+    await deleteSubmission(supabase, id);
 
     return successResponse({ message: "Deleted" });
   } catch (err) {

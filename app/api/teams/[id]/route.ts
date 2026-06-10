@@ -12,18 +12,19 @@ type Ctx = { params: { id: string } };
  * GET /api/teams/:id
  * Public — returns team details with members.
  */
-export async function GET(_req: NextRequest, { params }: Ctx) {
+export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params;
   try {
-    if (!isValidUUID(params.id)) return Errors.BAD_REQUEST('Invalid team ID');
+    if (!isValidUUID(id)) return Errors.BAD_REQUEST('Invalid team ID');
 
-    const supabase = createSupabaseServerClient();
-    const team = await getTeamById(supabase, params.id);
+    const supabase = await createSupabaseServerClient();
+    const team = await getTeamById(supabase, id);
 
     if (!team) return Errors.NOT_FOUND('Team');
 
     return successResponse(team);
   } catch (err) {
-    logger.error('GET /api/teams/[id]', { error: String(err), id: params.id });
+    logger.error('GET /api/teams/[id]', { error: String(err), id });
     return Errors.INTERNAL();
   }
 }
@@ -39,7 +40,7 @@ export const PUT = withAuth(async (req, { user, params }) => {
     const id = params!.id;
     if (!isValidUUID(id)) return Errors.BAD_REQUEST('Invalid team ID');
 
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
 
     // Verify the requester is a leader of this team
     const { data: membership } = await supabase

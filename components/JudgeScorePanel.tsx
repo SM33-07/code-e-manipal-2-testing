@@ -2,76 +2,86 @@
 
 import { useState } from "react"
 
-import { publicAnonKey } from "@/lib/supabase/info"
-
-const SERVER_URL =
-"https://ihnclawnbtkwvbfqwxfe.supabase.co/functions/v1/make-server-f5beda68"
-
 export default function JudgeScorePanel({
   projectId,
-  judgeEmail,
 }: {
   projectId: string
-  judgeEmail: string
 }) {
-
-  const [score, setScore] = useState(5)
+  const [scoreInnovation, setScoreInnovation] = useState(5)
+  const [scoreTechnical, setScoreTechnical] = useState(5)
+  const [scorePresentation, setScorePresentation] = useState(5)
+  const [scoreImpact, setScoreImpact] = useState(5)
   const [feedback, setFeedback] = useState("")
+  const [submitting, setSubmitting] = useState(false)
 
   const submitScore = async () => {
+    setSubmitting(true)
+    try {
+      const res = await fetch("/api/judging/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          submission_id: projectId,
+          score_innovation: scoreInnovation,
+          score_technical: scoreTechnical,
+          score_presentation: scorePresentation,
+          score_impact: scoreImpact,
+          feedback,
+          is_complete: true,
+        }),
+      })
 
-    await fetch(`${SERVER_URL}/score/${projectId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${publicAnonKey}`,
-      },
-      body: JSON.stringify({
-        judgeEmail,
-        score,
-        feedback,
-      }),
-    })
-
-    alert("Score submitted!")
-
+      if (!res.ok) throw new Error("Submit failed")
+      alert("Score submitted!")
+    } catch (err) {
+      console.error("Submit error:", err)
+      alert("Failed to submit score")
+    }
+    setSubmitting(false)
   }
 
-  return (
-
-    <div className="bg-white/5 p-6 rounded-xl">
-
-      <h3 className="text-white text-lg mb-4">
-        Judge Score
-      </h3>
-
+  const renderSlider = (label: string, value: number, setter: (v: number) => void) => (
+    <div className="mb-3">
+      <div className="flex justify-between text-white text-sm mb-1">
+        <span>{label}</span>
+        <span>{value}/10</span>
+      </div>
       <input
         type="range"
-        min="0"
-        max="10"
-        value={score}
-        onChange={(e)=>setScore(Number(e.target.value))}
-        className="w-full"
+        min={1}
+        max={10}
+        step={1}
+        value={value}
+        onChange={(e) => setter(Number(e.target.value))}
+        className="w-full accent-purple-500"
       />
+    </div>
+  )
 
-      <p className="text-white mt-2">
-        Score: {score}/10
-      </p>
+  return (
+    <div className="bg-white/5 p-6 rounded-xl">
+      <h3 className="text-white text-lg mb-4">Judge Score</h3>
+
+      {renderSlider("Innovation", scoreInnovation, setScoreInnovation)}
+      {renderSlider("Technical", scoreTechnical, setScoreTechnical)}
+      {renderSlider("Presentation", scorePresentation, setScorePresentation)}
+      {renderSlider("Impact", scoreImpact, setScoreImpact)}
 
       <textarea
         placeholder="Judge feedback..."
         value={feedback}
-        onChange={(e)=>setFeedback(e.target.value)}
-        className="w-full mt-4 p-2 rounded bg-black/40 text-white"
+        onChange={(e) => setFeedback(e.target.value)}
+        className="w-full mt-4 p-2 rounded bg-black/40 text-white border border-white/10 resize-none"
+        rows={3}
       />
 
       <button
         onClick={submitScore}
-        className="mt-4 px-4 py-2 bg-purple-600 rounded"
+        disabled={submitting}
+        className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded text-white w-full disabled:opacity-40"
       >
-        Submit Score
+        {submitting ? "Submitting..." : "Submit Score"}
       </button>
-
     </div>
   )
 }

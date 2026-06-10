@@ -2,17 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useAuth } from "@/components/AuthProvider";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import {
-  Submission,
-  SubmissionForm,
-} from "@/components/SubmissionForm";
-import { SubmissionCard } from "@/components/SubmissionCard";
-import { AnimatedBackground } from "@/components/AnimatedBackground";
-import { GradientOrbs } from "@/components/GradientOrbs";
-import { TypewriterText } from "@/components/Typewriter";
-import { AnimatedCounter } from "@/components/AnimatedCounter";
+import type { Submission } from "@/components/SubmissionForm";
 import Image from "next/image";
 import { toast } from "sonner";
 import {
@@ -27,6 +20,23 @@ import {
   Globe,
 } from "lucide-react";
 import { projectId, publicAnonKey } from "@/lib/supabase/info";
+
+const SubmissionForm = dynamic(
+  () => import("@/components/SubmissionForm").then((m) => m.SubmissionForm),
+  { ssr: false }
+);
+const SubmissionCard = dynamic(
+  () => import("@/components/SubmissionCard").then((m) => m.SubmissionCard),
+  { ssr: false }
+);
+const TypewriterText = dynamic(
+  () => import("@/components/Typewriter").then((m) => m.TypewriterText),
+  { ssr: false }
+);
+const AnimatedCounter = dynamic(
+  () => import("@/components/AnimatedCounter").then((m) => m.AnimatedCounter),
+  { ssr: false }
+);
 
 const SERVER_URL = "https://ihnclawnbtkwvbfqwxfe.supabase.co/functions/v1/make-server-f5beda68";
 const HEADERS = {
@@ -488,9 +498,6 @@ export default function Home() {
           overflowX: "hidden",
         }}
       >
-        <AnimatedBackground />
-        <GradientOrbs />
-
         {/* ── Header ── */}
         <header
           style={{

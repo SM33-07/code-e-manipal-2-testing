@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     const limit  = Math.min(Math.max(parseInt(searchParams.get('limit')  ?? '10'), 1), 100);
     const offset = Math.max(parseInt(searchParams.get('offset') ?? '0'), 0);
 
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const { posts, total } = await listPosts(supabase, { limit, offset });
 
     logger.info('GET /api/posts', { limit, offset, returned: posts.length });
@@ -44,7 +44,7 @@ export const POST = withAuth(async (req, { user }) => {
       return Errors.BAD_REQUEST('title must be 300 characters or fewer');
     }
 
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const post = await createPost(supabase, { title: title.trim(), content: content.trim(), userId: user.id });
 
     logger.info('POST /api/posts', { postId: post.id, userId: user.id });

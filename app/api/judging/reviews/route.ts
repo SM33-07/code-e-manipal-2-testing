@@ -25,7 +25,7 @@ import { logger } from '@/lib/utils/logger';
  *   is_complete?:         boolean
  * }
  */
-export const POST = withAuth(async (req, { user }) => {
+export const POST = withAuth(async (req, { user, profile }) => {
   try {
     const body = await req.json();
 
@@ -62,18 +62,20 @@ export const POST = withAuth(async (req, { user }) => {
       sanitizedScores[key] = sanitized;
     }
 
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
 
-    // Verify the judge is assigned to this submission
-    const { data: assignment } = await supabase
-      .from('judge_assignments')
-      .select('judge_id')
-      .eq('judge_id', user.id)
-      .eq('submission_id', submission_id)
-      .single();
+    // Admins skip the assignment check
+    if (profile?.role !== 'admin') {
+      const { data: assignment } = await supabase
+        .from('judge_assignments')
+        .select('judge_id')
+        .eq('judge_id', user.id)
+        .eq('submission_id', submission_id)
+        .single();
 
-    if (!assignment) {
-      return Errors.FORBIDDEN();
+      if (!assignment) {
+        return Errors.FORBIDDEN();
+      }
     }
 
     // Upsert the review
@@ -101,7 +103,7 @@ export const POST = withAuth(async (req, { user }) => {
 
     return successResponse(review, undefined, 201);
   } catch (err) {
-    logger.error('POST /api/judging/reviews', { error: String(err) });
+    logger.error('POST /api/judging/reviews', { error: err instanceof Error ? err.message : JSON.stringify(err) });
     return Errors.INTERNAL();
   }
 }, 'judge');

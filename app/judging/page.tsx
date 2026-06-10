@@ -1,62 +1,37 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 
 import { useAuth } from "@/components/AuthProvider";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { JudgeDashboard } from "@/components/JudgeDashboard";
 
 import AppShell from "@/components/ui/AppShell";
-import { AnimatedBackground } from "@/components/AnimatedBackground";
-import { GradientOrbs } from "@/components/GradientOrbs";
+
+const JudgeDashboard = dynamic(
+  () => import("@/components/JudgeDashboard").then((m) => m.JudgeDashboard),
+  { ssr: false }
+);
 
 export default function JudgingPage(){
 
-  const router = useRouter()
   const { logout, user, role, isAuthenticated } = useAuth()
-
-  const [judgeName] = useState(user?.email || "Judge")
-
-  useEffect(()=>{
-
-    if(!isAuthenticated){
-      router.push("/login")
-      return
-    }
-
-    if(role !== "judge" && role !== "admin"){
-      router.push("/team")
-    }
-
-  },[role,isAuthenticated,router])
-
-  if(!isAuthenticated || (role !== "judge" && role !== "admin")) return null
+  const router = useRouter()
 
   const handleLogout = async()=>{
-
     await logout()
     router.push("/login")
-
   }
 
+  if(!isAuthenticated) return <div className="min-h-screen flex items-center justify-center text-white/50 text-sm">Checking access...</div>
+  if(role !== "judge" && role !== "admin") return <div className="min-h-screen flex items-center justify-center text-white/50 text-sm">Redirecting...</div>
+
   return(
-
-    <ProtectedRoute>
-
-      <AppShell>
-
-        <AnimatedBackground/>
-        <GradientOrbs/>
-
-        <JudgeDashboard
-          judgeName={judgeName}
-          onLogout={handleLogout}
-        />
-
-      </AppShell>
-
-    </ProtectedRoute>
-
+    <AppShell>
+      <JudgeDashboard
+        judgeId={user?.id || ""}
+        judgeName={user?.email || "Judge"}
+        onLogout={handleLogout}
+      />
+    </AppShell>
   )
 }

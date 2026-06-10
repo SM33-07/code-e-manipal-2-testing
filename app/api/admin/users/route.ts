@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/middleware/withAuth';
-import { createSupabaseAdminClient } from '@/lib/supabase/admin';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { successResponse, Errors } from '@/lib/utils/response';
 import { getAllProfiles, setUserRole } from '@/services/profileService';
 import { isValidUUID } from '@/lib/utils/validate';
@@ -24,9 +24,8 @@ export const GET = withAuth(async (req) => {
       return Errors.BAD_REQUEST(`role must be one of: ${VALID_ROLES.join(', ')}`);
     }
 
-    // Use admin client so we see all profiles regardless of RLS
-    const admin    = createSupabaseAdminClient();
-    const profiles = await getAllProfiles(admin, role);
+    const supabase = await createSupabaseServerClient();
+    const profiles = await getAllProfiles(supabase, role);
 
     logger.info('GET /api/admin/users', { role: role ?? 'all', count: profiles.length });
 
@@ -61,8 +60,8 @@ export const POST = withAuth(async (req, { user: adminUser }) => {
       return Errors.BAD_REQUEST('Admins cannot remove their own admin role');
     }
 
-    const admin   = createSupabaseAdminClient();
-    const updated = await setUserRole(admin, user_id, role as UserRole);
+    const supabase = await createSupabaseServerClient();
+    const updated = await setUserRole(supabase, user_id, role as UserRole);
 
     logger.info('POST /api/admin/users (role update)', {
       targetUserId: user_id,

@@ -11,10 +11,11 @@ type Ctx = { params: { id: string } };
 // ─────────────────────────────────────────────
 // GET /api/posts/:id — Public
 // ─────────────────────────────────────────────
-export async function GET(_req: NextRequest, { params }: Ctx) {
+export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params;
   try {
-    const supabase = createSupabaseServerClient();
-    const post = await getPostById(supabase, params.id);
+    const supabase = await createSupabaseServerClient();
+    const post = await getPostById(supabase, id);
 
     if (!post) return Errors.NOT_FOUND('Post');
 
@@ -31,7 +32,7 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
 export const PUT = withAuth(async (req, { user, params }) => {
   const id = params?.id!;
   try {
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const existing = await getPostById(supabase, id);
 
     if (!existing) return Errors.NOT_FOUND('Post');
@@ -66,7 +67,7 @@ export const PUT = withAuth(async (req, { user, params }) => {
 export const DELETE = withAuth(async (_req, { user, profile, params }) => {
   const id = params?.id!;
   try {
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const existing = await getPostById(supabase, id);
 
     if (!existing) return Errors.NOT_FOUND('Post');
@@ -78,7 +79,7 @@ export const DELETE = withAuth(async (_req, { user, profile, params }) => {
 
     if (isAdmin) {
       // Admins can hard-delete using the service role client
-      const adminClient = createSupabaseAdminClient();
+      const adminClient = await createSupabaseAdminClient();
       await hardDeletePost(adminClient, id);
       logger.info('DELETE /api/posts/[id] (hard)', { postId: id, adminId: user.id });
     } else {

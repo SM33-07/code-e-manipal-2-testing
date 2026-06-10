@@ -2,13 +2,14 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, Scale, Trophy, BarChart3 } from "lucide-react"
+import { LayoutDashboard, Users, Scale, Trophy, BarChart3, FileSpreadsheet } from "lucide-react"
 
 const links = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Teams", href: "/team", icon: Users },
   { name: "Judging", href: "/judging", icon: Scale },
   { name: "Results", href: "/admin/results", icon: Trophy },
+  { name: "Report", href: "/admin/report", icon: FileSpreadsheet },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
 ]
 

@@ -4,8 +4,6 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
-import { AnimatedBackground } from "@/components/AnimatedBackground";
-import { GradientOrbs } from "@/components/GradientOrbs";
 import AppShell from "@/components/ui/AppShell";
 
 import SubmissionHeader from "@/components/SubmissionHeader";
@@ -53,12 +51,10 @@ export default function SubmissionResultPage() {
 
   const teamName = submission.teams?.name || "Team";
   const hackathonName = submission.teams?.hackathon || "Hackathon";
-  const submittedAt = submission.submitted_at;
+  const submittedAt = submission.created_at;
 
   return (
     <AppShell>
-      <AnimatedBackground />
-      <GradientOrbs />
 
       <motion.main
         variants={container}

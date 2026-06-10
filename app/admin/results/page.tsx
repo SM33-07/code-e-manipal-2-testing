@@ -3,74 +3,31 @@
 import { useEffect, useState } from "react"
 import GlassCard from "@/components/ui/GlassCard"
 import { Trophy, Activity } from "lucide-react"
-import { publicAnonKey } from "@/lib/supabase/info"
-import WinnerPanel from "@/components/WinnerPanel"
-
-const SERVER_URL =
-"https://ihnclawnbtkwvbfqwxfe.supabase.co/functions/v1/make-server-f5beda68"
 
 export default function ResultsPage() {
-
-  const [projects, setProjects] = useState<any[]>([])
+  const [ranked, setRanked] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   useEffect(() => {
-
     fetchResults()
-
-    const interval = setInterval(() => {
-      fetchResults()
-    }, 10000) // refresh every 10 seconds
-
+    const interval = setInterval(fetchResults, 30000)
     return () => clearInterval(interval)
-
   }, [])
 
   const fetchResults = async () => {
-
     try {
+      const res = await fetch("/api/admin/results")
+      const json = await res.json()
+      const data = Array.isArray(json.data) ? json.data : []
 
-      const res = await fetch(`${SERVER_URL}/submissions`, {
-        headers: {
-          Authorization: `Bearer ${publicAnonKey}`
-        }
-      })
-
-      const data = await res.json()
-
-      const ranked = (data.submissions || []).map((p: any) => {
-
-        const scores = p.scores || []
-
-        const avgScore =
-          scores.length > 0
-            ? scores.reduce((a: number, b: any) => a + b.score, 0) / scores.length
-            : 0
-
-        return {
-          ...p,
-          avgScore,
-          judgeCount: scores.length
-        }
-
-      })
-
-      ranked.sort((a: any, b: any) => b.avgScore - a.avgScore)
-
-      setProjects(ranked)
+      setRanked(data)
       setLastUpdated(new Date())
-
     } catch (err) {
-
-      console.error("Failed to fetch leaderboard:", err)
-
+      console.error("Failed to fetch results:", err)
     } finally {
-
       setLoading(false)
-
     }
-
   }
 
   if (loading) {
@@ -82,28 +39,16 @@ export default function ResultsPage() {
   }
 
   return (
-
     <div className="max-w-5xl mx-auto space-y-6">
-
-      {/* HEADER */}
-
       <div className="flex justify-between items-center">
-
         <h1 className="text-white text-3xl flex items-center gap-3">
-
           <Trophy className="text-yellow-400"/>
-
-          Live Hackathon Leaderboard
-
+          Hackathon Leaderboard
         </h1>
-
         <div className="flex items-center gap-2 text-sm text-green-400">
-
           <Activity size={16}/>
           Live
-
         </div>
-
       </div>
 
       {lastUpdated && (
@@ -112,65 +57,38 @@ export default function ResultsPage() {
         </p>
       )}
 
-      {/* WINNER PANEL */}
-
-      <WinnerPanel />
-
-      {/* EMPTY STATE */}
-
-      {projects.length === 0 && (
-
+      {ranked.length === 0 && (
         <GlassCard className="p-6 text-center">
-
-          <p className="text-white/70">
-            No submissions yet
-          </p>
-
+          <p className="text-white/70">No reviewed submissions yet</p>
         </GlassCard>
-
       )}
 
-      {/* LEADERBOARD */}
-
-      {projects.map((p, i) => (
-
+      {ranked.map((entry, i) => (
         <GlassCard
-          key={p.id}
+          key={entry.id}
           className="p-6 flex justify-between items-center"
         >
-
           <div>
-
             <h2 className="text-white text-lg font-semibold">
-
-              #{i + 1} {p.projectName}
-
+              #{entry.computed?.rank ?? i + 1} {entry.title}
             </h2>
-
             <p className="text-white/60">
-              {p.teamName}
+              {entry.teams?.name ?? "Unknown Team"}
             </p>
-
+            <p className="text-white/40 text-sm mt-1">
+              Avg: {entry.computed?.avg_innovation?.toFixed(1) ?? "?"}I · {entry.computed?.avg_technical?.toFixed(1) ?? "?"}T · {entry.computed?.avg_presentation?.toFixed(1) ?? "?"}P · {entry.computed?.avg_impact?.toFixed(1) ?? "?"}M
+            </p>
           </div>
-
           <div className="text-right">
-
             <p className="text-yellow-400 text-xl font-bold">
-              {p.avgScore.toFixed(2)}
+              {entry.computed?.total_score?.toFixed(2) ?? "0.00"}
             </p>
-
             <p className="text-white/50 text-sm">
-              {p.judgeCount} judges
+              {entry.computed?.review_count ?? 0} reviews
             </p>
-
           </div>
-
         </GlassCard>
-
       ))}
-
     </div>
-
   )
-
 }

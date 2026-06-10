@@ -26,36 +26,55 @@ export const GET = withAuth(async (req) => {
     const category    = p.get('category') ?? undefined;
     const minReviews  = Math.max(parseInt(p.get('min_reviews') ?? '1'), 1);
 
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
 
-    let query = supabase
+    // Fetch submissions
+    let subQuery = supabase
       .from('submissions')
-      .select(`
-        id, title, summary, category, status,
-        submitted_at, created_at,
-        teams(id, name, hackathon),
-        judge_reviews(
-          id, judge_id, is_complete,
-          score_innovation, score_technical,
-          score_presentation, score_impact,
-          feedback,
-          profiles:judge_id(name, avatar_url)
-        )
-      `)
+      .select('id, title, summary, category, status, created_at, team_id')
       .is('deleted_at', null)
-      .order('submitted_at', { ascending: false });
+      .order('created_at', { ascending: false });
 
-    if (category) query = query.eq('category', category);
+    if (category) subQuery = subQuery.eq('category', category);
 
-    const { data, error } = await query;
-    if (error) throw error;
+    const { data: submissions, error: subErr } = await subQuery;
+    if (subErr) throw subErr;
+
+    // Fetch teams
+    const teamIds = [...new Set((submissions ?? []).map(s => s.team_id))];
+    const { data: teams } = await supabase
+      .from('teams')
+      .select('id, name, hackathon')
+      .in('id', teamIds.length ? teamIds : ['none']);
+
+    // Fetch complete reviews
+    const subIds = (submissions ?? []).map(s => s.id);
+    const { data: reviews } = await supabase
+      .from('judge_reviews')
+      .select('submission_id, judge_id, is_complete, score_innovation, score_technical, score_presentation, score_impact, feedback')
+      .in('submission_id', subIds.length ? subIds : ['none']);
+
+    // Fetch judge profiles for reviews
+    const judgeIds = [...new Set((reviews ?? []).map(r => r.judge_id))];
+    const { data: judges } = await supabase
+      .from('profiles')
+      .select('id, name, avatar_url')
+      .in('id', judgeIds.length ? judgeIds : ['none']);
+
+    // Build lookup maps
+    const teamMap = new Map((teams ?? []).map(t => [t.id, t]));
+    const judgeMap = new Map((judges ?? []).map(j => [j.id, j]));
+    const reviewsBySub = new Map<string, any[]>();
+    for (const r of (reviews ?? [])) {
+      if (!reviewsBySub.has(r.submission_id)) reviewsBySub.set(r.submission_id, []);
+      reviewsBySub.get(r.submission_id)!.push(r);
+    }
 
     // Compute scores + filter by min_reviews
-    const ranked: RankedSubmission[] = (data ?? [])
+    const ranked: RankedSubmission[] = (submissions ?? [])
       .map((s: any) => {
-        const completeReviews = (s.judge_reviews ?? []).filter(
-          (r: any) => r.is_complete
-        );
+        const sReviews = reviewsBySub.get(s.id) ?? [];
+        const completeReviews = sReviews.filter((r: any) => r.is_complete);
 
         const avgInnovation   = avg(completeReviews.map((r: any) => r.score_innovation));
         const avgTechnical    = avg(completeReviews.map((r: any) => r.score_technical));
@@ -68,6 +87,11 @@ export const GET = withAuth(async (req) => {
 
         return {
           ...s,
+          teams: teamMap.get(s.team_id) ?? null,
+          judge_reviews: sReviews.map((r: any) => ({
+            ...r,
+            profiles: judgeMap.get(r.judge_id) ?? null,
+          })),
           computed: {
             avg_innovation:   avgInnovation,
             avg_technical:    avgTechnical,
@@ -107,7 +131,8 @@ export const GET = withAuth(async (req) => {
       min_reviews: minReviews,
     });
   } catch (err) {
-    logger.error('GET /api/admin/results', { error: String(err) });
+    console.error('GET /api/admin/results error:', err);
+    logger.error('GET /api/admin/results', { error: err instanceof Error ? err.message : JSON.stringify(err) });
     return Errors.INTERNAL();
   }
 }, 'admin');

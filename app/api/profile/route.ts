@@ -44,7 +44,7 @@ export const PUT = withAuth(async (req, { user }) => {
       return Errors.BAD_REQUEST('Provide at least one field to update: name or avatar_url');
     }
 
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const updated = await updateProfile(supabase, user.id, updates);
 
     logger.info('PUT /api/profile', { userId: user.id });

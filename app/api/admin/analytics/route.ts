@@ -14,7 +14,7 @@ import { logger } from '@/lib/utils/logger';
  */
 export const GET = withAuth(async () => {
   try {
-    const supabase  = createSupabaseServerClient();
+    const supabase  = await createSupabaseServerClient();
     const analytics = await getAnalytics(supabase);
 
     logger.info('GET /api/admin/analytics', {
