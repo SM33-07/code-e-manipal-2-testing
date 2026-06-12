@@ -1,35 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import {
   ArrowRight, ChevronDown, CheckCircle, FileText,
   Flame, Scale, Shuffle, Trophy, UserCircle, Users, Trash2,
 } from "lucide-react"
-
-const stats = [
-  { label: "Total Teams",       value: 1,  Icon: Users       },
-  { label: "Total Submissions", value: 3,  Icon: FileText    },
-  { label: "Submitted",         value: 3,  Icon: Scale       },
-  { label: "Reviewed",          value: 3,  Icon: CheckCircle },
-]
-
-const submissionOptions = [
-  "Unknown — xyz",
-  "Unknown — xyz",
-  "Unknown — PREM0905's Project",
-]
-
-const judgeOptions = [
-  "judge@learnit-muj.com",
-  "judge2@learnit-muj.com",
-]
-
-const initialAssignments = [
-  { name: "Unknown — xyz",                sub: "Assigned to: judge@learnit-muj.com" },
-  { name: "Unknown — xyz",                sub: "Assigned to: judge@learnit-muj.com" },
-  { name: "Unknown — PREM0905's Project", sub: "Assigned to: judge@learnit-muj.com" },
-]
 
 const F     = "'Inter', sans-serif"
 const SERIF = "'Cormorant Garamond', serif"
@@ -60,24 +36,100 @@ export default function AdminPage() {
   const router = useRouter()
   const [selSub,      setSelSub]      = useState("")
   const [selJudge,    setSelJudge]    = useState("")
-  const [assignments, setAssignments] = useState(initialAssignments)
+
+  const [stats, setStats] = useState([
+    { label: "Total Teams",       value: 0, Icon: Users },
+    { label: "Total Submissions", value: 0, Icon: FileText },
+    { label: "Submitted",         value: 0, Icon: Scale },
+    { label: "Reviewed",          value: 0, Icon: CheckCircle },
+  ])
+
+  type SubOpt = { id: string; title: string }
+  type JudgeOpt = { id: string; name: string; email: string }
+  type AssignItem = {
+    judge_id: string; submission_id: string; assigned_at: string
+    submissions: { id: string; title: string } | null
+    profiles: { id: string; name: string; email: string } | null
+  }
+
+  const [submissions,   setSubmissions]   = useState<SubOpt[]>([])
+  const [judges,        setJudges]        = useState<JudgeOpt[]>([])
+  const [assignments,   setAssignments]   = useState<AssignItem[]>([])
+  const [reviewedCount, setReviewedCount] = useState(0)
+  const [pendingCount,  setPendingCount]  = useState(0)
+
+  const loadAssignments = useCallback(async () => {
+    try {
+      const res  = await fetch("/api/admin/assignments")
+      const json = await res.json()
+      setAssignments(json.data ?? [])
+    } catch { /* ignore */ }
+  }, [])
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [aRes, sRes, jRes] = await Promise.all([
+          fetch("/api/admin/analytics"),
+          fetch("/api/submissions"),
+          fetch("/api/admin/users?role=judge"),
+        ])
+        const [aJson, sJson, jJson] = await Promise.all([
+          aRes.json(), sRes.json(), jRes.json(),
+        ])
+        const d = aJson.data ?? {}
+        setStats([
+          { label: "Total Teams",       value: d.total_teams ?? 0,       Icon: Users },
+          { label: "Total Submissions", value: d.total_submissions ?? 0, Icon: FileText },
+          { label: "Submitted",         value: d.submitted_count ?? 0,   Icon: Scale },
+          { label: "Reviewed",          value: d.reviewed_count ?? 0,    Icon: CheckCircle },
+        ])
+        setReviewedCount(d.reviewed_count ?? 0)
+        setPendingCount((d.submitted_count ?? 0) - (d.reviewed_count ?? 0))
+        setSubmissions(sJson.data ?? [])
+        setJudges(jJson.data ?? [])
+      } catch { /* ignore */ }
+    }
+    load()
+    loadAssignments()
+  }, [loadAssignments])
 
   const canAssign = selSub !== "" && selJudge !== ""
 
-  const handleAssign = () => {
+  const handleAssign = async () => {
     if (!canAssign) return
-    setAssignments(prev => [...prev, { name: selSub, sub: `Assigned to: ${selJudge}` }])
+    try {
+      await fetch("/api/admin/assignments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "assign", judge_id: selJudge, submission_id: selSub }),
+      })
+    } catch { /* ignore */ }
     setSelSub(""); setSelJudge("")
+    loadAssignments()
   }
 
-  const handleShuffle = () => {
-    const s = submissionOptions[Math.floor(Math.random() * submissionOptions.length)]
-    const j = judgeOptions[Math.floor(Math.random() * judgeOptions.length)]
-    setAssignments(prev => [...prev, { name: s, sub: `Assigned to: ${j}` }])
+  const handleShuffle = async () => {
+    try {
+      await fetch("/api/admin/assignments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "auto_assign" }),
+      })
+    } catch { /* ignore */ }
+    loadAssignments()
   }
 
-  const handleDelete = (i: number) =>
-    setAssignments(prev => prev.filter((_, idx) => idx !== i))
+  const handleUnassign = async (judgeId: string, subId: string) => {
+    try {
+      await fetch("/api/admin/assignments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "unassign", judge_id: judgeId, submission_id: subId }),
+      })
+    } catch { /* ignore */ }
+    loadAssignments()
+  }
 
   const dropStyle: React.CSSProperties = {
     height: 38, width: "100%",
@@ -104,24 +156,23 @@ export default function AdminPage() {
         background: "transparent",
         pointerEvents: "none",
       }}>
-        {/* Icon bubble — aligns to the flame icon in image */}
         <div style={{
           width: 0, height: 0, flexShrink: 0, borderRadius: 14,
           background: "rgba(139,23,48,0.10)",
           display: "flex", alignItems: "center", justifyContent: "center",
           marginLeft: 24,
         }}>
-          
+
         </div>
         <div style={{ marginLeft: 18 }}>
           <h1 style={{
             fontFamily: SERIF, fontSize: 24, fontWeight: 700,
             color: "#5A1420", margin: 0, lineHeight: 1.2,
           }}>
-            
+
           </h1>
           <p style={{ fontSize: 13, color: "#A36F55", margin: "4px 0 0", fontFamily: F }}>
-            
+
           </p>
         </div>
       </div>
@@ -175,7 +226,6 @@ export default function AdminPage() {
         background: "transparent",
         overflow: "hidden",
       }}>
-        {/* Section header */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
             <UserCircle size={32} style={{ color: "#8A1E35" }} />
@@ -197,19 +247,22 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {/* Dropdowns + Assign */}
         <div style={{ display: "flex", gap: 9, marginTop: 13, alignItems: "center", flexShrink: 0 }}>
           <div style={{ flex: 1, position: "relative" }}>
             <select value={selSub} onChange={e => setSelSub(e.target.value)} style={dropStyle}>
               <option value="">Select Submission</option>
-              {submissionOptions.map((o, i) => <option key={i} value={o}>{o}</option>)}
+              {submissions.map(s => (
+                <option key={s.id} value={s.id}>{s.title}</option>
+              ))}
             </select>
             <ChevronDown size={12} style={{ position: "absolute", right: 9, top: "50%", transform: "translateY(-50%)", color: "#8A1E35", pointerEvents: "none" }} />
           </div>
           <div style={{ flex: 1, position: "relative" }}>
             <select value={selJudge} onChange={e => setSelJudge(e.target.value)} style={dropStyle}>
               <option value="">Select Judge</option>
-              {judgeOptions.map(o => <option key={o} value={o}>{o}</option>)}
+              {judges.map(j => (
+                <option key={j.id} value={j.id}>{j.name || j.email}</option>
+              ))}
             </select>
             <ChevronDown size={12} style={{ position: "absolute", right: 9, top: "50%", transform: "translateY(-50%)", color: "#8A1E35", pointerEvents: "none" }} />
           </div>
@@ -224,10 +277,9 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {/* Assignment list */}
         <div style={{ flex: 1, overflowY: "auto", marginTop: 11, display: "flex", flexDirection: "column", gap: 6 }}>
           {assignments.map((item, i) => (
-            <div key={i} style={{
+            <div key={`${item.judge_id}-${item.submission_id}`} style={{
               display: "flex", alignItems: "center", justifyContent: "space-between", gap: 9,
               background: "rgba(251,243,238,0.80)", border: "1px solid rgba(238,220,208,0.75)",
               borderRadius: 10, padding: "8px 12px",
@@ -241,11 +293,15 @@ export default function AdminPage() {
                   <UserCircle size={16} style={{ color: "#8A1E35" }} />
                 </div>
                 <div>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: "#44211A", margin: 0 }}>{item.name}</p>
-                  <p style={{ fontSize: 11, color: "#8D6B61", margin: "1px 0 0" }}>{item.sub}</p>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: "#44211A", margin: 0 }}>
+                    {item.submissions?.title ?? "Unknown"}
+                  </p>
+                  <p style={{ fontSize: 11, color: "#8D6B61", margin: "1px 0 0" }}>
+                    Assigned to: {item.profiles?.name || item.profiles?.email || "Unknown"}
+                  </p>
                 </div>
               </div>
-              <button type="button" onClick={() => handleDelete(i)} style={{
+              <button type="button" onClick={() => handleUnassign(item.judge_id, item.submission_id)} style={{
                 width: 26, height: 26, flexShrink: 0, borderRadius: 7,
                 border: "1px solid rgba(228,210,198,0.8)", background: "rgba(255,255,255,0.55)",
                 display: "flex", alignItems: "center", justifyContent: "center",
@@ -272,7 +328,6 @@ export default function AdminPage() {
         background: "transparent",
         overflow: "hidden",
       }}>
-        {/* Section header */}
         <div style={{ display: "flex", alignItems: "center", gap: 9, flexShrink: 0 }}>
           <Trophy size={28} style={{ color: "#C89A4A" }} />
           <div>
@@ -299,7 +354,6 @@ export default function AdminPage() {
           <line x1="28" y1="3.5" x2="44" y2="3.5" stroke="#D3A64F" strokeWidth="0.9"/>
         </svg>
 
-        {/* Summary box */}
         <div style={{
           marginTop: 12, flex: 1,
           background: "rgba(251,243,238,0.78)",
@@ -315,9 +369,9 @@ export default function AdminPage() {
           </p>
           <div style={{ marginTop: 11, display: "flex", flexDirection: "column", gap: 9 }}>
             {[
-              { label: "Projects reviewed", val: "3"   },
-              { label: "Pending reports",   val: "0"   },
-              { label: "Export ready",      val: "Yes" },
+              { label: "Projects reviewed", val: String(reviewedCount) },
+              { label: "Pending reports",   val: String(pendingCount) },
+              { label: "Export ready",      val: reviewedCount > 0 ? "Yes" : "No" },
             ].map(({ label, val }) => (
               <div key={label} style={{
                 display: "flex", justifyContent: "space-between", alignItems: "center",

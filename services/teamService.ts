@@ -4,7 +4,7 @@ import type { Team } from '@/types';
 export async function getTeamById(supabase: SupabaseClient, id: string) {
   const { data, error } = await supabase
     .from('teams')
-    .select('*, team_members(*, profiles(name, avatar_url, email))')
+    .select('*, team_members(*)')
     .eq('id', id)
     .single();
   if (error) return null;
@@ -12,16 +12,31 @@ export async function getTeamById(supabase: SupabaseClient, id: string) {
 }
 
 export async function getTeamByUserId(supabase: SupabaseClient, userId: string) {
-  const { data, error } = await supabase
+  const { data: member, error: memberError } = await supabase
     .from('team_members')
-    .select('teams(*, team_members(*, profiles(name, avatar_url, email)))')
+    .select('team_id')
     .eq('user_id', userId)
+    .limit(1)
+    .maybeSingle();
+  if (memberError || !member) return null;
+
+  const { data: team, error: teamError } = await supabase
+    .from('teams')
+    .select('*, team_members(*)')
+    .eq('id', member.team_id)
     .single();
-  if (error) return null;
-  return (data as any)?.teams as Team;
+  if (teamError) return null;
+
+  return team as unknown as Team;
 }
 
 export async function createTeam(supabase: SupabaseClient, name: string, userId: string) {
+  // Clean up any stale team_members records for this user
+  await supabase
+    .from('team_members')
+    .delete()
+    .eq('user_id', userId);
+
   const { data: team, error: teamError } = await supabase
     .from('teams')
     .insert({ name, created_by: userId })
@@ -34,22 +49,49 @@ export async function createTeam(supabase: SupabaseClient, name: string, userId:
     .insert({ team_id: team.id, user_id: userId, role: 'leader' });
   if (memberError) throw memberError;
 
-  return team as Team;
+  // Re-fetch to pick up any trigger-rotated invite_code
+  const { data: refreshed } = await supabase
+    .from('teams')
+    .select('*, team_members(*)')
+    .eq('id', team.id)
+    .single();
+
+  return (refreshed || team) as unknown as Team;
 }
 
 export async function joinTeamByInviteCode(supabase: SupabaseClient, inviteCode: string, userId: string) {
   const { data: team, error: findErr } = await supabase
     .from('teams')
-    .select('id')
+    .select('id, name, invite_code, created_by')
     .eq('invite_code', inviteCode)
     .single();
-  if (findErr || !team) throw new Error('Invalid invite code');
+  if (findErr || !team) throw new Error('INVALID_INVITE_CODE');
 
-  const { error } = await supabase
+  const { data: members, error: membersErr } = await supabase
+    .from('team_members')
+    .select('user_id')
+    .eq('team_id', team.id);
+  if (membersErr) throw membersErr;
+
+  if (members && members.length >= 4) {
+    throw new Error('TEAM_FULL');
+  }
+
+  const alreadyInTeam = members?.some((m: any) => m.user_id === userId);
+  if (alreadyInTeam) throw new Error('ALREADY_IN_TEAM');
+
+  const { error: insertErr } = await supabase
     .from('team_members')
     .insert({ team_id: team.id, user_id: userId, role: 'member' });
-  if (error) throw error;
-  return team;
+  if (insertErr) throw insertErr;
+
+  const { data: updatedTeam } = await supabase
+    .from('teams')
+    .select('*, team_members(*)')
+    .eq('id', team.id)
+    .single();
+
+  return updatedTeam || team;
 }
 
 export async function updateTeam(supabase: SupabaseClient, id: string, updates: Partial<Pick<Team, 'name' | 'is_locked'>>) {
@@ -67,7 +109,7 @@ export async function updateTeam(supabase: SupabaseClient, id: string, updates: 
 export async function listAllTeams(supabase: SupabaseClient) {
   const { data, error } = await supabase
     .from('teams')
-    .select('*, team_members(*, profiles(name, avatar_url, email))')
+    .select('*, team_members(*)')
     .order('created_at', { ascending: false });
 
   if (error) throw error;

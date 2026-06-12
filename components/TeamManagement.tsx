@@ -57,8 +57,8 @@ const SERIF = "'Playfair Display', 'Cormorant Garamond', Georgia, serif"
 function mapApiTeamToInfo(team: any): TeamInfo {
   const members: TeamMember[] = (team.team_members || []).map((m: any) => ({
     id: m.user_id,
-    name: m.profiles?.name || "Unknown",
-    email: m.profiles?.email || "",
+    name: m.profiles?.name || m.name || "Unknown",
+    email: m.profiles?.email || m.email || "",
     joinedAt: m.joined_at,
   }))
   const leader = team.team_members?.find((m: any) => m.role === "leader")
@@ -76,7 +76,7 @@ function mapApiTeamToInfo(team: any): TeamInfo {
 
 // ─────────────────────────────────────────────────────────────────────────────
 export function TeamManagement() {
-  const { user, isAuthenticated, login, logout } = useAuth()
+  const { user, role, isAuthenticated, login, logout } = useAuth()
 
   // ── State ─────────────────────────────────────────────────────────────────
   const [allTeams, setAllTeams]       = useState<TeamInfo[]>([])
@@ -98,6 +98,13 @@ export function TeamManagement() {
       setLoading(false)
     }
   }, [isAuthenticated])
+
+  // ── Auto-refresh every 5s when in a team — picks up new members & stable code ──
+  useEffect(() => {
+    if (!myTeam) return
+    const id = setInterval(fetchMyTeam, 5000)
+    return () => clearInterval(id)
+  }, [myTeam?.id])
 
   const fetchMyTeam = async () => {
     try {
@@ -169,12 +176,12 @@ export function TeamManagement() {
     if (!user)              return setError("Please log in to join a team")
     if (!inviteCode.trim()) return setError("Please enter an invite code")
     if (myTeam)             return setError("You are already in a team. Leave your current team first.")
-    try {
-      const res = await fetch("/api/teams", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "join", invite_code: inviteCode.trim().toUpperCase() }),
-      })
+      try {
+        const res = await fetch("/api/teams", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "join", invite_code: inviteCode.trim() }),
+        })
       if (!res.ok) {
         const data = await res.json()
         return setError(data.error || "Invalid invite code")
@@ -547,7 +554,7 @@ export function TeamManagement() {
                 value={inviteCode}
                 placeholder="Enter invite code"
                 style={{ ...inputStyle, fontFamily: SERIF, letterSpacing: "2px", fontWeight: 600 }}
-                onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                onChange={(e) => setInviteCode(e.target.value)}
               />
               <button type="button" onClick={joinTeam} style={primaryBtn}>
                 <UserPlus size={15} /> Join
@@ -557,66 +564,68 @@ export function TeamManagement() {
         )}
       </div>
 
-      {/* ── RIGHT CARD — All Teams List ─────────────────────────────────────── */}
-      <div style={{
-        position: "absolute", left: 860, top: 420,
-        width: 380, height: 370,
-        background: "rgba(255,252,248,0.40)",
-        backdropFilter: "blur(18px)",
-        WebkitBackdropFilter: "blur(18px)",
-        border: "1px solid rgba(200,160,110,0.22)",
-        borderRadius: 24,
-        boxShadow: "0 8px 40px rgba(120,70,40,0.10)",
-        overflow: "hidden",
-        display: "flex", flexDirection: "column",
-        padding: "15px 24px",
-        boxSizing: "border-box",
-      }}>
-        <h2 style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 700, color: "#8B1C2E", margin: 0 }}>
-          All Teams ({allTeams.length})
-        </h2>
-        <p style={{ fontSize: 16, color: "#9A6B56", margin: "2px 0 16px", fontFamily: F }}>
-          All registered teams
-        </p>
-        <div style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
-          {allTeams.length > 0 ? (
-            allTeams.map((team) => (
-              <div key={team.id} style={{
-                background: "rgba(255,248,240,1.90)",
-                border: "1px solid rgba(220,190,160,0.30)",
-                borderRadius: 14,
-                padding: "9px 14px",
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <UserCircle size={20} style={{ color: "#8B1C2E" }} />
-                  <div>
-                    <p style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 600, color: "#8B1C2E", margin: 0 }}>
-                      {team.name}
-                    </p>
-                    <p style={{ fontSize: 12, color: "#9A6B56", margin: 0, fontFamily: F }}>
-                      {team.members.length} member{team.members.length !== 1 ? "s" : ""}
-                    </p>
+      {/* ── RIGHT CARD — All Teams List (admin only) ────────────────────────── */}
+      {role === "admin" && (
+        <div style={{
+          position: "absolute", left: 860, top: 420,
+          width: 380, height: 370,
+          background: "rgba(255,252,248,0.40)",
+          backdropFilter: "blur(18px)",
+          WebkitBackdropFilter: "blur(18px)",
+          border: "1px solid rgba(200,160,110,0.22)",
+          borderRadius: 24,
+          boxShadow: "0 8px 40px rgba(120,70,40,0.10)",
+          overflow: "hidden",
+          display: "flex", flexDirection: "column",
+          padding: "15px 24px",
+          boxSizing: "border-box",
+        }}>
+          <h2 style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 700, color: "#8B1C2E", margin: 0 }}>
+            All Teams ({allTeams.length})
+          </h2>
+          <p style={{ fontSize: 16, color: "#9A6B56", margin: "2px 0 16px", fontFamily: F }}>
+            All registered teams
+          </p>
+          <div style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
+            {allTeams.length > 0 ? (
+              allTeams.map((team) => (
+                <div key={team.id} style={{
+                  background: "rgba(255,248,240,1.90)",
+                  border: "1px solid rgba(220,190,160,0.30)",
+                  borderRadius: 14,
+                  padding: "9px 14px",
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <UserCircle size={20} style={{ color: "#8B1C2E" }} />
+                    <div>
+                      <p style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 600, color: "#8B1C2E", margin: 0 }}>
+                        {team.name}
+                      </p>
+                      <p style={{ fontSize: 12, color: "#9A6B56", margin: 0, fontFamily: F }}>
+                        {team.members.length} member{team.members.length !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    {team.isLocked && <Lock size={10} style={{ color: "#C8941C" }} />}
+                    <span style={{
+                      fontSize: 11, fontWeight: 700, color: "#8B1C2E", fontFamily: F,
+                      background: "rgba(139,28,46,0.1)", padding: "3px 8px", borderRadius: 999,
+                    }}>
+                      {team.members.length}/{team.maxSize}
+                    </span>
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  {team.isLocked && <Lock size={10} style={{ color: "#C8941C" }} />}
-                  <span style={{
-                    fontSize: 11, fontWeight: 700, color: "#8B1C2E", fontFamily: F,
-                    background: "rgba(139,28,46,0.1)", padding: "3px 8px", borderRadius: 999,
-                  }}>
-                    {team.members.length}/{team.maxSize}
-                  </span>
-                </div>
+              ))
+            ) : (
+              <div style={{ paddingTop: 24, textAlign: "center", fontSize: 13, color: "#9A6B56", fontFamily: F }}>
+                No teams registered yet
               </div>
-            ))
-          ) : (
-            <div style={{ paddingTop: 24, textAlign: "center", fontSize: 13, color: "#9A6B56", fontFamily: F }}>
-              No teams registered yet
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
     </>
   )

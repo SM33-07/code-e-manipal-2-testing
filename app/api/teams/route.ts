@@ -16,13 +16,14 @@ import { logger } from '@/lib/utils/logger';
  * Authenticated — returns the current user's team with members.
  * Use ?all=true to list all teams.
  */
-export const GET = withAuth(async (req, { user }) => {
+export const GET = withAuth(async (req, { user, profile }) => {
   try {
     const supabase = await createSupabaseServerClient();
     const { searchParams } = new URL(req.url);
     const listAll = searchParams.get('all') === 'true';
 
     if (listAll) {
+      if (profile.role !== 'admin') return Errors.FORBIDDEN();
       const teams = await listAllTeams(supabase);
       return successResponse(teams);
     }
@@ -60,7 +61,7 @@ export const POST = withAuth(async (req, { user }) => {
 
     // ── Join via invite code ──────────────────────────────────
     if (action === 'join') {
-      const invite_code = sanitizeString(body.invite_code, 20);
+      const invite_code = sanitizeString(body.invite_code, 20)?.toLowerCase();
       if (!invite_code) return Errors.BAD_REQUEST('invite_code is required');
 
       try {
@@ -70,6 +71,8 @@ export const POST = withAuth(async (req, { user }) => {
       } catch (e: any) {
         if (e.message === 'INVALID_INVITE_CODE') return Errors.BAD_REQUEST('Invalid invite code');
         if (e.message === 'ALREADY_IN_TEAM')    return Errors.CONFLICT('Already in this team');
+        if (e.message === 'TEAM_FULL')          return Errors.BAD_REQUEST('This team is full');
+        if (e.message?.includes('duplicate key')) return Errors.CONFLICT('Already in this team');
         throw e;
       }
     }
