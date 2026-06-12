@@ -69,9 +69,9 @@ function SectionHeader({
         display: "flex",
         alignItems: "flex-start",
         gap: "14px",
-        marginBottom: "22px",
+        marginBottom: "12px",
         paddingBottom: "18px",
-        borderBottom: "1px solid rgba(59,130,246,0.1)",
+        borderBottom: "1px solid rgba(255,239,248,0.1)",
       }}
     >
       <div
@@ -150,7 +150,7 @@ function Field({
     width: "100%",
     padding: icon ? "10px 14px 10px 38px" : "10px 14px",
     borderRadius: "10px",
-    background: focused ? "rgba(15,23,42,0.85)" : "rgba(8,14,38,0.7)",
+    background: focused ? "rgba(58,12,29,0.88)" : "rgba(8,14,38,0.7)",
     border: overLimit
       ? "1px solid rgba(239,68,68,0.5)"
       : focused
@@ -248,7 +248,7 @@ function Section({ children, visible, delay = 0 }: { children: React.ReactNode; 
         padding: "26px 28px",
         borderRadius: "16px",
         background: "rgba(8,14,38,0.65)",
-        border: "1px solid rgba(255,255,255,0.06)",
+        border: "1px solid rgba(255,239,248,0.06)",
         backdropFilter: "blur(10px)",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(16px)",
@@ -748,7 +748,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
           onMouseEnter={() => setBtnHovered(true)}
           onMouseLeave={() => setBtnHovered(false)}
           style={{
-            width: "100%", padding: "16px 24px", borderRadius: "14px", border: "none",
+            width: "100%", padding: "16px 32px", borderRadius: "16px", height: "52px", border: "none",
             background: submitted
               ? "linear-gradient(135deg,#059669,#10b981)"
               : isSubmitting

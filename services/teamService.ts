@@ -52,16 +52,26 @@ export async function joinTeamByInviteCode(supabase: SupabaseClient, inviteCode:
   return team;
 }
 
-export async function updateTeam(supabase: SupabaseClient, id: string, name: string) {
+export async function updateTeam(supabase: SupabaseClient, id: string, updates: Partial<Pick<Team, 'name' | 'is_locked'>>) {
   const { data, error } = await supabase
     .from('teams')
-    .update({ name })
+    .update(updates)
     .eq('id', id)
     .select()
     .single();
 
   if (error) throw error;
   return data as Team;
+}
+
+export async function listAllTeams(supabase: SupabaseClient) {
+  const { data, error } = await supabase
+    .from('teams')
+    .select('*, team_members(*, profiles(name, avatar_url, email))')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data || []) as Team[];
 }
 
 export async function getTeamMembers(supabase: SupabaseClient, teamId: string) {

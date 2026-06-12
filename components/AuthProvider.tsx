@@ -13,6 +13,7 @@ import { createClient } from "@/lib/supabase/client"
 interface AuthContextType {
   user: any | null
   role: string
+  loading: boolean
   login: (email: string, password: string) => Promise<any>
   logout: () => Promise<void>
   isAuthenticated: boolean
@@ -77,13 +78,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setRole("participant")
   }
 
-  if(loading) return null
-
   return(
     <AuthContext.Provider
       value={{
         user,
         role,
+        loading,
         login,
         logout,
         isAuthenticated:!!user

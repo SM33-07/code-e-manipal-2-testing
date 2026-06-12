@@ -9,7 +9,12 @@ import Image from "next/image"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
 
-export default function VideoCarousel(){
+interface VideoCarouselProps {
+  videoUrl?: string;
+  title?: string;
+}
+
+export default function VideoCarousel({ videoUrl, title }: VideoCarouselProps){
 
   const router = useRouter()
 

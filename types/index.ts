@@ -18,6 +18,7 @@ export interface Team {
   hackathon: string;
   invite_code: string;
   created_by: string | null;
+  is_locked: boolean;
   created_at: string;
   updated_at: string;
   team_members?: TeamMember[];

@@ -17,29 +17,14 @@ body {
 }
 
 
-/* Fix black text across the app */
+/* Fix black text across the app — only for non-admin/non-login routes */
 
 .text-muted-foreground {
-  color: #94a3b8 !important;
+  color: #94a3b8;
 }
 
 .text-foreground {
-  color: #e2e8f0 !important;
-}
-
-
-/* Headings */
-
-h1,h2,h3,h4,h5 {
-  color: #f8fafc;
-}
-
-
-/* Paragraph readability */
-
-p {
-  color: #cbd5f5;
-  line-height: 1.7;
+  color: #e2e8f0;
 }
 
 
@@ -74,4 +59,17 @@ p {
   box-shadow:
   0 20px 60px rgba(0,0,0,0.4),
   0 0 40px rgba(59,130,246,0.15);
+}
+
+@keyframes shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-6px); }
+  40%  { transform: translateX(6px); }
+  60%  { transform: translateX(-4px); }
+  80%  { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease;
 }

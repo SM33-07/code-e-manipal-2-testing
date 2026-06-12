@@ -21,7 +21,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
 
     return successResponse(post);
   } catch (err) {
-    logger.error('GET /api/posts/[id] failed', { error: String(err), id: params.id });
+    logger.error('GET /api/posts/[id] failed', { error: String(err), id });
     return Errors.INTERNAL();
   }
 }

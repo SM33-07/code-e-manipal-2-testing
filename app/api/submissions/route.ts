@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { withAuth } from "@/lib/middleware/withAuth";
-import { successResponse } from "@/lib/utils/response";
+import { successResponse, Errors } from "@/lib/utils/response";
 import {
   listSubmissions,
   createSubmission,
@@ -22,10 +22,7 @@ export async function GET() {
   } catch (err) {
     console.error("🔥 GET ERROR:", err);
 
-    return new Response(
-      JSON.stringify({ error: String(err) }),
-      { status: 500 }
-    );
+    return Errors.INTERNAL();
   }
 }
 
@@ -42,9 +39,6 @@ export const POST = withAuth(async (req, { user }) => {
   } catch (err) {
     console.error("🔥 POST ERROR:", err);
 
-    return new Response(
-      JSON.stringify({ error: String(err) }),
-      { status: 500 }
-    );
+    return Errors.INTERNAL();
   }
 });

@@ -13,7 +13,7 @@ export interface SessionData {
  */
 export async function getServerSession(): Promise<SessionData | null> {
   try {
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient();
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) return null;
 

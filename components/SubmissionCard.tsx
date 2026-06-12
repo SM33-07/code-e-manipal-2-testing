@@ -104,7 +104,6 @@ export function SubmissionCard({ submission, index = 0 }: SubmissionCardProps) {
           : "0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.02)",
         backdropFilter: "blur(14px)",
         overflow: "hidden",
-        transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
       }}
     >
       {/* Spotlight */}
@@ -135,7 +134,7 @@ export function SubmissionCard({ submission, index = 0 }: SubmissionCardProps) {
 
       <div style={{ position: "relative", zIndex: 1 }}>
         {/* ── Card Header ── */}
-        <div style={{ padding: "20px 20px 16px" }}>
+        <div style={{ padding: "20px 20px 6px" }}>
           {/* Project name + team */}
           <div style={{ marginBottom: "10px" }}>
             <h3 style={{

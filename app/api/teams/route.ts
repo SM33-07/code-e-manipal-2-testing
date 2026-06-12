@@ -6,6 +6,7 @@ import {
   createTeam,
   getTeamByUserId,
   joinTeamByInviteCode,
+  listAllTeams,
 } from '@/services/teamService';
 import { sanitizeString } from '@/lib/utils/validate';
 import { logger } from '@/lib/utils/logger';
@@ -13,10 +14,19 @@ import { logger } from '@/lib/utils/logger';
 /**
  * GET /api/teams
  * Authenticated — returns the current user's team with members.
+ * Use ?all=true to list all teams.
  */
-export const GET = withAuth(async (_req, { user }) => {
+export const GET = withAuth(async (req, { user }) => {
   try {
     const supabase = await createSupabaseServerClient();
+    const { searchParams } = new URL(req.url);
+    const listAll = searchParams.get('all') === 'true';
+
+    if (listAll) {
+      const teams = await listAllTeams(supabase);
+      return successResponse(teams);
+    }
+
     const team = await getTeamByUserId(supabase, user.id);
 
     if (!team) return Errors.NOT_FOUND('Team');

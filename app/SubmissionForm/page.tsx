@@ -21,6 +21,11 @@ import {
 } from "lucide-react";
 import { projectId, publicAnonKey } from "@/lib/supabase/info";
 
+// ─── Dynamic Imports (SSR disabled) ──────────────────────────────────────────
+// SubmissionForm: Main form component with 5 sections (Project, Tech, Links, Reflection, Team)
+// SubmissionCard: Card displayed in Browse tab for each submission
+// TypewriterText: Animated rotating text in hero
+// AnimatedCounter: Number animation for stat cards
 const SubmissionForm = dynamic(
   () => import("@/components/SubmissionForm").then((m) => m.SubmissionForm),
   { ssr: false }
@@ -38,6 +43,10 @@ const AnimatedCounter = dynamic(
   { ssr: false }
 );
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+// SERVER_URL: Supabase edge function endpoint for submissions
+// HEADERS: Auth headers for API calls
+// CATEGORY_FILTERS: Dropdown options for category filtering in Browse tab
 const SERVER_URL = "https://ihnclawnbtkwvbfqwxfe.supabase.co/functions/v1/make-server-f5beda68";
 const HEADERS = {
   "Content-Type": "application/json",
@@ -55,7 +64,9 @@ const CATEGORY_FILTERS = [
   "Other",
 ];
 
-// ─── Stat Card ────────────────────────────────────────────────────────────────
+// ─── Stat Card Component ──────────────────────────────────────────────────────
+// Renders animated stat boxes in hero (Submissions, Categories, Hours Left)
+// Controls: background, border, shadow, number color, label text, animation delay
 function StatCard({
   value,
   label,
@@ -82,15 +93,15 @@ function StatCard({
         textAlign: "center",
         padding: "20px 28px",
         borderRadius: "14px",
-        background: "rgba(10,15,40,0.6)",
-        border: "1px solid rgba(59,130,246,0.15)",
+        background: "rgba(255,248,239,0.88)",
+        border: "1px solid #EBCFB5",
         backdropFilter: "blur(10px)",
         opacity: visible ? 1 : 0,
         transform: visible
           ? "translateY(0)"
           : "translateY(20px)",
         transition: `opacity 0.6s ease ${delay}ms, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+        boxShadow: "0 6px 24px rgba(173,114,55,0.06)",
       }}
     >
       <div
@@ -98,7 +109,7 @@ function StatCard({
           fontSize: "2rem",
           fontWeight: 700,
           background:
-            "linear-gradient(135deg, #60a5fa, #93c5fd)",
+            "linear-gradient(135deg, #8F102A, #D59B3D)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           lineHeight: 1,
@@ -110,7 +121,7 @@ function StatCard({
       <div
         style={{
           fontSize: "0.78rem",
-          color: "rgba(148,163,184,0.7)",
+          color: "#7A5A4A",
           fontWeight: 500,
           letterSpacing: "0.04em",
           textTransform: "uppercase",
@@ -122,7 +133,10 @@ function StatCard({
   );
 }
 
-// ─── Tab Button ───────────────────────────────────────────────────────────────
+// ─── Tab Button Component ─────────────────────────────────────────────────────
+// Header navigation tabs: "Submit" and "Browse"
+// Controls: active/hover colors, border, background, badge count styling
+// Active: maroon bg, cream text | Hover: light cream bg | Default: cream bg, brown text
 function TabButton({
   active,
   onClick,
@@ -145,20 +159,20 @@ function TabButton({
         padding: "10px 22px",
         borderRadius: "10px",
         border: active
-          ? "1px solid rgba(59,130,246,0.5)"
+          ? "none"
           : hovered
-            ? "1px solid rgba(59,130,246,0.2)"
-            : "1px solid transparent",
+            ? "1px solid #E9C39B"
+            : "1px solid #EBCFB5",
         background: active
-          ? "linear-gradient(135deg, rgba(29,78,216,0.3), rgba(37,99,235,0.2))"
+          ? "#8F102A"
           : hovered
-            ? "rgba(59,130,246,0.08)"
-            : "transparent",
+            ? "#FCEAD8"
+            : "#FFF6ED",
         color: active
-          ? "#93c5fd"
+          ? "#FFF7F1"
           : hovered
-            ? "#60a5fa"
-            : "rgba(148,163,184,0.7)",
+            ? "#A15C2E"
+            : "#A15C2E",
         fontSize: "0.9rem",
         fontWeight: active ? 600 : 400,
         cursor: "pointer",
@@ -167,7 +181,7 @@ function TabButton({
         alignItems: "center",
         gap: "7px",
         boxShadow: active
-          ? "0 2px 12px rgba(29,78,216,0.2)"
+          ? "0 4px 16px rgba(143,16,42,0.3)"
           : "none",
         whiteSpace: "nowrap",
       }}
@@ -180,9 +194,9 @@ function TabButton({
             padding: "1px 6px",
             borderRadius: "999px",
             background: active
-              ? "rgba(59,130,246,0.3)"
-              : "rgba(255,255,255,0.08)",
-            color: active ? "#bfdbfe" : "rgba(148,163,184,0.6)",
+              ? "rgba(255,247,241,0.3)"
+              : "rgba(235,207,181,0.3)",
+            color: active ? "#FFF7F1" : "#A15C2E",
             transition: "all 0.25s ease",
           }}
         >
@@ -193,7 +207,9 @@ function TabButton({
   );
 }
 
-// ─── Pulse Ring ───────────────────────────────────────────────────────────────
+// ─── Pulse Ring Component ─────────────────────────────────────────────────────
+// Animated pulsing dot for "Live" badge in header
+// Controls: outer ring color (gold), inner dot color, animation timing
 function PulseRing() {
   return (
     <span
@@ -209,7 +225,7 @@ function PulseRing() {
           position: "absolute",
           inset: 0,
           borderRadius: "50%",
-          background: "#3b82f6",
+          background: "#D59B3D",
           animation: "pulse-ring-outer 2s ease-out infinite",
         }}
       />
@@ -218,7 +234,7 @@ function PulseRing() {
           position: "absolute",
           inset: "2px",
           borderRadius: "50%",
-          background: "#60a5fa",
+          background: "#E8B55A",
         }}
       />
       <style>{`
@@ -232,6 +248,9 @@ function PulseRing() {
 }
 
 // ─── User Menu Component ────────────────────────────────────────────────────────
+// Header user avatar + dropdown with email and logout
+// Controls: button style (secondary), avatar gradient (maroon), dropdown bg/border/shadow
+// Logout button: maroon text, hover background
 function UserMenu() {
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -252,21 +271,21 @@ function UserMenu() {
           gap: "8px",
           padding: "6px 12px",
           borderRadius: "6px",
-          background: "rgba(59,130,246,0.1)",
-          border: "1px solid rgba(59,130,246,0.2)",
-          color: "#93c5fd",
+          background: "#FFF8F1",
+          border: "1px solid #EBC9AA",
+          color: "#9A5A2B",
           fontSize: "0.75rem",
           fontWeight: 500,
           cursor: "pointer",
           transition: "all 0.2s ease",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = "rgba(59,130,246,0.15)";
-          e.currentTarget.style.borderColor = "rgba(59,130,246,0.3)";
+          e.currentTarget.style.background = "#FCEAD8";
+          e.currentTarget.style.borderColor = "#EBCFB5";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = "rgba(59,130,246,0.1)";
-          e.currentTarget.style.borderColor = "rgba(59,130,246,0.2)";
+          e.currentTarget.style.background = "#FFF8F1";
+          e.currentTarget.style.borderColor = "#EBC9AA";
         }}
       >
         <div
@@ -274,12 +293,12 @@ function UserMenu() {
             width: "18px",
             height: "18px",
             borderRadius: "50%",
-            background: "linear-gradient(135deg, #3b82f6, #60a5fa)",
+            background: "linear-gradient(135deg, #8F102A, #A61B36)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: "0.65rem",
-            color: "white",
+            color: "#FFF6EE",
             fontWeight: 700,
           }}
         >
@@ -293,24 +312,24 @@ function UserMenu() {
           style={{
             position: "absolute",
             top: "100%",
-            right: 0,
+            right: 10,
             marginTop: "8px",
-            background: "rgba(30,41,59,0.95)",
-            border: "1px solid rgba(59,130,246,0.2)",
+            background: "rgba(255,248,239,0.98)",
+            border: "1px solid #EBCFB5",
             borderRadius: "8px",
             padding: "8px 0",
             minWidth: "160px",
             zIndex: 1000,
-            boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+            boxShadow: "0 6px 24px rgba(173,114,55,0.12)",
             backdropFilter: "blur(10px)",
           }}
         >
           <div
             style={{
               padding: "8px 12px",
-              borderBottom: "1px solid rgba(59,130,246,0.1)",
+              borderBottom: "1px solid #EBCFB5",
               fontSize: "0.7rem",
-              color: "rgba(148,163,184,0.7)",
+              color: "#B89A85",
             }}
           >
             {user?.email}
@@ -322,7 +341,7 @@ function UserMenu() {
               padding: "8px 12px",
               background: "none",
               border: "none",
-              color: "#f87171",
+              color: "#8F102A",
               fontSize: "0.75rem",
               fontWeight: 500,
               cursor: "pointer",
@@ -330,7 +349,7 @@ function UserMenu() {
               transition: "background 0.2s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(239,68,68,0.1)";
+              e.currentTarget.style.background = "rgba(143,16,42,0.08)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = "none";
@@ -344,7 +363,15 @@ function UserMenu() {
   );
 }
 
-// ─── Main Page ─────────────────────────────────────────────────────────────────
+// ─── Main Page Component ────────────────────────────────────────────────────────
+// State:
+//   activeTab: "submit" | "browse" - switches between form and gallery
+//   submissions: array of all submissions from API
+//   loading: shows spinner while fetching
+//   searchQuery: text filter for browse grid
+//   activeCategory: category filter pill selection
+//   headerVisible/heroVisible: entrance animation triggers
+//   showFilters: toggles category filter pills visibility
 export default function Home() {
   const [activeTab, setActiveTab] = useState<
     "submit" | "browse"
@@ -359,13 +386,13 @@ export default function Home() {
   const [heroVisible, setHeroVisible] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Entrance animations on mount
+  // Entrance animations on mount - staggers header then hero
   useEffect(() => {
     setTimeout(() => setHeaderVisible(true), 100);
     setTimeout(() => setHeroVisible(true), 300);
   }, []);
 
-  // Fetch submissions from server
+  // Fetch submissions from server on mount
   useEffect(() => {
     fetchSubmissions();
   }, []);
@@ -412,6 +439,10 @@ export default function Home() {
 
   const router = useRouter(); // ✅ ADD THIS at top of component
 
+  // ─── handleSubmission ────────────────────────────────────────────────────────
+  // Called by SubmissionForm onSubmit
+  // Maps form data to API payload, POSTs to /api/submissions
+  // On success: prepends new submission to list, shows toast, redirects to result page
   const handleSubmission = async (newSubmission: any) => {
     try {
       const payload = {
@@ -461,6 +492,9 @@ export default function Home() {
     }
   };
 
+  // ─── filteredSubmissions ─────────────────────────────────────────────────────
+  // Derived state: filters submissions by searchQuery (name, team, summary, tagline)
+  // and activeCategory. Used in Browse tab grid.
   const filteredSubmissions = submissions.filter((s) => {
     const matchesSearch =
       !searchQuery ||
@@ -490,9 +524,8 @@ export default function Home() {
       <div
         style={{
           minHeight: "100vh",
-          background:
-            "linear-gradient(135deg, #020817 0%, #050d24 30%, #04091d 60%, #020817 100%)",
-          color: "#e2e8f0",
+          background: "transparent",
+          color: "#7A5A4A",
           position: "relative",
           fontFamily: "'Inter', system-ui, sans-serif",
           overflowX: "hidden",
@@ -504,8 +537,8 @@ export default function Home() {
             position: "sticky",
             top: 0,
             zIndex: 50,
-            borderBottom: "1px solid rgba(255,255,255,0.05)",
-            background: "rgba(2,8,23,0.75)",
+            borderBottom: "1px solid #EBCFB5",
+            background: "rgba(255,248,239,0.88)",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
             opacity: headerVisible ? 1 : 0,
@@ -532,7 +565,7 @@ export default function Home() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "12px",
+                gap: "22px",
               }}
             >
               <div
@@ -540,19 +573,19 @@ export default function Home() {
                   width: "38px",
                   height: "38px",
                   borderRadius: "10px",
-
+                  background: "linear-gradient(135deg, #8F102A, #A61B36)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  boxShadow: "0 0 20px rgba(59,130,246,0.4)",
+                  boxShadow: "0 0 20px rgba(143,16,42,0.4)",
                   flexShrink: 0,
                 }}
               >
                 <Image
                   src="/logo.png"
                   alt="LearnIT Logo"
-                  width={26}
-                  height={26}
+                  width={30}
+                  height={30}
                   style={{
                     objectFit: "contain",
                     width: "auto",
@@ -565,19 +598,16 @@ export default function Home() {
                   style={{
                     fontSize: "1.05rem",
                     fontWeight: 700,
-                    background:
-                      "linear-gradient(135deg, #ffffff, #93c5fd)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
+                    color: "#8F102A",
                     letterSpacing: "-0.01em",
                   }}
                 >
-                  Code-e-Manipal 2.0
+                  
                 </div>
                 <div
                   style={{
                     fontSize: "0.7rem",
-                    color: "rgba(148,163,184,0.55)",
+                    color: "#B89A85",
                     letterSpacing: "0.04em",
                   }}
                 >
@@ -587,7 +617,7 @@ export default function Home() {
             </div>
 
             {/* Nav tabs */}
-            <div style={{ display: "flex", gap: "6px" }}>
+            <div style={{ display: "flex", gap: "36px" }}>
               <TabButton
                 active={activeTab === "submit"}
                 onClick={() => setActiveTab("submit")}
@@ -622,15 +652,15 @@ export default function Home() {
                   gap: "7px",
                   padding: "6px 14px",
                   borderRadius: "999px",
-                  background: "rgba(16,185,129,0.08)",
-                  border: "1px solid rgba(16,185,129,0.2)",
+                  background: "rgba(255,239,248,0.22)",
+                  border: "1px solid #E9C39B",
                 }}
               >
                 <PulseRing />
                 <span
                   style={{
                     fontSize: "0.75rem",
-                    color: "#34d399",
+                    color: "#A15C2E",
                     fontWeight: 500,
                   }}
                 >
@@ -644,14 +674,14 @@ export default function Home() {
           </div>
         </header>
 
-        {/* ── Hero ── */}
+        {/* ── Hero ── Centered, animated entrance, gold badge, maroon/gold heading, stats */}
         <section
           style={{
             position: "relative",
             zIndex: 10,
             textAlign: "center",
-            padding: "72px 24px 56px",
-            maxWidth: "900px",
+            padding: "22px 24px 56px",
+            maxWidth: "1000px",
             margin: "0 auto",
             opacity: heroVisible ? 1 : 0,
             transform: heroVisible
@@ -666,27 +696,27 @@ export default function Home() {
             style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: "7px",
-              padding: "5px 14px",
+              gap: "170px",
+              padding: "15px 14px",
               borderRadius: "999px",
-              background: "rgba(29,78,216,0.12)",
-              border: "1px solid rgba(59,130,246,0.25)",
+              background: "#8F102A",
+              border: "1px solid #E9C39B",
               marginBottom: "24px",
-              fontSize: "0.78rem",
-              color: "#93c5fd",
+              fontSize: "1.48rem",
+              color: "#A15C2E",
               fontWeight: 500,
               letterSpacing: "0.03em",
             }}
           >
-            <Sparkles style={{ width: "12px", height: "12px" }} />
+            <Sparkles style={{ width: "27px", height: "22px", color: "#D59B3D" }} />
             Hackathon Submission Portal
-            <Sparkles style={{ width: "12px", height: "12px" }} />
+            <Sparkles style={{ width: "27px", height: "22px", color: "#D59B3D" }} />
           </div>
 
           {/* Main heading */}
           <h1
             style={{
-              fontSize: "clamp(2.2rem, 5vw, 3.6rem)",
+              fontSize: "clamp(2.2rem, 5vw, 3.4rem)",
               fontWeight: 800,
               lineHeight: 1.1,
               marginBottom: "16px",
@@ -695,10 +725,7 @@ export default function Home() {
           >
             <span
               style={{
-                background:
-                  "linear-gradient(135deg, #ffffff 0%, #e0eaff 50%, #93c5fd 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                color: "#8F102A",
                 display: "block",
               }}
             >
@@ -706,10 +733,7 @@ export default function Home() {
             </span>
             <span
               style={{
-                background:
-                  "linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                color: "#D59B3D",
                 display: "block",
                 animation: "header-glow 3s ease-in-out infinite",
               }}
@@ -718,8 +742,8 @@ export default function Home() {
                 texts={[
                   "Submit Your Vision",
                   "Share Your Innovation",
-                  "Show Your Talent",
                   "Launch Your Idea",
+                  "Show Your Talent",
                 ]}
               />
             </span>
@@ -728,7 +752,7 @@ export default function Home() {
           <p
             style={{
               fontSize: "1.05rem",
-              color: "rgba(148,163,184,0.75)",
+              color: "#7A5A4A",
               maxWidth: "560px",
               margin: "0 auto 40px",
               lineHeight: 1.7,
@@ -744,7 +768,7 @@ export default function Home() {
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "12px",
+              gap: "170px",
               maxWidth: "480px",
               margin: "0 auto",
             }}
@@ -768,7 +792,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Main Content ── */}
+        {/* ── Main Container ── */}
         <main
           style={{
             position: "relative",
@@ -784,30 +808,32 @@ export default function Home() {
               style={{
                 animation:
                   "float-up 0.5s cubic-bezier(0.22,1,0.36,1) forwards",
-                maxWidth: "720px",
-                margin: "0 auto",
+                display: "flex",
+                justifyContent: "flex-end",
+                width: "100%",
+                paddingRight: "80px",
               }}
             >
+              <div style={{ maxWidth: "720px", width: "100%" }}>
               <div
                 style={{
                   borderRadius: "20px",
-                  background: "rgba(8,14,38,0.7)",
-                  border: "1px solid rgba(59,130,246,0.18)",
+                  background: "rgba(255,248,239,0.68)",
+                  border: "1px solid #EBCFB5",
                   backdropFilter: "blur(16px)",
                   overflow: "hidden",
                   boxShadow:
-                    "0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(59,130,246,0.06)",
+                    "0 20px 60px rgba(173,114,55,0.1), 0 0 0 1px rgba(235,207,181,0.2)",
                 }}
               >
                 {/* Form header */}
                 <div
                   style={{
                     padding: "28px 32px 0",
-                    borderBottom:
-                      "1px solid rgba(255,255,255,0.05)",
+                    borderBottom: "1px solid #EBCFB5",
                     paddingBottom: "20px",
                     background:
-                      "linear-gradient(180deg, rgba(29,78,216,0.06) 0%, transparent 100%)",
+                      "linear-gradient(180deg, rgba(213,155,61,0.08) 0%, transparent 100%)",
                   }}
                 >
                   <div
@@ -823,8 +849,8 @@ export default function Home() {
                         width: "32px",
                         height: "32px",
                         borderRadius: "8px",
-                        background: "rgba(29,78,216,0.2)",
-                        border: "1px solid rgba(59,130,246,0.3)",
+                        background: "rgba(143,16,42,0.12)",
+                        border: "1px solid #EBCFB5",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -834,15 +860,15 @@ export default function Home() {
                         style={{
                           width: "14px",
                           height: "14px",
-                          color: "#60a5fa",
+                          color: "#8F102A",
                         }}
                       />
                     </div>
                     <h2
                       style={{
-                        fontSize: "1.25rem",
+                        fontSize: "1.55rem",
                         fontWeight: 700,
-                        color: "#f0f4ff",
+                        color: "#8F102A",
                         margin: 0,
                       }}
                     >
@@ -851,14 +877,14 @@ export default function Home() {
                   </div>
                   <p
                     style={{
-                      fontSize: "0.83rem",
-                      color: "rgba(148,163,184,0.6)",
+                      fontSize: "0.99rem",
+                      color: "#7A5A4A",
                       margin: 0,
                     }}
                   >
                     Share your creation with the hackathon
                     community. Fields marked with{" "}
-                    <span style={{ color: "#f87171" }}>*</span>{" "}
+                    <span style={{ color: "#8F102A" }}>*</span>{" "}
                     are required.
                   </p>
                 </div>
@@ -889,7 +915,7 @@ export default function Home() {
                   {
                     icon: (
                       <Globe
-                        style={{ width: "13px", height: "13px" }}
+                        style={{ width: "18px", height: "13px" }}
                       />
                     ),
                     label: "learnitmuj.org",
@@ -901,8 +927,8 @@ export default function Home() {
                       display: "flex",
                       alignItems: "center",
                       gap: "5px",
-                      fontSize: "0.78rem",
-                      color: "rgba(148,163,184,0.45)",
+                      fontSize: "1.00rem",
+                      color: "#B89A85",
                       background: "none",
                       border: "none",
                       cursor: "pointer",
@@ -912,18 +938,19 @@ export default function Home() {
                     onMouseEnter={(e) =>
                     ((
                       e.currentTarget as HTMLButtonElement
-                    ).style.color = "#60a5fa")
+                    ).style.color = "#D59B3D")
                     }
                     onMouseLeave={(e) =>
                     ((
                       e.currentTarget as HTMLButtonElement
-                    ).style.color = "rgba(148,163,184,0.45)")
+                    ).style.color = "#B89A85")
                     }
                   >
                     {icon}
                     {label}
                   </button>
                 ))}
+              </div>
               </div>
             </div>
           )}
@@ -960,14 +987,14 @@ export default function Home() {
                       style={{
                         width: "20px",
                         height: "20px",
-                        color: "#fbbf24",
+                        color: "#D59B3D",
                       }}
                     />
                     <h2
                       style={{
-                        fontSize: "1.5rem",
+                        fontSize: "1.7rem",
                         fontWeight: 700,
-                        color: "#f0f4ff",
+                        color: "#8F102A",
                         margin: 0,
                       }}
                     >
@@ -976,8 +1003,8 @@ export default function Home() {
                   </div>
                   <p
                     style={{
-                      fontSize: "0.83rem",
-                      color: "rgba(148,163,184,0.55)",
+                      fontSize: "1.00rem",
+                      color: "#7A5A4A",
                       margin: 0,
                     }}
                   >
@@ -1009,7 +1036,7 @@ export default function Home() {
                         transform: "translateY(-50%)",
                         width: "14px",
                         height: "14px",
-                        color: "rgba(148,163,184,0.4)",
+                        color: "#B89A85",
                         pointerEvents: "none",
                       }}
                     />
@@ -1023,26 +1050,23 @@ export default function Home() {
                       style={{
                         padding: "9px 14px 9px 34px",
                         borderRadius: "10px",
-                        background: "rgba(10,15,35,0.7)",
-                        border:
-                          "1px solid rgba(255,255,255,0.08)",
-                        color: "#e2e8f0",
-                        fontSize: "0.85rem",
+                        background: "rgba(255,255,255,0.72)",
+                        border: "1px solid #E6C7A8",
+                        color: "#6A4635",
+                        fontSize: "1.00rem",
                         outline: "none",
                         width: "220px",
-                        transition: "border-color 0.2s ease",
+                        transition: "border-color 0.2s ease, box-shadow 0.2s ease",
                       }}
                       onFocus={(e) =>
                       ((
                         e.target as HTMLInputElement
-                      ).style.borderColor =
-                        "rgba(59,130,246,0.5)")
+                      ).style.borderColor = "#C9822B")
                       }
                       onBlur={(e) =>
                       ((
                         e.target as HTMLInputElement
-                      ).style.borderColor =
-                        "rgba(255,255,255,0.08)")
+                      ).style.borderColor = "#E6C7A8")
                       }
                     />
                   </div>
@@ -1052,19 +1076,19 @@ export default function Home() {
                       padding: "9px 14px",
                       borderRadius: "10px",
                       background: showFilters
-                        ? "rgba(29,78,216,0.2)"
-                        : "rgba(10,15,35,0.7)",
+                        ? "#8F102A"
+                        : "#FFF8F1",
                       border: showFilters
-                        ? "1px solid rgba(59,130,246,0.4)"
-                        : "1px solid rgba(255,255,255,0.08)",
+                        ? "none"
+                        : "1px solid #EBC9AA",
                       color: showFilters
-                        ? "#93c5fd"
-                        : "rgba(148,163,184,0.6)",
+                        ? "#FFF7F1"
+                        : "#9A5A2B",
                       cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
                       gap: "5px",
-                      fontSize: "0.85rem",
+                      fontSize: "1.0rem",
                       transition: "all 0.2s ease",
                     }}
                   >
@@ -1096,8 +1120,8 @@ export default function Home() {
                     marginBottom: "24px",
                     padding: "16px",
                     borderRadius: "12px",
-                    background: "rgba(8,14,38,0.6)",
-                    border: "1px solid rgba(255,255,255,0.05)",
+                    background: "rgba(255,248,239,0.88)",
+                    border: "1px solid #EBCFB5",
                     animation:
                       "float-up 0.3s cubic-bezier(0.22,1,0.36,1) forwards",
                   }}
@@ -1109,21 +1133,21 @@ export default function Home() {
                       style={{
                         padding: "5px 14px",
                         borderRadius: "999px",
-                        fontSize: "0.8rem",
+                        fontSize: "1.00rem",
                         fontWeight:
                           activeCategory === cat ? 600 : 400,
                         background:
                           activeCategory === cat
-                            ? "rgba(29,78,216,0.3)"
-                            : "rgba(255,255,255,0.04)",
+                            ? "#8F102A"
+                            : "#FFF6ED",
                         border:
                           activeCategory === cat
-                            ? "1px solid rgba(59,130,246,0.5)"
-                            : "1px solid rgba(255,255,255,0.06)",
+                            ? "none"
+                            : "1px solid #E9C39B",
                         color:
                           activeCategory === cat
-                            ? "#93c5fd"
-                            : "rgba(148,163,184,0.6)",
+                            ? "#FFF7F1"
+                            : "#A15C2E",
                         cursor: "pointer",
                         transition: "all 0.2s ease",
                       }}
@@ -1151,14 +1175,14 @@ export default function Home() {
                       width: "48px",
                       height: "48px",
                       borderRadius: "50%",
-                      border: "2px solid rgba(59,130,246,0.1)",
-                      borderTopColor: "#3b82f6",
+                      border: "2px solid #EBCFB5",
+                      borderTopColor: "#D59B3D",
                       animation: "spin 1s linear infinite",
                     }}
                   />
                   <p
                     style={{
-                      color: "rgba(148,163,184,0.5)",
+                      color: "#7A5A4A",
                       fontSize: "0.9rem",
                     }}
                   >
@@ -1179,8 +1203,8 @@ export default function Home() {
                       width: "72px",
                       height: "72px",
                       borderRadius: "20px",
-                      background: "rgba(29,78,216,0.1)",
-                      border: "1px solid rgba(59,130,246,0.15)",
+                      background: "rgba(143,16,42,0.1)",
+                      border: "1px solid #EBCFB5",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -1191,13 +1215,13 @@ export default function Home() {
                       style={{
                         width: "30px",
                         height: "30px",
-                        color: "rgba(59,130,246,0.5)",
+                        color: "#8F102A",
                       }}
                     />
                   </div>
                   <h3
                     style={{
-                      color: "#e2e8f0",
+                      color: "#8F102A",
                       fontSize: "1.1rem",
                       marginBottom: "8px",
                     }}
@@ -1208,7 +1232,7 @@ export default function Home() {
                   </h3>
                   <p
                     style={{
-                      color: "rgba(148,163,184,0.45)",
+                      color: "#B89A85",
                       fontSize: "0.88rem",
                     }}
                   >
@@ -1224,14 +1248,14 @@ export default function Home() {
                         padding: "10px 22px",
                         borderRadius: "10px",
                         background:
-                          "linear-gradient(135deg, #1d4ed8, #2563eb)",
+                          "linear-gradient(90deg, #8F102A 0%, #A61B36 50%, #7A0E22 100%)",
                         border: "none",
-                        color: "white",
+                        color: "#FFF6EE",
                         fontSize: "0.88rem",
                         fontWeight: 500,
                         cursor: "pointer",
                         boxShadow:
-                          "0 4px 16px rgba(29,78,216,0.3)",
+                          "0 4px 16px rgba(143,16,42,0.3)",
                       }}
                     >
                       Submit First Project →
@@ -1265,9 +1289,9 @@ export default function Home() {
         <footer
           style={{
             position: "relative",
-            zIndex: 10,
-            borderTop: "1px solid rgba(255,255,255,0.04)",
-            background: "rgba(2,8,23,0.6)",
+            zIndex: 7,
+            borderTop: "1px solid #EBCFB5",
+            background: "rgba(255,248,239,0.6)",
             backdropFilter: "blur(10px)",
             padding: "24px",
             textAlign: "center",
@@ -1288,7 +1312,7 @@ export default function Home() {
                 height: "22px",
                 borderRadius: "6px",
                 background:
-                  "linear-gradient(135deg, #1d4ed8, #3b82f6)",
+                  "linear-gradient(135deg, #8F102A, #A61B36)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -1298,15 +1322,15 @@ export default function Home() {
                 style={{
                   width: "11px",
                   height: "11px",
-                  color: "white",
+                  color: "#FFF6EE",
                 }}
               />
             </div>
             <span
               style={{
-                fontSize: "0.85rem",
+                fontSize: "1.40rem",
                 fontWeight: 600,
-                color: "rgba(148,163,184,0.6)",
+                color: "#8F102A",
               }}
             >
               Code-e-Manipal 2.0
@@ -1314,8 +1338,8 @@ export default function Home() {
           </div>
           <p
             style={{
-              fontSize: "0.72rem",
-              color: "rgba(148,163,184,0.3)",
+              fontSize: "1.00rem",
+              color: "#B89A85",
               margin: 0,
             }}
           >
@@ -1330,15 +1354,15 @@ export default function Home() {
           100% { opacity: 1; transform: translateY(0); }
         }
         @keyframes header-glow {
-          0%, 100% { filter: drop-shadow(0 0 8px rgba(59,130,246,0.4)); }
-          50% { filter: drop-shadow(0 0 20px rgba(96,165,250,0.7)); }
+          0%, 100% { filter: drop-shadow(0 0 8px rgba(143,16,42,0.4)); }
+          50% { filter: drop-shadow(0 0 20px rgba(213,155,61,0.7)); }
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(2,8,23,0.5); }
-        ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.5); }
-        input::placeholder { color: rgba(148,163,184,0.35) !important; }
+        ::-webkit-scrollbar-track { background: #FFF9F3; }
+        ::-webkit-scrollbar-thumb { background: #EBCFB5; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D59B3D; }
+        input::placeholder { color: #B89A85 !important; }
       `}</style>
       </div>
     </ProtectedRoute>);

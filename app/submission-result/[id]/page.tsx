@@ -95,8 +95,13 @@ export default function SubmissionResultPage() {
         <motion.div variants={item}>
           <ProjectWriteup
             writeup={{
-              problem: submission.description,
-              solution: submission.summary,
+              problemStatement: submission.description || "",
+              solutionOverview: submission.summary || "",
+              technicalImplementation: "",
+              architecture: "",
+              challenges: "",
+              futureImprovements: "",
+              reflection: "",
             }}
           />
         </motion.div>
@@ -111,7 +116,7 @@ export default function SubmissionResultPage() {
 
         <motion.div variants={item}>
           <JudgeReview
-            scores={[]} // will plug real reviews later
+            scores={null}
             feedback=""
           />
         </motion.div>
