@@ -18,8 +18,9 @@ function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isLogin = pathname === "/login"
   const isAdmin = pathname.startsWith("/admin")
+  const isGallery = pathname === "/gallery"
 
-  if (isLogin || isAdmin) {
+  if (isLogin || isAdmin || isGallery) {
     return <>{children}</>
   }
 

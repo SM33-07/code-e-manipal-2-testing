@@ -73,3 +73,65 @@ body {
 .animate-shake {
   animation: shake 0.4s ease;
 }
+
+/* Isometric Grid Background */
+.isometric-grid-container {
+  perspective: 1200px;
+  overflow: hidden;
+}
+
+.isometric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  transform: rotateX(55deg) rotateZ(-45deg) translateY(-20%) scale(1.1);
+  transform-style: preserve-3d;
+  width: 140%;
+  margin-left: -20%;
+}
+
+.isometric-card {
+  aspect-ratio: 16/10;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(223, 205, 189, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.isometric-card:hover {
+  transform: translateZ(20px);
+  box-shadow: 0 20px 40px rgba(139, 31, 68, 0.15);
+}
+
+/* Center Mode Video Carousel styling */
+.video-carousel-container .slick-slide {
+  transition: all 0.5s ease-in-out;
+  transform: scale(0.85);
+  opacity: 0.4;
+  filter: blur(1px);
+}
+
+.video-carousel-container .slick-slide.slick-center {
+  transform: scale(1.03);
+  opacity: 1;
+  filter: blur(0);
+}
+
+/* Laptop Mockup Styles */
+.laptop-mockup-wrapper {
+  perspective: 2000px;
+}
+
+.laptop-screen-container {
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  transform-style: preserve-3d;
+}
+
+.laptop-base {
+  background: linear-gradient(to bottom, #dcd7ce 0%, #b8af9f 100%);
+  border-bottom: 4px solid #9c9282;
+  box-shadow: 0 20px 40px rgba(40, 10, 10, 0.15);
+}
+
+
