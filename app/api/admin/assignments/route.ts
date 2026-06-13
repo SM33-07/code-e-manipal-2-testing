@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/middleware/withAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { createSupabaseAdminClient } from '@/lib/supabase/admin';
+import { query } from '@/lib/db';
 import { successResponse, Errors } from '@/lib/utils/response';
 import {
   assignJudge,
@@ -18,26 +17,36 @@ import { logger } from '@/lib/utils/logger';
 export const GET = withAuth(async (req) => {
   try {
     const judgeId = req.nextUrl.searchParams.get('judge_id');
-    const supabase = await createSupabaseServerClient();
 
-    let query = supabase
-      .from('judge_assignments')
-      .select(`
-        *,
-        submissions!inner(id, title, category, status),
-        profiles!inner(id, name, email, avatar_url)
-      `)
-      .order('assigned_at', { ascending: false });
-
+    let sql = `
+      SELECT 
+        ja.*,
+        json_build_object(
+          'id', s.id,
+          'title', s.title,
+          'category', s.category,
+          'status', s.status
+        ) AS submissions,
+        json_build_object(
+          'id', p.id,
+          'name', p.name,
+          'email', p.email,
+          'avatar_url', p.avatar_url
+        ) AS profiles
+      FROM public.judge_assignments ja
+      JOIN public.submissions s ON s.id = ja.submission_id
+      JOIN public.profiles p ON p.id = ja.judge_id
+    `;
+    const params: any[] = [];
     if (judgeId) {
       if (!isValidUUID(judgeId)) return Errors.BAD_REQUEST('Invalid judge_id');
-      query = query.eq('judge_id', judgeId);
+      sql += ' WHERE ja.judge_id = $1';
+      params.push(judgeId);
     }
+    sql += ' ORDER BY ja.assigned_at DESC';
 
-    const { data, error } = await query;
-    if (error) throw error;
-
-    return successResponse(data ?? []);
+    const { rows } = await query(sql, params);
+    return successResponse(rows ?? []);
   } catch (err) {
     logger.error('GET /api/admin/assignments', { error: String(err) });
     return Errors.INTERNAL();
@@ -60,8 +69,7 @@ export const POST = withAuth(async (req) => {
 
     // ── Auto assign ───────────────────────────────────────────
     if (action === 'auto_assign') {
-      const supabase = await createSupabaseServerClient();
-      const count = await autoAssignAllJudges(supabase);
+      const count = await autoAssignAllJudges();
 
       logger.info('POST /api/admin/assignments (auto_assign)', { assigned: count });
       return successResponse({ action: 'auto_assign', assigned: count });
@@ -77,14 +85,12 @@ export const POST = withAuth(async (req) => {
       return Errors.BAD_REQUEST('A valid submission_id is required');
     }
 
-    const supabase = await createSupabaseServerClient();
-
     // Verify the user is actually a judge (or admin)
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role, name')
-      .eq('id', judge_id)
-      .single();
+    const profileRes = await query(
+      'SELECT role, name FROM public.profiles WHERE id = $1',
+      [judge_id]
+    );
+    const profile = profileRes.rows[0];
 
     if (!profile) return Errors.NOT_FOUND('Judge');
 
@@ -93,13 +99,13 @@ export const POST = withAuth(async (req) => {
     }
 
     if (action === 'unassign') {
-      await removeJudgeAssignment(supabase, judge_id, submission_id);
+      await removeJudgeAssignment(judge_id, submission_id);
       logger.info('POST /api/admin/assignments (unassign)', { judge_id, submission_id });
       return successResponse({ action: 'unassign', judge_id, submission_id });
     }
 
     // Default: assign
-    await assignJudge(supabase, judge_id, submission_id);
+    await assignJudge(judge_id, submission_id);
 
     logger.info('POST /api/admin/assignments (assign)', { judge_id, submission_id });
     return successResponse({ action: 'assign', judge_id, submission_id }, undefined, 201);

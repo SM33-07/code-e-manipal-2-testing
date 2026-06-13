@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/middleware/withAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { successResponse, Errors } from '@/lib/utils/response';
 import { getAllProfiles, setUserRole } from '@/services/profileService';
 import { isValidUUID } from '@/lib/utils/validate';
@@ -24,8 +23,7 @@ export const GET = withAuth(async (req) => {
       return Errors.BAD_REQUEST(`role must be one of: ${VALID_ROLES.join(', ')}`);
     }
 
-    const supabase = await createSupabaseServerClient();
-    const profiles = await getAllProfiles(supabase, role);
+    const profiles = await getAllProfiles(role);
 
     logger.info('GET /api/admin/users', { role: role ?? 'all', count: profiles.length });
 
@@ -60,8 +58,7 @@ export const POST = withAuth(async (req, { user: adminUser }) => {
       return Errors.BAD_REQUEST('Admins cannot remove their own admin role');
     }
 
-    const supabase = await createSupabaseServerClient();
-    const updated = await setUserRole(supabase, user_id, role as UserRole);
+    const updated = await setUserRole(user_id, role as UserRole);
 
     logger.info('POST /api/admin/users (role update)', {
       targetUserId: user_id,

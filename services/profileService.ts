@@ -1,64 +1,72 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { query } from '@/lib/db';
 import type { Profile, UpdateProfileInput, UserRole } from '@/types';
 
-export async function getProfile(
-  supabase: SupabaseClient,
-  userId: string
-): Promise<Profile | null> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
-
-  if (error) return null;
-  return data as Profile;
+/**
+ * Fetch a single user profile by ID
+ */
+export async function getProfile(userId: string): Promise<Profile | null> {
+  const { rows } = await query('SELECT * FROM public.profiles WHERE id = $1 LIMIT 1', [userId]);
+  return (rows[0] as Profile) || null;
 }
 
+/**
+ * Update user profile details
+ */
 export async function updateProfile(
-  supabase: SupabaseClient,
   userId: string,
   input: UpdateProfileInput
 ): Promise<Profile> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .update(input)
-    .eq('id', userId)
-    .select()
-    .single();
+  const keys = Object.keys(input);
+  if (keys.length === 0) {
+    const current = await getProfile(userId);
+    if (!current) throw new Error('Profile not found');
+    return current;
+  }
 
-  if (error) throw error;
-  return data as Profile;
+  const setClause = keys.map((key, index) => `"${key}" = $${index + 2}`).join(', ');
+  const values = keys.map((key) => (input as any)[key]);
+
+  const { rows } = await query(
+    `UPDATE public.profiles SET ${setClause} WHERE id = $1 RETURNING *`,
+    [userId, ...values]
+  );
+  const updated = rows[0];
+  if (!updated) throw new Error('Profile not found for update');
+
+  return updated as Profile;
 }
 
-export async function getAllProfiles(
-  supabase: SupabaseClient,
-  role?: string
-): Promise<Profile[]> {
-  let query = supabase
-    .from('profiles')
-    .select('*')
-    .order('name');
+/**
+ * Fetch all profiles, optionally filtering by role
+ */
+export async function getAllProfiles(role?: string): Promise<Profile[]> {
+  let sql = 'SELECT * FROM public.profiles';
+  const params: any[] = [];
 
-  if (role) query = query.eq('role', role);
+  if (role) {
+    sql += ' WHERE role = $1';
+    params.push(role);
+  }
 
-  const { data, error } = await query;
-  if (error) throw error;
-  return data as Profile[];
+  sql += ' ORDER BY name ASC';
+
+  const { rows } = await query(sql, params);
+  return rows as Profile[];
 }
 
+/**
+ * Promote or demote a user's role (Admin action)
+ */
 export async function setUserRole(
-  supabase: SupabaseClient,
   userId: string,
   role: UserRole
 ): Promise<Profile> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .update({ role })
-    .eq('id', userId)
-    .select()
-    .single();
+  const { rows } = await query(
+    'UPDATE public.profiles SET role = $2 WHERE id = $1 RETURNING *',
+    [userId, role]
+  );
+  const updated = rows[0];
+  if (!updated) throw new Error('Profile not found for role update');
 
-  if (error) throw error;
-  return data as Profile;
+  return updated as Profile;
 }

@@ -1,6 +1,4 @@
 import { NextRequest } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/middleware/withAuth';
 import { successResponse, Errors } from '@/lib/utils/response';
 import { getPostById, updatePost, softDeletePost, hardDeletePost } from '@/services/postService';
@@ -8,14 +6,13 @@ import { logger } from '@/lib/utils/logger';
 
 type Ctx = { params: { id: string } };
 
-// ─────────────────────────────────────────────
-// GET /api/posts/:id — Public
-// ─────────────────────────────────────────────
+/**
+ * GET /api/posts/:id — Public
+ */
 export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
   try {
-    const supabase = await createSupabaseServerClient();
-    const post = await getPostById(supabase, id);
+    const post = await getPostById(id);
 
     if (!post) return Errors.NOT_FOUND('Post');
 
@@ -26,14 +23,13 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
   }
 }
 
-// ─────────────────────────────────────────────
-// PUT /api/posts/:id — Owner only
-// ─────────────────────────────────────────────
+/**
+ * PUT /api/posts/:id — Owner only
+ */
 export const PUT = withAuth(async (req, { user, params }) => {
   const id = params?.id!;
   try {
-    const supabase = await createSupabaseServerClient();
-    const existing = await getPostById(supabase, id);
+    const existing = await getPostById(id);
 
     if (!existing) return Errors.NOT_FOUND('Post');
     if (existing.user_id !== user.id) return Errors.FORBIDDEN();
@@ -48,7 +44,7 @@ export const PUT = withAuth(async (req, { user, params }) => {
       return Errors.BAD_REQUEST('content cannot be empty');
     }
 
-    const updated = await updatePost(supabase, id, {
+    const updated = await updatePost(id, {
       ...(title   && { title:   title.trim() }),
       ...(content && { content: content.trim() }),
     });
@@ -61,14 +57,13 @@ export const PUT = withAuth(async (req, { user, params }) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// DELETE /api/posts/:id — Owner (soft) or Admin (hard)
-// ─────────────────────────────────────────────
+/**
+ * DELETE /api/posts/:id — Owner (soft) or Admin (hard)
+ */
 export const DELETE = withAuth(async (_req, { user, profile, params }) => {
   const id = params?.id!;
   try {
-    const supabase = await createSupabaseServerClient();
-    const existing = await getPostById(supabase, id);
+    const existing = await getPostById(id);
 
     if (!existing) return Errors.NOT_FOUND('Post');
 
@@ -78,13 +73,12 @@ export const DELETE = withAuth(async (_req, { user, profile, params }) => {
     if (!isOwner && !isAdmin) return Errors.FORBIDDEN();
 
     if (isAdmin) {
-      // Admins can hard-delete using the service role client
-      const adminClient = await createSupabaseAdminClient();
-      await hardDeletePost(adminClient, id);
+      // Admins can hard-delete
+      await hardDeletePost(id);
       logger.info('DELETE /api/posts/[id] (hard)', { postId: id, adminId: user.id });
     } else {
       // Owners get a soft delete
-      await softDeletePost(supabase, id);
+      await softDeletePost(id);
       logger.info('DELETE /api/posts/[id] (soft)', { postId: id, userId: user.id });
     }
 

@@ -1,58 +1,109 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { query } from '@/lib/db';
 import type { JudgeReview, JudgeAssignment } from '@/types';
 
-export async function getJudgeAssignments(supabase: SupabaseClient, judgeId: string) {
-  const { data, error } = await supabase
-    .from('judge_assignments')
-    .select('*, submissions(*, teams(name))')
-    .eq('judge_id', judgeId);
-  if (error) throw error;
-  return data as JudgeAssignment[];
+/**
+ * Get the assignments assigned to a specific judge
+ */
+export async function getJudgeAssignments(judgeId: string): Promise<JudgeAssignment[]> {
+  const res = await query(
+    `SELECT 
+       ja.*,
+       json_build_object(
+         'id', s.id,
+         'title', s.title,
+         'summary', s.summary,
+         'description', s.description,
+         'category', s.category,
+         'technologies', s.technologies,
+         'github_url', s.github_url,
+         'demo_url', s.demo_url,
+         'docs_url', s.docs_url,
+         'demo_video_url', s.demo_video_url,
+         'status', s.status,
+         'submitted_at', s.submitted_at,
+         'created_at', s.created_at,
+         'updated_at', s.updated_at,
+         'teams', json_build_object('name', t.name)
+       ) AS submissions
+     FROM public.judge_assignments ja
+     JOIN public.submissions s ON s.id = ja.submission_id
+     JOIN public.teams t ON t.id = s.team_id
+     WHERE ja.judge_id = $1`,
+    [judgeId]
+  );
+  return res.rows as JudgeAssignment[];
 }
 
-export async function upsertReview(supabase: SupabaseClient, review: Partial<JudgeReview> & { submission_id: string; judge_id: string }) {
-  const { data, error } = await supabase
-    .from('judge_reviews')
-    .upsert(review, { onConflict: 'submission_id,judge_id' })
-    .select()
-    .single();
-  if (error) throw error;
-  return data as JudgeReview;
+/**
+ * Create or update (upsert) a judge review
+ */
+export async function upsertReview(
+  review: Partial<JudgeReview> & { submission_id: string; judge_id: string }
+): Promise<JudgeReview> {
+  const res = await query(
+    `INSERT INTO public.judge_reviews (
+       submission_id, judge_id, score_innovation, score_technical, score_presentation, score_impact, feedback, is_complete
+     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+     ON CONFLICT (submission_id, judge_id) DO UPDATE SET
+       score_innovation = EXCLUDED.score_innovation,
+       score_technical = EXCLUDED.score_technical,
+       score_presentation = EXCLUDED.score_presentation,
+       score_impact = EXCLUDED.score_impact,
+       feedback = EXCLUDED.feedback,
+       is_complete = EXCLUDED.is_complete,
+       updated_at = NOW()
+     RETURNING *`,
+    [
+      review.submission_id,
+      review.judge_id,
+      review.score_innovation || null,
+      review.score_technical || null,
+      review.score_presentation || null,
+      review.score_impact || null,
+      review.feedback || null,
+      review.is_complete || false,
+    ]
+  );
+  return res.rows[0] as JudgeReview;
 }
 
-export async function getReviewsForSubmission(supabase: SupabaseClient, submissionId: string) {
-  const { data, error } = await supabase
-    .from('judge_reviews')
-    .select('*, profiles(name)')
-    .eq('submission_id', submissionId);
-  if (error) throw error;
-  return data as JudgeReview[];
+/**
+ * Get all complete/draft reviews for a specific submission
+ */
+export async function getReviewsForSubmission(submissionId: string): Promise<JudgeReview[]> {
+  const res = await query(
+    `SELECT 
+       jr.*,
+       json_build_object('name', p.name) AS profiles
+     FROM public.judge_reviews jr
+     JOIN public.profiles p ON p.id = jr.judge_id
+     WHERE jr.submission_id = $1`,
+    [submissionId]
+  );
+  return res.rows as JudgeReview[];
 }
 
-export async function assignJudge(
-  supabase: SupabaseClient,
-  judgeId: string,
-  submissionId: string
-) {
-  const { error } = await supabase
-    .from('judge_assignments')
-    .insert({ judge_id: judgeId, submission_id: submissionId });
-  if (error) throw error;
+/**
+ * Manually assign a judge to a submission
+ */
+export async function assignJudge(judgeId: string, submissionId: string): Promise<void> {
+  await query(
+    'INSERT INTO public.judge_assignments (judge_id, submission_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+    [judgeId, submissionId]
+  );
 }
 
-export async function removeJudgeAssignment(
-  supabase: SupabaseClient,
-  judgeId: string,
-  submissionId: string
-) {
-  const { error } = await supabase
-    .from('judge_assignments')
-    .delete()
-    .eq('judge_id', judgeId)
-    .eq('submission_id', submissionId);
-  if (error) throw error;
+/**
+ * Manually unassign a judge from a submission
+ */
+export async function removeJudgeAssignment(judgeId: string, submissionId: string): Promise<void> {
+  await query(
+    'DELETE FROM public.judge_assignments WHERE judge_id = $1 AND submission_id = $2',
+    [judgeId, submissionId]
+  );
 }
 
+// Utility to shuffle array randomly
 function shuffleArray<T>(arr: T[]): T[] {
   const shuffled = [...arr];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -62,22 +113,20 @@ function shuffleArray<T>(arr: T[]): T[] {
   return shuffled;
 }
 
-export async function autoAssignAllJudges(supabase: SupabaseClient): Promise<number> {
+/**
+ * Auto-assign all active judges to all submitted assignments round-robin
+ */
+export async function autoAssignAllJudges(): Promise<number> {
   // Get all judges
-  const { data: judges, error: judgeErr } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('role', 'judge');
-  if (judgeErr) throw judgeErr;
+  const judgeRes = await query("SELECT id FROM public.profiles WHERE role = 'judge'");
+  const judges = judgeRes.rows;
   if (!judges || judges.length === 0) return 0;
 
   // Get all submitted (non-draft, non-deleted) submissions
-  const { data: submissions, error: subErr } = await supabase
-    .from('submissions')
-    .select('id')
-    .in('status', ['submitted', 'under_review', 'reviewed'])
-    .is('deleted_at', null);
-  if (subErr) throw subErr;
+  const subRes = await query(
+    "SELECT id FROM public.submissions WHERE status IN ('submitted', 'under_review', 'reviewed') AND deleted_at IS NULL"
+  );
+  const submissions = subRes.rows;
   if (!submissions || submissions.length === 0) return 0;
 
   // Shuffle submissions randomly
@@ -89,50 +138,64 @@ export async function autoAssignAllJudges(supabase: SupabaseClient): Promise<num
     submission_id: sub.id,
   }));
 
-  // Clear existing auto-assignments for these submissions
-  const subIds = submissions.map(s => s.id);
-  await supabase
-    .from('judge_assignments')
-    .delete()
-    .in('submission_id', subIds);
+  const subIds = submissions.map((s) => s.id);
+  
+  // Clear existing assignments for these submissions
+  await query('DELETE FROM public.judge_assignments WHERE submission_id = ANY($1::uuid[])', [subIds]);
 
-  // Bulk insert new assignments
-  const { error: insertErr } = await supabase
-    .from('judge_assignments')
-    .insert(assignments);
-  if (insertErr) throw insertErr;
+  // Bulk insert new assignments within a transaction
+  await query('BEGIN');
+  try {
+    for (const assign of assignments) {
+      await query(
+        'INSERT INTO public.judge_assignments (judge_id, submission_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+        [assign.judge_id, assign.submission_id]
+      );
+    }
+    await query('COMMIT');
+  } catch (err) {
+    await query('ROLLBACK');
+    throw err;
+  }
 
   return assignments.length;
 }
 
-export async function getReviewById(
-  supabase: SupabaseClient,
-  id: string,
-  userId: string
-): Promise<JudgeReview | null> {
-  const { data, error } = await supabase
-    .from('judge_reviews')
-    .select('*')
-    .eq('id', id)
-    .eq('judge_id', userId)
-    .single();
-  if (error) return null;
-  return data as JudgeReview;
+/**
+ * Fetch a single review by review ID and judge ID
+ */
+export async function getReviewById(id: string, userId: string): Promise<JudgeReview | null> {
+  const res = await query(
+    'SELECT * FROM public.judge_reviews WHERE id = $1 AND judge_id = $2 LIMIT 1',
+    [id, userId]
+  );
+  return (res.rows[0] as JudgeReview) || null;
 }
 
+/**
+ * Update score/feedback updates on an existing review
+ */
 export async function updateReview(
-  supabase: SupabaseClient,
   id: string,
   userId: string,
   updates: Record<string, unknown>
 ): Promise<JudgeReview> {
-  const { data, error } = await supabase
-    .from('judge_reviews')
-    .update(updates)
-    .eq('id', id)
-    .eq('judge_id', userId)
-    .select()
-    .single();
-  if (error) throw error;
-  return data as JudgeReview;
+  const keys = Object.keys(updates);
+  if (keys.length === 0) {
+    const current = await getReviewById(id, userId);
+    if (!current) throw new Error('Review not found');
+    return current;
+  }
+
+  const setClause = keys.map((key, index) => `"${key}" = $${index + 3}`).join(', ');
+  const values = keys.map((key) => updates[key]);
+
+  const res = await query(
+    `UPDATE public.judge_reviews SET ${setClause} WHERE id = $1 AND judge_id = $2 RETURNING *`,
+    [id, userId, ...values]
+  );
+  const updated = res.rows[0];
+  if (!updated) throw new Error('Review not found for update');
+
+  return updated as JudgeReview;
 }

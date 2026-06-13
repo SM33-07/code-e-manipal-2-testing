@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { query } from '@/lib/db';
 import { withAuth } from '@/lib/middleware/withAuth';
 import { successResponse, Errors } from '@/lib/utils/response';
 import { getTeamMembers, removeTeamMember } from '@/services/teamService';
@@ -17,8 +17,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
   try {
     if (!isValidUUID(id)) return Errors.BAD_REQUEST('Invalid team ID');
 
-    const supabase = await createSupabaseServerClient();
-    const members  = await getTeamMembers(supabase, id);
+    const members = await getTeamMembers(id);
 
     return successResponse(members);
   } catch (err) {
@@ -48,15 +47,12 @@ export const DELETE = withAuth(async (req, { user, params }) => {
 
     if (!isValidUUID(targetUserId)) return Errors.BAD_REQUEST('Invalid target_user_id');
 
-    const supabase = await createSupabaseServerClient();
-
     // Fetch the requester's membership
-    const { data: myMembership } = await supabase
-      .from('team_members')
-      .select('role')
-      .eq('team_id', teamId)
-      .eq('user_id', user.id)
-      .single();
+    const myMembershipRes = await query(
+      'SELECT role FROM public.team_members WHERE team_id = $1 AND user_id = $2',
+      [teamId, user.id]
+    );
+    const myMembership = myMembershipRes.rows[0];
 
     if (!myMembership) return Errors.FORBIDDEN();
 
@@ -74,16 +70,15 @@ export const DELETE = withAuth(async (req, { user, params }) => {
     if (!isSelf && !isLeader) return Errors.FORBIDDEN();
 
     // Verify target is actually in the team
-    const { data: targetMembership } = await supabase
-      .from('team_members')
-      .select('role')
-      .eq('team_id', teamId)
-      .eq('user_id', targetUserId)
-      .single();
+    const targetMembershipRes = await query(
+      'SELECT role FROM public.team_members WHERE team_id = $1 AND user_id = $2',
+      [teamId, targetUserId]
+    );
+    const targetMembership = targetMembershipRes.rows[0];
 
     if (!targetMembership) return Errors.NOT_FOUND('Team member');
 
-    await removeTeamMember(supabase, teamId, targetUserId);
+    await removeTeamMember(teamId, targetUserId);
 
     logger.info('DELETE /api/teams/[id]/members', {
       teamId,

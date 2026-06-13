@@ -1,4 +1,3 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { successResponse } from "@/lib/utils/response";
 import {
   getSubmissionById,
@@ -13,14 +12,10 @@ export async function GET(
 ) {
   const { id } = await ctx.params;
   try {
-    const supabase = await createSupabaseServerClient();
-
-    const submission = await getSubmissionById(supabase, id);
-
+    const submission = await getSubmissionById(id);
     return successResponse(submission);
   } catch (err) {
     console.error("🔥 GET BY ID ERROR:", err);
-
     return new Response(
       JSON.stringify({ error: String(err) }),
       { status: 500 }
@@ -36,14 +31,10 @@ export async function PUT(
   const { id } = await ctx.params;
   try {
     const body = await req.json();
-    const supabase = await createSupabaseServerClient();
-
-    const updated = await updateSubmission(supabase, id, body);
-
+    const updated = await updateSubmission(id, body);
     return successResponse(updated);
   } catch (err) {
     console.error("🔥 UPDATE ERROR:", err);
-
     return new Response(
       JSON.stringify({ error: String(err) }),
       { status: 500 }
@@ -58,14 +49,10 @@ export async function DELETE(
 ) {
   const { id } = await ctx.params;
   try {
-    const supabase = await createSupabaseServerClient();
-
-    await deleteSubmission(supabase, id);
-
+    await deleteSubmission(id);
     return successResponse({ message: "Deleted" });
   } catch (err) {
     console.error("🔥 DELETE ERROR:", err);
-
     return new Response(
       JSON.stringify({ error: String(err) }),
       { status: 500 }

@@ -1,103 +1,90 @@
-import { SupabaseClient } from "@supabase/supabase-js";
+import { query } from "@/lib/db";
 
 // ─── LIST ─────────────────────────────
 export async function listSubmissions(
-  supabase: SupabaseClient,
   { limit, offset }: { limit: number; offset: number },
   filters: any
 ) {
-  let query = supabase
-    .from("submissions")
-    .select("*", { count: "exact" })
-    .order("created_at", { ascending: false })
-    .range(offset, offset + limit - 1);
-
+  let sql = 'SELECT COUNT(*) OVER()::int AS total_count, * FROM public.submissions WHERE deleted_at IS NULL';
+  const params: any[] = [];
+  
   if (filters?.category) {
-    query = query.eq("category", filters.category);
+    params.push(filters.category);
+    sql += ` AND category = $${params.length}`;
   }
-
+  
   if (filters?.search) {
-    query = query.ilike("title", `%${filters.search}%`);
+    params.push(`%${filters.search}%`);
+    sql += ` AND title ILIKE $${params.length}`;
   }
+  
+  sql += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+  params.push(limit, offset);
 
-  const { data, error, count } = await query;
+  const { rows } = await query(sql, params);
+  const total = rows[0]?.total_count ?? 0;
 
-  if (error) throw error;
+  // Map out total_count from each row object
+  const submissions = rows.map((r: any) => {
+    const { total_count, ...sub } = r;
+    return sub;
+  });
 
   return {
-    submissions: data || [],
-    total: count || 0,
+    submissions,
+    total,
   };
 }
 
 // ─── GET BY ID ─────────────────────────
-export async function getSubmissionById(
-  supabase: SupabaseClient,
-  id: string
-) {
-  const { data, error } = await supabase
-    .from("submissions")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if (error) throw error;
-
-  return data;
+export async function getSubmissionById(id: string) {
+  const { rows } = await query(
+    'SELECT * FROM public.submissions WHERE id = $1 AND deleted_at IS NULL LIMIT 1',
+    [id]
+  );
+  return rows[0] || null;
 }
 
 // ─── CREATE ────────────────────────────
-export async function createSubmission(
-  supabase: SupabaseClient,
-  input: any
-) {
-  const { data, error } = await supabase
-    .from("submissions")
-    .insert({
-      team_id: input.team_id,
-      title: input.title,
-      summary: input.summary,
-      category: input.category,
-      technologies: input.technologies || [],
-      github_url: input.github_url,
-      demo_url: input.demo_url,
-      docs_url: input.docs_url,
-    })
-    .select()
-    .single();
+export async function createSubmission(input: any) {
+  const { rows } = await query(
+    `INSERT INTO public.submissions (
+      team_id, title, summary, category, technologies, github_url, demo_url, docs_url
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+    [
+      input.team_id,
+      input.title,
+      input.summary,
+      input.category,
+      input.technologies || [],
+      input.github_url,
+      input.demo_url,
+      input.docs_url,
+    ]
+  );
 
-  if (error) throw error;
-
-  return data;
+  return rows[0];
 }
 
 // ─── UPDATE ────────────────────────────
-export async function updateSubmission(
-  supabase: SupabaseClient,
-  id: string,
-  input: any
-) {
-  const { data, error } = await supabase
-    .from("submissions")
-    .update(input)
-    .eq("id", id)
-    .select()
-    .single();
+export async function updateSubmission(id: string, input: any) {
+  const keys = Object.keys(input);
+  if (keys.length === 0) {
+    return getSubmissionById(id);
+  }
 
-  if (error) throw error;
+  const setClause = keys.map((key, index) => `"${key}" = $${index + 2}`).join(', ');
+  const values = keys.map(key => input[key]);
 
-  return data;
+  const { rows } = await query(
+    `UPDATE public.submissions SET ${setClause} WHERE id = $1 RETURNING *`,
+    [id, ...values]
+  );
+
+  return rows[0];
 }
 
 // ─── DELETE (HARD) ─────────────────────
-export async function deleteSubmission(
-  supabase: SupabaseClient,
-  id: string
-) {
-  const { error } = await supabase
-    .from("submissions")
-    .delete()
-    .eq("id", id);
-
-  if (error) throw error;
+export async function deleteSubmission(id: string) {
+  await query('DELETE FROM public.submissions WHERE id = $1', [id]);
 }

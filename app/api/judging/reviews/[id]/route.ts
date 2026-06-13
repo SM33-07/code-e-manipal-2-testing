@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/middleware/withAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { query } from '@/lib/db';
 import { successResponse, Errors } from '@/lib/utils/response';
 import { getReviewById, updateReview } from '@/services/judgingService';
 import { sanitizeScore, isValidUUID } from '@/lib/utils/validate';
@@ -17,8 +17,7 @@ export const GET = withAuth(async (_req, { user, params }) => {
     const id = params!.id;
     if (!isValidUUID(id)) return Errors.BAD_REQUEST('Invalid review ID');
 
-    const supabase = await createSupabaseServerClient();
-    const review   = await getReviewById(supabase, id, user.id);
+    const review = await getReviewById(id, user.id);
 
     if (!review) return Errors.NOT_FOUND('Review');
 
@@ -42,8 +41,7 @@ export const PUT = withAuth(async (req, { user, params }) => {
     const id = params!.id;
     if (!isValidUUID(id)) return Errors.BAD_REQUEST('Invalid review ID');
 
-    const supabase = await createSupabaseServerClient();
-    const existing = await getReviewById(supabase, id, user.id);
+    const existing = await getReviewById(id, user.id);
 
     if (!existing) return Errors.NOT_FOUND('Review');
 
@@ -90,15 +88,15 @@ export const PUT = withAuth(async (req, { user, params }) => {
       return Errors.BAD_REQUEST('No valid fields provided to update');
     }
 
-    const updated = await updateReview(supabase, id, user.id, updates);
+    const updated = await updateReview(id, user.id, updates);
 
     // Sync submission status if is_complete changed
     if ('is_complete' in updates) {
       const newStatus = updates.is_complete ? 'reviewed' : 'under_review';
-      await supabase
-        .from('submissions')
-        .update({ status: newStatus })
-        .eq('id', existing.submission_id);
+      await query(
+        'UPDATE public.submissions SET status = $1 WHERE id = $2',
+        [newStatus, existing.submission_id]
+      );
     }
 
     logger.info('PUT /api/judging/reviews/[id]', {

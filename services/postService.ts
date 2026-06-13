@@ -1,84 +1,74 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { query } from '@/lib/db';
 
-export async function listPosts(
-  supabase: SupabaseClient,
-  { limit, offset }: { limit: number; offset: number }
-) {
-  const query = supabase
-    .from('posts')
-    .select('*', { count: 'exact' })
-    .is('deleted_at', null)
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1);
+/**
+ * List all non-deleted posts with pagination
+ */
+export async function listPosts({ limit, offset }: { limit: number; offset: number }) {
+  const { rows } = await query(
+    'SELECT COUNT(*) OVER()::int AS total_count, * FROM public.posts WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+    [limit, offset]
+  );
 
-  const { data, error, count } = await query;
-  if (error) throw error;
+  const total = rows[0]?.total_count ?? 0;
+  const posts = rows.map((r: any) => {
+    const { total_count, ...post } = r;
+    return post;
+  });
 
   return {
-    posts: data || [],
-    total: count || 0,
+    posts,
+    total,
   };
 }
 
-export async function createPost(
-  supabase: SupabaseClient,
-  input: { title: string; content: string; userId: string }
-) {
-  const { data, error } = await supabase
-    .from('posts')
-    .insert({
-      title: input.title,
-      content: input.content,
-      user_id: input.userId,
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+/**
+ * Create a new announcement post
+ */
+export async function createPost(input: { title: string; content: string; userId: string }) {
+  const { rows } = await query(
+    'INSERT INTO public.posts (title, content, user_id) VALUES ($1, $2, $3) RETURNING *',
+    [input.title, input.content, input.userId]
+  );
+  return rows[0];
 }
 
-export async function getPostById(supabase: SupabaseClient, id: string) {
-  const { data, error } = await supabase
-    .from('posts')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) return null;
-  return data;
+/**
+ * Retrieve a post by ID
+ */
+export async function getPostById(id: string) {
+  const { rows } = await query('SELECT * FROM public.posts WHERE id = $1 LIMIT 1', [id]);
+  return rows[0] || null;
 }
 
-export async function updatePost(
-  supabase: SupabaseClient,
-  id: string,
-  updates: Record<string, unknown>
-) {
-  const { data, error } = await supabase
-    .from('posts')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single();
+/**
+ * Update an existing post
+ */
+export async function updatePost(id: string, updates: Record<string, unknown>) {
+  const keys = Object.keys(updates);
+  if (keys.length === 0) {
+    return getPostById(id);
+  }
 
-  if (error) throw error;
-  return data;
+  const setClause = keys.map((key, index) => `"${key}" = $${index + 2}`).join(', ');
+  const values = keys.map((key) => updates[key]);
+
+  const { rows } = await query(
+    `UPDATE public.posts SET ${setClause} WHERE id = $1 RETURNING *`,
+    [id, ...values]
+  );
+  return rows[0];
 }
 
-export async function softDeletePost(supabase: SupabaseClient, id: string) {
-  const { error } = await supabase
-    .from('posts')
-    .update({ deleted_at: new Date().toISOString() })
-    .eq('id', id);
-
-  if (error) throw error;
+/**
+ * Soft delete a post (owner action)
+ */
+export async function softDeletePost(id: string) {
+  await query('UPDATE public.posts SET deleted_at = NOW() WHERE id = $1', [id]);
 }
 
-export async function hardDeletePost(supabase: SupabaseClient, id: string) {
-  const { error } = await supabase
-    .from('posts')
-    .delete()
-    .eq('id', id);
-
-  if (error) throw error;
+/**
+ * Hard delete a post (admin action)
+ */
+export async function hardDeletePost(id: string) {
+  await query('DELETE FROM public.posts WHERE id = $1', [id]);
 }

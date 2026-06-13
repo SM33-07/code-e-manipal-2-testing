@@ -1,12 +1,10 @@
 import { NextRequest } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { query } from '@/lib/db';
 import { withAuth } from '@/lib/middleware/withAuth';
 import { successResponse, Errors } from '@/lib/utils/response';
 import { getTeamById, updateTeam } from '@/services/teamService';
 import { sanitizeString, isValidUUID } from '@/lib/utils/validate';
 import { logger } from '@/lib/utils/logger';
-
-type Ctx = { params: { id: string } };
 
 /**
  * GET /api/teams/:id
@@ -17,8 +15,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
   try {
     if (!isValidUUID(id)) return Errors.BAD_REQUEST('Invalid team ID');
 
-    const supabase = await createSupabaseServerClient();
-    const team = await getTeamById(supabase, id);
+    const team = await getTeamById(id);
 
     if (!team) return Errors.NOT_FOUND('Team');
 
@@ -40,15 +37,12 @@ export const PUT = withAuth(async (req, { user, params }) => {
     const id = params!.id;
     if (!isValidUUID(id)) return Errors.BAD_REQUEST('Invalid team ID');
 
-    const supabase = await createSupabaseServerClient();
-
     // Verify the requester is a leader of this team
-    const { data: membership } = await supabase
-      .from('team_members')
-      .select('role')
-      .eq('team_id', id)
-      .eq('user_id', user.id)
-      .single();
+    const membershipRes = await query(
+      'SELECT role FROM public.team_members WHERE team_id = $1 AND user_id = $2',
+      [id, user.id]
+    );
+    const membership = membershipRes.rows[0];
 
     if (!membership)               return Errors.FORBIDDEN();
     if (membership.role !== 'leader') return Errors.FORBIDDEN();
@@ -70,7 +64,7 @@ export const PUT = withAuth(async (req, { user, params }) => {
       return Errors.BAD_REQUEST('No valid fields to update');
     }
 
-    const team = await updateTeam(supabase, id, updates);
+    const team = await updateTeam(id, updates);
     logger.info('PUT /api/teams/[id]', { teamId: id, userId: user.id });
     return successResponse(team);
 
@@ -90,32 +84,29 @@ export const DELETE = withAuth(async (_req, { user, params }) => {
     const id = params!.id;
     if (!isValidUUID(id)) return Errors.BAD_REQUEST('Invalid team ID');
 
-    const supabase = await createSupabaseServerClient();
-
     // Verify the requester is a leader of this team
-    const { data: membership } = await supabase
-      .from('team_members')
-      .select('role')
-      .eq('team_id', id)
-      .eq('user_id', user.id)
-      .single();
+    const membershipRes = await query(
+      'SELECT role FROM public.team_members WHERE team_id = $1 AND user_id = $2',
+      [id, user.id]
+    );
+    const membership = membershipRes.rows[0];
 
     if (!membership)               return Errors.FORBIDDEN();
     if (membership.role !== 'leader') return Errors.FORBIDDEN();
 
     // Count total members
-    const { count } = await supabase
-      .from('team_members')
-      .select('*', { count: 'exact', head: true })
-      .eq('team_id', id);
+    const countRes = await query(
+      'SELECT COUNT(*)::int AS count FROM public.team_members WHERE team_id = $1',
+      [id]
+    );
+    const count = countRes.rows[0]?.count ?? 0;
 
-    if (count && count > 1) {
+    if (count > 1) {
       return Errors.BAD_REQUEST('Cannot disband team with other members. Remove them first.');
     }
 
-    // Delete the team (cascades to team_members)
-    const { error } = await supabase.from('teams').delete().eq('id', id);
-    if (error) throw error;
+    // Delete the team (cascades to team_members in DB)
+    await query('DELETE FROM public.teams WHERE id = $1', [id]);
 
     logger.info('DELETE /api/teams/[id]', { teamId: id, userId: user.id });
     return successResponse({ disbanded: true });

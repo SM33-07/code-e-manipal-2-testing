@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/middleware/withAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { successResponse, Errors } from '@/lib/utils/response';
 import { updateProfile } from '@/services/profileService';
 import { sanitizeString, isValidUrl } from '@/lib/utils/validate';
@@ -44,8 +43,7 @@ export const PUT = withAuth(async (req, { user }) => {
       return Errors.BAD_REQUEST('Provide at least one field to update: name or avatar_url');
     }
 
-    const supabase = await createSupabaseServerClient();
-    const updated = await updateProfile(supabase, user.id, updates);
+    const updated = await updateProfile(user.id, updates);
 
     logger.info('PUT /api/profile', { userId: user.id });
     return successResponse(updated);

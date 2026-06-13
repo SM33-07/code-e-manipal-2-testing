@@ -1,21 +1,22 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { query } from '@/lib/db';
 import type { AnalyticsData } from '@/types';
 
 interface CategoryCount { category: string; count: number; }
 interface StatusCount { status: string; count: number; }
 interface AvgScore { avg_innovation: number; avg_technical: number; avg_presentation: number; avg_impact: number; total_reviews: number; }
 
-export async function getAnalytics(supabase: SupabaseClient): Promise<AnalyticsData> {
+export async function getAnalytics(): Promise<AnalyticsData> {
   const [catResult, statusResult, teamResult, scoreResult] = await Promise.all([
-    supabase.rpc('get_category_counts'),
-    supabase.rpc('get_status_counts'),
-    supabase.from('teams').select('id', { count: 'exact', head: true }),
-    supabase.rpc('get_avg_scores'),
+    query<CategoryCount>('SELECT * FROM public.get_category_counts()'),
+    query<StatusCount>('SELECT * FROM public.get_status_counts()'),
+    query('SELECT COUNT(*)::int AS count FROM public.teams'),
+    query<AvgScore>('SELECT * FROM public.get_avg_scores()'),
   ]);
 
-  const categories: CategoryCount[] = catResult.data ?? [];
-  const statuses: StatusCount[] = statusResult.data ?? [];
-  const scores: AvgScore | undefined = scoreResult.data?.[0];
+  const categories = catResult.rows;
+  const statuses = statusResult.rows;
+  const teamCount = Number(teamResult.rows[0]?.count ?? 0);
+  const scores = scoreResult.rows[0];
 
   const category_breakdown: Record<string, number> = {};
   for (const c of categories) {
@@ -34,7 +35,7 @@ export async function getAnalytics(supabase: SupabaseClient): Promise<AnalyticsD
     total_submissions: totalSubmissions,
     submitted_count: submittedCount,
     reviewed_count: reviewedCount,
-    total_teams: teamResult.count ?? 0,
+    total_teams: teamCount,
     category_breakdown,
     avg_scores: {
       innovation: scores ? Number(scores.avg_innovation) : 0,

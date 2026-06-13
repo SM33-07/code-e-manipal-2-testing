@@ -3,8 +3,25 @@
 -- Run this in: Supabase Dashboard → SQL Editor
 -- ============================================================
 
+-- Create auth schema wrapper for hybrid database compatibility
+CREATE SCHEMA IF NOT EXISTS auth;
+
+CREATE TABLE IF NOT EXISTS auth.users (
+  id                 UUID PRIMARY KEY,
+  email              TEXT,
+  raw_user_meta_data JSONB
+);
+
+CREATE OR REPLACE FUNCTION auth.uid()
+RETURNS UUID
+LANGUAGE sql STABLE
+AS $$
+  SELECT null::uuid;
+$$;
+
+
 -- ── Extensions ───────────────────────────────────────────────
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- uuid-ossp is restricted on Azure; we use the built-in gen_random_uuid() instead.
 
 -- ============================================================
 -- PROFILES
@@ -25,7 +42,7 @@ CREATE TABLE public.profiles (
 -- TEAMS
 -- ============================================================
 CREATE TABLE public.teams (
-  id          UUID        PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   name        TEXT        NOT NULL CHECK (char_length(name) BETWEEN 1 AND 100),
   hackathon   TEXT        NOT NULL DEFAULT 'LearnIT 2025',
   invite_code TEXT        UNIQUE DEFAULT substr(md5(random()::text), 0, 9),
@@ -52,7 +69,7 @@ CREATE INDEX team_members_user_id_idx ON public.team_members(user_id);
 -- SUBMISSIONS
 -- ============================================================
 CREATE TABLE public.submissions (
-  id              UUID        PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   team_id         UUID        NOT NULL REFERENCES public.teams(id) ON DELETE CASCADE,
   title           TEXT        NOT NULL CHECK (char_length(title) BETWEEN 1 AND 200),
   summary         TEXT        NOT NULL CHECK (char_length(summary) BETWEEN 1 AND 500),
@@ -82,7 +99,7 @@ CREATE INDEX submissions_deleted_at_idx  ON public.submissions(deleted_at)
 -- JUDGE REVIEWS
 -- ============================================================
 CREATE TABLE public.judge_reviews (
-  id                   UUID        PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                   UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   submission_id        UUID        NOT NULL REFERENCES public.submissions(id) ON DELETE CASCADE,
   judge_id             UUID        NOT NULL REFERENCES auth.users(id)         ON DELETE CASCADE,
   score_innovation     INT         CHECK (score_innovation   BETWEEN 1 AND 10),

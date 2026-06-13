@@ -1,5 +1,5 @@
 import { withAuth } from '@/lib/middleware/withAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { query } from '@/lib/db';
 import { successResponse, Errors } from '@/lib/utils/response';
 import { getCached, setCached } from '@/lib/utils/cache';
 import { logger } from '@/lib/utils/logger';
@@ -24,16 +24,12 @@ export const GET = withAuth(async (req) => {
       return successResponse(cached.data, cached.meta);
     }
 
-    const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase
-      .rpc('get_ranked_results', {
-        category_filter: category,
-        min_reviews: minReviews,
-      });
+    const { rows } = await query(
+      'SELECT * FROM public.get_ranked_results($1, $2)',
+      [category, minReviews]
+    );
 
-    if (error) throw error;
-
-    const ranked = (data ?? []).map((row: any) => ({
+    const ranked = (rows ?? []).map((row: any) => ({
       id: row.submission_id,
       title: row.title,
       summary: row.summary,

@@ -1,5 +1,4 @@
 import { withAuth } from '@/lib/middleware/withAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { successResponse, Errors } from '@/lib/utils/response';
 import { getAnalytics } from '@/services/analyticsService';
 import { logger } from '@/lib/utils/logger';
@@ -14,8 +13,7 @@ import { logger } from '@/lib/utils/logger';
  */
 export const GET = withAuth(async () => {
   try {
-    const supabase  = await createSupabaseServerClient();
-    const analytics = await getAnalytics(supabase);
+    const analytics = await getAnalytics();
 
     logger.info('GET /api/admin/analytics', {
       total_submissions: analytics.total_submissions,

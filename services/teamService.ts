@@ -1,77 +1,71 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { query } from '@/lib/db';
 import type { Team } from '@/types';
 
-export async function getTeamById(supabase: SupabaseClient, id: string) {
-  const { data, error } = await supabase
-    .from('teams')
-    .select('*, team_members(*)')
-    .eq('id', id)
-    .single();
-  if (error) return null;
-  return data as Team;
+/**
+ * Get team details by ID (including members)
+ */
+export async function getTeamById(id: string): Promise<Team | null> {
+  const teamRes = await query('SELECT * FROM public.teams WHERE id = $1', [id]);
+  const team = teamRes.rows[0];
+  if (!team) return null;
+
+  const membersRes = await query('SELECT * FROM public.team_members WHERE team_id = $1', [id]);
+  team.team_members = membersRes.rows;
+  return team as Team;
 }
 
-export async function getTeamByUserId(supabase: SupabaseClient, userId: string) {
-  const { data: member, error: memberError } = await supabase
-    .from('team_members')
-    .select('team_id')
-    .eq('user_id', userId)
-    .limit(1)
-    .maybeSingle();
-  if (memberError || !member) return null;
+/**
+ * Get team details by associated user ID
+ */
+export async function getTeamByUserId(userId: string): Promise<Team | null> {
+  const memberRes = await query(
+    'SELECT team_id FROM public.team_members WHERE user_id = $1 LIMIT 1',
+    [userId]
+  );
+  const member = memberRes.rows[0];
+  if (!member) return null;
 
-  const { data: team, error: teamError } = await supabase
-    .from('teams')
-    .select('*, team_members(*)')
-    .eq('id', member.team_id)
-    .single();
-  if (teamError) return null;
-
-  return team as unknown as Team;
+  return getTeamById(member.team_id);
 }
 
-export async function createTeam(supabase: SupabaseClient, name: string, userId: string) {
-  // Clean up any stale team_members records for this user
-  await supabase
-    .from('team_members')
-    .delete()
-    .eq('user_id', userId);
+/**
+ * Create a new team and add the user as leader
+ */
+export async function createTeam(name: string, userId: string): Promise<Team> {
+  // Clean up any stale team_members records for this user (ensure they can join a new one)
+  await query('DELETE FROM public.team_members WHERE user_id = $1', [userId]);
 
-  const { data: team, error: teamError } = await supabase
-    .from('teams')
-    .insert({ name, created_by: userId })
-    .select()
-    .single();
-  if (teamError) throw teamError;
+  // Insert the team
+  const teamRes = await query(
+    'INSERT INTO public.teams (name, created_by) VALUES ($1, $2) RETURNING *',
+    [name, userId]
+  );
+  const team = teamRes.rows[0];
 
-  const { error: memberError } = await supabase
-    .from('team_members')
-    .insert({ team_id: team.id, user_id: userId, role: 'leader' });
-  if (memberError) throw memberError;
+  // Insert the creator as the leader
+  await query(
+    "INSERT INTO public.team_members (team_id, user_id, role) VALUES ($1, $2, 'leader')",
+    [team.id, userId]
+  );
 
-  // Re-fetch to pick up any trigger-rotated invite_code
-  const { data: refreshed } = await supabase
-    .from('teams')
-    .select('*, team_members(*)')
-    .eq('id', team.id)
-    .single();
-
-  return (refreshed || team) as unknown as Team;
+  const refreshed = await getTeamById(team.id);
+  return refreshed || (team as Team);
 }
 
-export async function joinTeamByInviteCode(supabase: SupabaseClient, inviteCode: string, userId: string) {
-  const { data: team, error: findErr } = await supabase
-    .from('teams')
-    .select('id, name, invite_code, created_by')
-    .eq('invite_code', inviteCode)
-    .single();
-  if (findErr || !team) throw new Error('INVALID_INVITE_CODE');
+/**
+ * Join an existing team by invite code
+ */
+export async function joinTeamByInviteCode(inviteCode: string, userId: string): Promise<Team> {
+  const teamRes = await query(
+    'SELECT id, name, invite_code, created_by FROM public.teams WHERE invite_code = $1',
+    [inviteCode]
+  );
+  const team = teamRes.rows[0];
+  if (!team) throw new Error('INVALID_INVITE_CODE');
 
-  const { data: members, error: membersErr } = await supabase
-    .from('team_members')
-    .select('user_id')
-    .eq('team_id', team.id);
-  if (membersErr) throw membersErr;
+  // Verify member capacity (limit to 4)
+  const membersRes = await query('SELECT user_id FROM public.team_members WHERE team_id = $1', [team.id]);
+  const members = membersRes.rows;
 
   if (members && members.length >= 4) {
     throw new Error('TEAM_FULL');
@@ -80,58 +74,94 @@ export async function joinTeamByInviteCode(supabase: SupabaseClient, inviteCode:
   const alreadyInTeam = members?.some((m: any) => m.user_id === userId);
   if (alreadyInTeam) throw new Error('ALREADY_IN_TEAM');
 
-  const { error: insertErr } = await supabase
-    .from('team_members')
-    .insert({ team_id: team.id, user_id: userId, role: 'member' });
-  if (insertErr) throw insertErr;
+  // Insert member
+  await query(
+    "INSERT INTO public.team_members (team_id, user_id, role) VALUES ($1, $2, 'member')",
+    [team.id, userId]
+  );
 
-  const { data: updatedTeam } = await supabase
-    .from('teams')
-    .select('*, team_members(*)')
-    .eq('id', team.id)
-    .single();
+  const updatedTeam = await getTeamById(team.id);
+  if (!updatedTeam) throw new Error('Failed to retrieve updated team details');
 
-  return updatedTeam || team;
+  return updatedTeam;
 }
 
-export async function updateTeam(supabase: SupabaseClient, id: string, updates: Partial<Pick<Team, 'name' | 'is_locked'>>) {
-  const { data, error } = await supabase
-    .from('teams')
-    .update(updates)
-    .eq('id', id)
-    .select()
-    .single();
+/**
+ * Update team settings
+ */
+export async function updateTeam(
+  id: string,
+  updates: Partial<Pick<Team, 'name' | 'is_locked'>>
+): Promise<Team> {
+  const keys = Object.keys(updates);
+  if (keys.length === 0) {
+    const current = await getTeamById(id);
+    if (!current) throw new Error('Team not found');
+    return current;
+  }
 
-  if (error) throw error;
-  return data as Team;
+  const setClause = keys.map((key, index) => `"${key}" = $${index + 2}`).join(', ');
+  const values = keys.map((key) => (updates as any)[key]);
+
+  const res = await query(
+    `UPDATE public.teams SET ${setClause} WHERE id = $1 RETURNING *`,
+    [id, ...values]
+  );
+  const updated = res.rows[0];
+  if (!updated) throw new Error('Team not found for update');
+
+  // Include members in the return type
+  const refreshed = await getTeamById(updated.id);
+  return refreshed || (updated as Team);
 }
 
-export async function listAllTeams(supabase: SupabaseClient) {
-  const { data, error } = await supabase
-    .from('teams')
-    .select('*, team_members(*)')
-    .order('created_at', { ascending: false });
+/**
+ * List all registered teams and their members
+ */
+export async function listAllTeams(): Promise<Team[]> {
+  const teamsRes = await query('SELECT * FROM public.teams ORDER BY created_at DESC');
+  const teams = teamsRes.rows;
 
-  if (error) throw error;
-  return (data || []) as Team[];
+  const membersRes = await query('SELECT * FROM public.team_members');
+  const members = membersRes.rows;
+
+  const membersMap = new Map<string, any[]>();
+  for (const m of members) {
+    if (!membersMap.has(m.team_id)) {
+      membersMap.set(m.team_id, []);
+    }
+    membersMap.get(m.team_id)!.push(m);
+  }
+
+  for (const t of teams) {
+    t.team_members = membersMap.get(t.id) ?? [];
+  }
+
+  return teams as Team[];
 }
 
-export async function getTeamMembers(supabase: SupabaseClient, teamId: string) {
-  const { data, error } = await supabase
-    .from('team_members')
-    .select('*, profiles(name, avatar_url, email)')
-    .eq('team_id', teamId);
-
-  if (error) throw error;
-  return data || [];
+/**
+ * Get all members of a specific team with profile info
+ */
+export async function getTeamMembers(teamId: string): Promise<any[]> {
+  const res = await query(
+    `SELECT 
+       tm.*,
+       json_build_object('name', p.name, 'avatar_url', p.avatar_url, 'email', p.email) AS profiles
+     FROM public.team_members tm
+     JOIN public.profiles p ON p.id = tm.user_id
+     WHERE tm.team_id = $1`,
+    [teamId]
+  );
+  return res.rows || [];
 }
 
-export async function removeTeamMember(supabase: SupabaseClient, teamId: string, userId: string) {
-  const { error } = await supabase
-    .from('team_members')
-    .delete()
-    .eq('team_id', teamId)
-    .eq('user_id', userId);
-
-  if (error) throw error;
+/**
+ * Remove a member from a team
+ */
+export async function removeTeamMember(teamId: string, userId: string): Promise<void> {
+  await query(
+    'DELETE FROM public.team_members WHERE team_id = $1 AND user_id = $2',
+    [teamId, userId]
+  );
 }

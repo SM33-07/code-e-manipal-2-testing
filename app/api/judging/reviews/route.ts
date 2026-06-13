@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/middleware/withAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { query } from '@/lib/db';
 import { successResponse, Errors } from '@/lib/utils/response';
 import { upsertReview } from '@/services/judgingService';
 import { sanitizeScore, isValidUUID } from '@/lib/utils/validate';
@@ -62,24 +62,20 @@ export const POST = withAuth(async (req, { user, profile }) => {
       sanitizedScores[key] = sanitized;
     }
 
-    const supabase = await createSupabaseServerClient();
-
     // Admins skip the assignment check
     if (profile?.role !== 'admin') {
-      const { data: assignment } = await supabase
-        .from('judge_assignments')
-        .select('judge_id')
-        .eq('judge_id', user.id)
-        .eq('submission_id', submission_id)
-        .single();
+      const assignmentRes = await query(
+        'SELECT 1 FROM public.judge_assignments WHERE judge_id = $1 AND submission_id = $2 LIMIT 1',
+        [user.id, submission_id]
+      );
 
-      if (!assignment) {
+      if (assignmentRes.rows.length === 0) {
         return Errors.FORBIDDEN();
       }
     }
 
     // Upsert the review
-    const review = await upsertReview(supabase, {
+    const review = await upsertReview({
       submission_id,
       judge_id: user.id,
       ...sanitizedScores,
@@ -89,10 +85,10 @@ export const POST = withAuth(async (req, { user, profile }) => {
 
     // Sync submission status
     const newStatus = is_complete ? 'reviewed' : 'under_review';
-    await supabase
-      .from('submissions')
-      .update({ status: newStatus })
-      .eq('id', submission_id);
+    await query(
+      'UPDATE public.submissions SET status = $1 WHERE id = $2',
+      [newStatus, submission_id]
+    );
 
     logger.info('POST /api/judging/reviews', {
       reviewId:     review.id,

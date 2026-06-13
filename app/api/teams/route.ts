@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/middleware/withAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { successResponse, Errors } from '@/lib/utils/response';
 import {
   createTeam,
@@ -18,17 +17,16 @@ import { logger } from '@/lib/utils/logger';
  */
 export const GET = withAuth(async (req, { user, profile }) => {
   try {
-    const supabase = await createSupabaseServerClient();
     const { searchParams } = new URL(req.url);
     const listAll = searchParams.get('all') === 'true';
 
     if (listAll) {
       if (profile.role !== 'admin') return Errors.FORBIDDEN();
-      const teams = await listAllTeams(supabase);
+      const teams = await listAllTeams();
       return successResponse(teams);
     }
 
-    const team = await getTeamByUserId(supabase, user.id);
+    const team = await getTeamByUserId(user.id);
 
     if (!team) return Errors.NOT_FOUND('Team');
 
@@ -51,10 +49,8 @@ export const POST = withAuth(async (req, { user }) => {
     const body = await req.json();
     const { action } = body;
 
-    const supabase = await createSupabaseServerClient();
-
     // ── Prevent joining/creating a second team ────────────────
-    const existingTeam = await getTeamByUserId(supabase, user.id);
+    const existingTeam = await getTeamByUserId(user.id);
     if (existingTeam) {
       return Errors.CONFLICT('You are already a member of a team');
     }
@@ -65,7 +61,7 @@ export const POST = withAuth(async (req, { user }) => {
       if (!invite_code) return Errors.BAD_REQUEST('invite_code is required');
 
       try {
-        const team = await joinTeamByInviteCode(supabase, invite_code, user.id);
+        const team = await joinTeamByInviteCode(invite_code, user.id);
         logger.info('POST /api/teams (join)', { teamId: team.id, userId: user.id });
         return successResponse(team, undefined, 201);
       } catch (e: any) {
@@ -81,7 +77,7 @@ export const POST = withAuth(async (req, { user }) => {
     const name = sanitizeString(body.name, 100);
     if (!name) return Errors.BAD_REQUEST('name must be 1–100 characters');
 
-    const team = await createTeam(supabase, name, user.id);
+    const team = await createTeam(name, user.id);
     logger.info('POST /api/teams (create)', { teamId: team.id, userId: user.id });
     return successResponse(team, undefined, 201);
 
@@ -90,3 +86,4 @@ export const POST = withAuth(async (req, { user }) => {
     return Errors.INTERNAL();
   }
 });
+

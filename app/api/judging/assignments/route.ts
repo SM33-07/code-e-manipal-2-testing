@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { withAuth } from '@/lib/middleware/withAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { query } from '@/lib/db';
 import { successResponse, Errors } from '@/lib/utils/response';
 import { logger } from '@/lib/utils/logger';
 
@@ -11,67 +11,82 @@ import { logger } from '@/lib/utils/logger';
  */
 export const GET = withAuth(async (req, { user, profile }) => {
   try {
-    const supabase = await createSupabaseServerClient();
     const isAdmin = profile?.role === 'admin';
 
-    // 1. Get assignments (all subs for admin)
-    let items: any[] = [];
-    if (isAdmin) {
-      const { data, error } = await supabase
-        .from('submissions')
-        .select('*')
-        .is('deleted_at', null)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      items = (data ?? []).map((s: any) => ({
-        judge_id: user.id,
-        submission_id: s.id,
-        submissions: s,
-      }));
-    } else {
-      const { data: assignments, error: e1 } = await supabase
-        .from('judge_assignments')
-        .select('judge_id, submission_id, assigned_at')
-        .eq('judge_id', user.id);
-      if (e1) throw e1;
+    let sql = '';
+    const params = [user.id];
 
-      if (assignments && assignments.length > 0) {
-        const subIds = assignments.map(a => a.submission_id);
-        const { data: subs, error: e2 } = await supabase
-          .from('submissions')
-          .select('*')
-          .in('id', subIds);
-        if (e2) throw e2;
-        const subMap = new Map((subs ?? []).map(s => [s.id, s]));
-        items = assignments.map(a => ({
-          ...a,
-          submissions: subMap.get(a.submission_id) ?? null,
-        }));
-      }
+    if (isAdmin) {
+      // Admins see all submissions
+      sql = `
+        SELECT 
+          $1::uuid AS judge_id,
+          s.id AS submission_id,
+          json_build_object(
+            'id', s.id,
+            'title', s.title,
+            'summary', s.summary,
+            'description', s.description,
+            'category', s.category,
+            'technologies', s.technologies,
+            'github_url', s.github_url,
+            'demo_url', s.demo_url,
+            'docs_url', s.docs_url,
+            'demo_video_url', s.demo_video_url,
+            'status', s.status,
+            'submitted_at', s.submitted_at,
+            'created_at', s.created_at,
+            'updated_at', s.updated_at
+          ) AS submissions,
+          EXISTS(
+            SELECT 1 FROM public.judge_reviews jr
+            WHERE jr.submission_id = s.id AND jr.judge_id = $1
+          ) AS reviewed
+        FROM public.submissions s
+        WHERE s.deleted_at IS NULL
+        ORDER BY s.created_at DESC;
+      `;
+    } else {
+      // Judges only see assigned submissions
+      sql = `
+        SELECT 
+          ja.judge_id,
+          ja.submission_id,
+          ja.assigned_at,
+          json_build_object(
+            'id', s.id,
+            'title', s.title,
+            'summary', s.summary,
+            'description', s.description,
+            'category', s.category,
+            'technologies', s.technologies,
+            'github_url', s.github_url,
+            'demo_url', s.demo_url,
+            'docs_url', s.docs_url,
+            'demo_video_url', s.demo_video_url,
+            'status', s.status,
+            'submitted_at', s.submitted_at,
+            'created_at', s.created_at,
+            'updated_at', s.updated_at
+          ) AS submissions,
+          EXISTS(
+            SELECT 1 FROM public.judge_reviews jr
+            WHERE jr.submission_id = ja.submission_id AND jr.judge_id = ja.judge_id
+          ) AS reviewed
+        FROM public.judge_assignments ja
+        JOIN public.submissions s ON s.id = ja.submission_id
+        WHERE ja.judge_id = $1 AND s.deleted_at IS NULL
+        ORDER BY ja.assigned_at DESC;
+      `;
     }
 
-    // 2. Get reviews to mark reviewed status (admin sees all, judge sees own)
-    const subIds = items.map(i => i.submission_id);
-    let reviewQuery = supabase
-      .from('judge_reviews')
-      .select('submission_id')
-      .in('submission_id', subIds.length ? subIds : ['none']);
-    if (!isAdmin) reviewQuery = reviewQuery.eq('judge_id', user.id);
-    const { data: myReviews } = await reviewQuery;
-
-    const reviewedSet = new Set((myReviews ?? []).map(r => r.submission_id));
-
-    // 3. Attach reviewed flag
-    const result = items.map(i => ({
-      ...i,
-      reviewed: reviewedSet.has(i.submission_id),
-    }));
+    const { rows } = await query(sql, params);
 
     // Optional status filter
     const status = req.nextUrl.searchParams.get('status');
     const filtered = status
-      ? result.filter(i => i.submissions?.status === status)
-      : result;
+      ? rows.filter(i => i.submissions?.status === status)
+      : rows;
 
     logger.info('GET /api/judging/assignments', {
       userId: user.id,
@@ -83,8 +98,7 @@ export const GET = withAuth(async (req, { user, profile }) => {
       completed: filtered.filter((i: any) => i.reviewed).length,
     });
   } catch (err) {
-    console.error('GET /api/judging/assignments error:', err);
-    logger.error('GET /api/judging/assignments', { error: err instanceof Error ? err.message : JSON.stringify(err) });
+    logger.error('GET /api/judging/assignments', { error: String(err) });
     return Errors.INTERNAL();
   }
 }, 'judge');

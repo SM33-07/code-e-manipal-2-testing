@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { withAuth } from "@/lib/middleware/withAuth";
 import { successResponse, Errors } from "@/lib/utils/response";
 import {
@@ -10,10 +9,7 @@ import {
 // ─── GET ALL ───────────────────────────
 export async function GET() {
   try {
-    const supabase = await createSupabaseServerClient();
-
     const { submissions, total } = await listSubmissions(
-      supabase,
       { limit: 20, offset: 0 },
       {}
     );
@@ -21,24 +17,19 @@ export async function GET() {
     return successResponse(submissions, { total });
   } catch (err) {
     console.error("🔥 GET ERROR:", err);
-
     return Errors.INTERNAL();
   }
 }
 
 // ─── CREATE ────────────────────────────
-export const POST = withAuth(async (req, { user }) => {
+export const POST = withAuth(async (req) => {
   try {
     const body = await req.json();
-
-    const supabase = await createSupabaseServerClient();
-
-    const submission = await createSubmission(supabase, body);
+    const submission = await createSubmission(body);
 
     return successResponse(submission, undefined, 201);
   } catch (err) {
     console.error("🔥 POST ERROR:", err);
-
     return Errors.INTERNAL();
   }
 });
