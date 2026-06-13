@@ -17,51 +17,29 @@ import { logger } from '@/lib/utils/logger';
  */
 export const GET = withAuth(async (req) => {
   try {
-    const judgeId  = req.nextUrl.searchParams.get('judge_id');
-
+    const judgeId = req.nextUrl.searchParams.get('judge_id');
     const supabase = await createSupabaseServerClient();
 
-    // Fetch assignments
-    let assignQuery = supabase
+    let query = supabase
       .from('judge_assignments')
-      .select('*')
+      .select(`
+        *,
+        submissions!inner(id, title, category, status),
+        profiles!inner(id, name, email, avatar_url)
+      `)
       .order('assigned_at', { ascending: false });
 
     if (judgeId) {
       if (!isValidUUID(judgeId)) return Errors.BAD_REQUEST('Invalid judge_id');
-      assignQuery = assignQuery.eq('judge_id', judgeId);
+      query = query.eq('judge_id', judgeId);
     }
 
-    const { data: assignments, error: assignErr } = await assignQuery;
-    if (assignErr) throw assignErr;
+    const { data, error } = await query;
+    if (error) throw error;
 
-    // Fetch related submissions
-    const subIds = [...new Set(assignments.map(a => a.submission_id))];
-    const { data: submissions } = await supabase
-      .from('submissions')
-      .select('id, title, category, status')
-      .in('id', subIds.length ? subIds : ['none']);
-
-    // Fetch related judge profiles
-    const judgeIds = [...new Set(assignments.map(a => a.judge_id))];
-    const { data: judges } = await supabase
-      .from('profiles')
-      .select('id, name, email, avatar_url')
-      .in('id', judgeIds.length ? judgeIds : ['none']);
-
-    // Join in-memory
-    const subMap = new Map((submissions ?? []).map(s => [s.id, s]));
-    const judgeMap = new Map((judges ?? []).map(j => [j.id, j]));
-    const data = assignments.map(a => ({
-      ...a,
-      submissions: subMap.get(a.submission_id) ?? null,
-      profiles: judgeMap.get(a.judge_id) ?? null,
-    }));
-
-    return successResponse(data);
+    return successResponse(data ?? []);
   } catch (err) {
-    console.error('GET /api/admin/assignments error:', err);
-    logger.error('GET /api/admin/assignments', { error: err instanceof Error ? err.message : JSON.stringify(err) });
+    logger.error('GET /api/admin/assignments', { error: String(err) });
     return Errors.INTERNAL();
   }
 }, 'admin');
@@ -77,7 +55,7 @@ export const GET = withAuth(async (req) => {
  */
 export const POST = withAuth(async (req) => {
   try {
-    const body   = await req.json();
+    const body = await req.json();
     const action = body.action as string;
 
     // ── Auto assign ───────────────────────────────────────────
@@ -127,8 +105,7 @@ export const POST = withAuth(async (req) => {
     return successResponse({ action: 'assign', judge_id, submission_id }, undefined, 201);
 
   } catch (err) {
-    console.error('POST /api/admin/assignments error:', err);
-    logger.error('POST /api/admin/assignments', { error: err instanceof Error ? err.message : JSON.stringify(err) });
+    logger.error('POST /api/admin/assignments', { error: String(err) });
     return Errors.INTERNAL();
   }
 }, 'admin');

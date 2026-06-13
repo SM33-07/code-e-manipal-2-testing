@@ -1,34 +1,46 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { AnalyticsData } from '@/types';
 
+interface CategoryCount { category: string; count: number; }
+interface StatusCount { status: string; count: number; }
+interface AvgScore { avg_innovation: number; avg_technical: number; avg_presentation: number; avg_impact: number; total_reviews: number; }
+
 export async function getAnalytics(supabase: SupabaseClient): Promise<AnalyticsData> {
-  const [subResult, teamResult, reviewResult] = await Promise.all([
-    supabase.from('submissions').select('status, category').is('deleted_at', null),
+  const [catResult, statusResult, teamResult, scoreResult] = await Promise.all([
+    supabase.rpc('get_category_counts'),
+    supabase.rpc('get_status_counts'),
     supabase.from('teams').select('id', { count: 'exact', head: true }),
-    supabase.from('judge_reviews').select('score_innovation, score_technical, score_presentation, score_impact').eq('is_complete', true),
+    supabase.rpc('get_avg_scores'),
   ]);
 
-  const subs = subResult.data ?? [];
-  const reviews = reviewResult.data ?? [];
+  const categories: CategoryCount[] = catResult.data ?? [];
+  const statuses: StatusCount[] = statusResult.data ?? [];
+  const scores: AvgScore | undefined = scoreResult.data?.[0];
 
-  const category_breakdown = subs.reduce((acc: Record<string, number>, s) => {
-    acc[s.category] = (acc[s.category] ?? 0) + 1;
-    return acc;
-  }, {});
+  const category_breakdown: Record<string, number> = {};
+  for (const c of categories) {
+    category_breakdown[c.category] = Number(c.count);
+  }
 
-  const avg = (arr: number[]) => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+  const totalSubmissions = statuses.reduce((sum: number, s: StatusCount) => sum + Number(s.count), 0);
+  const submittedCount = statuses
+    .filter((s: StatusCount) => s.status !== 'draft')
+    .reduce((sum: number, s: StatusCount) => sum + Number(s.count), 0);
+  const reviewedCount = Number(
+    statuses.find((s: StatusCount) => s.status === 'reviewed')?.count ?? 0
+  );
 
   return {
-    total_submissions: subs.length,
-    submitted_count:   subs.filter(s => s.status !== 'draft').length,
-    reviewed_count:    subs.filter(s => s.status === 'reviewed').length,
-    total_teams:       teamResult.count ?? 0,
+    total_submissions: totalSubmissions,
+    submitted_count: submittedCount,
+    reviewed_count: reviewedCount,
+    total_teams: teamResult.count ?? 0,
     category_breakdown,
     avg_scores: {
-      innovation:   avg(reviews.map(r => r.score_innovation).filter(Boolean)),
-      technical:    avg(reviews.map(r => r.score_technical).filter(Boolean)),
-      presentation: avg(reviews.map(r => r.score_presentation).filter(Boolean)),
-      impact:       avg(reviews.map(r => r.score_impact).filter(Boolean)),
+      innovation: scores ? Number(scores.avg_innovation) : 0,
+      technical: scores ? Number(scores.avg_technical) : 0,
+      presentation: scores ? Number(scores.avg_presentation) : 0,
+      impact: scores ? Number(scores.avg_impact) : 0,
     },
   };
 }
