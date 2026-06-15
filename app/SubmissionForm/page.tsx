@@ -447,6 +447,7 @@ export default function Home() {
     try {
       const payload = {
         team_id: newSubmission.teamId, // ⚠️ IMPORTANT
+        teamName: newSubmission.teamName,
         title: newSubmission.projectName,
         summary: newSubmission.solutionSummary,
         description: newSubmission.solutionSummary,

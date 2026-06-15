@@ -1,6 +1,10 @@
-const fs = require('fs');
-const path = require('path');
-const { Client } = require('pg');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { Client } from 'pg';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -24,7 +28,7 @@ async function run() {
     console.log('🔌 Connected to Azure PostgreSQL Database successfully.');
 
     const migrationsDir = path.join(__dirname, '../supabase/migrations');
-    
+
     // Read and sort SQL files alphabetically (e.g. 001_schema.sql, 002_seed.sql)
     const migrationFiles = fs.readdirSync(migrationsDir)
       .filter((file) => file.endsWith('.sql'))
