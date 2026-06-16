@@ -3,8 +3,10 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { CheckCircle2 } from "lucide-react";
 
 import AppShell from "@/components/ui/AppShell";
+import { Confetti } from "@/components/ui/Confetti";
 
 import SubmissionHeader from "@/components/SubmissionHeader";
 import ProjectOverview from "@/components/ProjectOverview";
@@ -55,6 +57,7 @@ export default function SubmissionResultPage() {
 
   return (
     <AppShell>
+      <Confetti />
 
       <motion.main
         variants={container}
@@ -62,6 +65,23 @@ export default function SubmissionResultPage() {
         animate="show"
         className="relative z-10 max-w-5xl mx-auto px-6 py-12 space-y-10"
       >
+        <motion.div
+          variants={item}
+          className="bg-green-500/10 border border-green-500/20 rounded-2xl p-5 flex items-start gap-4 shadow-sm"
+        >
+          <div className="p-2 rounded-full bg-green-500/20 text-green-600 dark:text-green-400 shrink-0">
+            <CheckCircle2 className="w-5 h-5 animate-pulse" />
+          </div>
+          <div>
+            <h2 className="text-base font-bold text-green-800 dark:text-green-400">
+              Project Submitted Successfully!
+            </h2>
+            <p className="text-xs text-green-700/80 dark:text-green-400/80 mt-1 leading-relaxed">
+              Congratulations! Your hackathon project submission has been successfully locked and saved to the database. The judging panel will review your write-up and video pitch during evaluations. Good luck!
+            </p>
+          </div>
+        </motion.div>
+
         <motion.div variants={item}>
           <SubmissionHeader
             teamName={teamName}

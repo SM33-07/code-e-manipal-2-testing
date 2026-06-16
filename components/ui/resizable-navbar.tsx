@@ -105,8 +105,7 @@ export const NavBody = ({ children, className, visible, isSubmissionForm }: NavB
       }}
       className={cn(
         "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between rounded-full bg-transparent px-6 py-3 lg:flex transition-all duration-300",
-        isSubmissionForm && !visible ? "py-8 lg:py-12 max-w-[95%]" : "",
-        visible && "bg-white/90 dark:bg-neutral-950/90 border border-jaipur-gold/20",
+        visible && "bg-[#FCF6EF]/90 dark:bg-[#0F0A05]/90 border border-jaipur-gold/20",
         className,
       )}
     >
@@ -144,7 +143,7 @@ export const NavItems = ({ items, className, onItemClick, pathname }: NavItemsPr
             {hovered === idx && (
               <motion.div
                 layoutId="hovered"
-                className="absolute inset-0 h-full w-full rounded-full bg-gray-100 dark:bg-neutral-800"
+                className="absolute inset-0 h-full w-full rounded-full bg-jaipur-secondary dark:bg-[#2A1D16]"
               />
             )}
             <span className="relative z-20">{item.name}</span>
@@ -176,8 +175,7 @@ export const MobileNav = ({ children, className, visible, isSubmissionForm }: Mo
       }}
       className={cn(
         "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-3 lg:hidden transition-all duration-300",
-        isSubmissionForm && !visible ? "py-6 px-8" : "",
-        visible && "bg-white/95 dark:bg-neutral-950/95 border border-jaipur-gold/20",
+        visible && "bg-[#FCF6EF]/95 dark:bg-[#0F0A05]/95 border border-jaipur-gold/20",
         className,
       )}
     >
@@ -216,7 +214,7 @@ export const MobileNavMenu = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           className={cn(
-            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-2xl bg-white px-6 py-8 shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05)] dark:bg-neutral-950 border border-jaipur-gold/20",
+            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-2xl bg-[#FCF6EF] px-6 py-8 shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05)] dark:bg-[#1E1208] border border-jaipur-gold/20",
             className,
           )}
         >
@@ -235,9 +233,9 @@ export const MobileNavToggle = ({
   onClick: () => void;
 }) => {
   return isOpen ? (
-    <X className="text-black dark:text-white cursor-pointer size-6" onClick={onClick} />
+    <X className="text-foreground cursor-pointer size-6" onClick={onClick} />
   ) : (
-    <Menu className="text-black dark:text-white cursor-pointer size-6" onClick={onClick} />
+    <Menu className="text-foreground cursor-pointer size-6" onClick={onClick} />
   );
 };
 
@@ -245,10 +243,10 @@ export const NavbarLogo = () => {
   return (
     <Link
       href="/"
-      className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black"
+      className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-foreground"
     >
       <img
-        src="/logo-2.0-full.png"
+        src="/logo.png"
         alt="logo"
         className="h-10 w-auto object-contain"
       />

@@ -99,7 +99,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center no-underline h-12 flex-shrink-0 z-20">
           <Image
-            src="/logo-2.0-full.png"
+            src="/logo.png"
             width={200}
             height={52}
             alt="Code-e-Manipal 2.0"
@@ -232,7 +232,7 @@ export default function Navbar() {
         <MobileNavHeader>
           <Link href="/" className="flex items-center no-underline h-10">
             <Image
-              src="/logo-2.0-full.png"
+              src="/logo.png"
               width={160}
               height={40}
               alt="Code-e-Manipal 2.0"

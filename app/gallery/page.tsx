@@ -1,18 +1,26 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Image from "next/image"
+import { useTheme } from "next-themes"
 import { projects } from "@/data/projects"
 
 import HeaderGallery from "@/components/HeaderGallery"
 import FeaturedProjects from "@/components/FeaturedProjects"
 import VideoCarousel from "@/components/VideoCarousel"
 import ProjectGrid from "@/components/ProjectGrid"
-import { MandalaWatermark, CornerOrnament, OrnamentalDivider, JharokhaDivider } from "@/components/ThemeOrnaments"
+import { MandalaWatermark, CornerOrnament, JharokhaDivider } from "@/components/ThemeOrnaments"
 
 export default function Gallery() {
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const { scrollY } = useScroll()
-  
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   // Fade out and scale down the background isometric grid on scroll
   const gridOpacity = useTransform(scrollY, [0, 450], [0.38, 0])
   const gridScale = useTransform(scrollY, [0, 450], [1.02, 0.96])
@@ -25,6 +33,8 @@ export default function Gallery() {
 
   // Fill a 4x4 isometric background grid using actual project thumbnails
   const bgGridProjects = [...projects, ...projects, ...projects, ...projects].slice(0, 16)
+
+  const isDark = mounted && resolvedTheme === "dark"
 
   return (
     <div className="min-h-screen bg-transparent text-foreground relative overflow-hidden transition-colors duration-300">
@@ -67,21 +77,18 @@ export default function Gallery() {
 
       {/* Page Content */}
       <div className="relative z-10">
-
         <HeaderGallery />
 
         {/* Hero Section */}
         <section className="py-12 md:py-16">
-
           <div className="max-w-5xl mx-auto px-6 text-center">
-
             <div 
               className="relative overflow-hidden"
               style={{
                 background: "var(--jaipur-card)",
                 border: "1px solid var(--jaipur-secondary-light)",
                 borderRadius: 24,
-                boxShadow: "0 16px 48px rgba(60, 20, 20, 0.06)",
+                boxShadow: isDark ? "0 16px 48px rgba(0, 0, 0, 0.4)" : "0 16px 48px rgba(60, 20, 20, 0.06)",
                 padding: "48px 40px",
               }}
             >
@@ -101,20 +108,19 @@ export default function Gallery() {
                 transition={{ duration: 0.8 }}
                 className="relative z-10"
               >
-
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                   className="inline-block mb-4"
                 >
-                  <span className="px-5 py-1.5 rounded-full bg-[#8F102A]/10 border border-[#8F102A]/20 text-[#8F102A] text-xs font-bold tracking-widest uppercase">
+                  <span className="px-5 py-1.5 rounded-full bg-jaipur-primary/10 border border-jaipur-primary/20 text-jaipur-primary text-xs font-bold tracking-widest uppercase">
                     🏆 Celebrating Innovation & Excellence
                   </span>
                 </motion.div>
 
                 <h2 
-                  className="text-4xl md:text-5xl font-bold mb-2 text-[#4B1F24]"
+                  className="text-4xl md:text-5xl font-bold mb-2 text-foreground"
                   style={{ fontFamily: "'Cormorant Garamond', serif" }}
                 >
                   Innovation Knowledge Base
@@ -126,7 +132,7 @@ export default function Gallery() {
                 </div>
 
                 <p 
-                  className="text-base md:text-lg text-[#7A5A4A] max-w-2xl mx-auto leading-relaxed"
+                  className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed"
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   Explore groundbreaking projects, watch demos, and learn from the
@@ -140,73 +146,55 @@ export default function Gallery() {
                   transition={{ duration: 0.6, delay: 0.4 }}
                   className="flex justify-center gap-16 mt-10"
                 >
-
                   <div className="text-center">
                     <div 
-                      className="text-4xl font-bold text-[#8F102A]"
+                      className="text-4xl font-bold text-jaipur-primary"
                       style={{ fontFamily: "'Cormorant Garamond', serif" }}
                     >
                       8+
                     </div>
-                    <div className="text-xs uppercase tracking-wider font-semibold text-[#A46A49] mt-1">Projects</div>
+                    <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground mt-1">Projects</div>
                   </div>
 
                   <div className="text-center">
                     <div 
-                      className="text-4xl font-bold text-[#8F102A]"
+                      className="text-4xl font-bold text-jaipur-primary"
                       style={{ fontFamily: "'Cormorant Garamond', serif" }}
                     >
                       25+
                     </div>
-                    <div className="text-xs uppercase tracking-wider font-semibold text-[#A46A49] mt-1">Participants</div>
+                    <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground mt-1">Participants</div>
                   </div>
 
                   <div className="text-center">
                     <div 
-                      className="text-4xl font-bold text-[#8F102A]"
+                      className="text-4xl font-bold text-jaipur-primary"
                       style={{ fontFamily: "'Cormorant Garamond', serif" }}
                     >
                       30+
                     </div>
-                    <div className="text-xs uppercase tracking-wider font-semibold text-[#A46A49] mt-1">Technologies</div>
+                    <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground mt-1">Technologies</div>
                   </div>
-
                 </motion.div>
-
               </motion.div>
-
             </div>
-
           </div>
-
         </section>
 
-        {/* Gallery Sections */}
-
         <FeaturedProjects />
-
         <VideoCarousel />
-
         <ProjectGrid />
 
         {/* Footer */}
-
-        <footer className="border-t border-[#EBCFB5]/50 py-8 mt-16 bg-[#FFF8F1]/40">
-
-          <div className="max-w-6xl mx-auto px-6 text-center text-[#7A5A4A]/80 text-xs tracking-wider">
-
+        <footer className="border-t border-jaipur-secondary-light py-8 mt-16 bg-jaipur-card/40">
+          <div className="max-w-6xl mx-auto px-6 text-center text-muted-foreground/80 text-xs tracking-wider">
             <p>© 2026 LearnIT Club — Code-e-Manipal Hackathon</p>
-
             <p className="mt-2 font-medium">
               Empowering innovation through technology
             </p>
-
           </div>
-
         </footer>
-
       </div>
-
     </div>
   )
 }

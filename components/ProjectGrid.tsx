@@ -1,16 +1,25 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, Grid, List as ListIcon, X, ExternalLink } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import { useTheme } from "next-themes"
 
 import { projects, categories } from "@/data/projects"
 
 export default function ProjectGrid() {
   const router = useRouter()
-  
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const isDark = mounted && resolvedTheme === "dark"
+
   // State variables
   const [searchTerm, setSearchTerm] = useState("")
   const [activeFilter, setActiveFilter] = useState("All")
@@ -73,7 +82,10 @@ export default function ProjectGrid() {
           
           {/* Spotlight Search (Left) */}
           <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9A7B73]" />
+            <Search 
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" 
+              style={{ color: isDark ? "#F0C060" : "#9A7B73" }}
+            />
             <input
               type="text"
               placeholder="Search projects by title, team, or tech stack..."
@@ -84,9 +96,9 @@ export default function ProjectGrid() {
               }}
               className="w-full pl-11 pr-4 py-2.5 rounded-xl outline-none transition-all border text-sm"
               style={{
-                background: "rgba(255, 250, 245, 0.92)",
-                border: "1px solid #DFCDBD",
-                color: "#5B4640",
+                background: isDark ? "rgba(30, 18, 8, 0.75)" : "rgba(255, 250, 245, 0.92)",
+                border: isDark ? "1px solid rgba(201, 162, 39, 0.25)" : "1px solid #DFCDBD",
+                color: isDark ? "#F5EFE0" : "#5B4640",
               }}
             />
           </div>
@@ -122,21 +134,46 @@ export default function ProjectGrid() {
         {/* ROW 2: THE QUICK FILTER BAR */}
         <div className="w-full overflow-x-auto scrollbar-none mb-8 -mx-4 px-4">
           <div className="flex gap-2 min-w-max pb-2">
-            {quickFilters.map((filter) => (
-              <button
-                key={filter}
-                onClick={() => handleFilterSelect(filter)}
-                className="px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide border transition-all"
-                style={{
-                  background: activeFilter === filter ? "#8B1F44" : "rgba(255, 251, 247, 0.85)",
-                  borderColor: activeFilter === filter ? "#8B1F44" : "#E2D0C1",
-                  color: activeFilter === filter ? "#FFFFFF" : "#6D524A",
-                  boxShadow: activeFilter === filter ? "0 4px 10px rgba(139, 31, 68, 0.15)" : "none"
-                }}
-              >
-                {filter}
-              </button>
-            ))}
+            {quickFilters.map((filter) => {
+              const isActive = activeFilter === filter;
+              return (
+                <button
+                  key={filter}
+                  onClick={() => handleFilterSelect(filter)}
+                  className="px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide border transition-all"
+                  style={{
+                    background: isActive 
+                      ? isDark 
+                        ? "#D4732A" 
+                        : "#8B1F44" 
+                      : isDark 
+                        ? "rgba(30, 18, 8, 0.72)" 
+                        : "rgba(255, 251, 247, 0.85)",
+                    borderColor: isActive 
+                      ? isDark 
+                        ? "#D4732A" 
+                        : "#8B1F44" 
+                      : isDark 
+                        ? "rgba(201, 162, 39, 0.25)" 
+                        : "#E2D0C1",
+                    color: isActive 
+                      ? isDark 
+                        ? "#0F0A05" 
+                        : "#FFFFFF" 
+                      : isDark 
+                        ? "#B89A85" 
+                        : "#6D524A",
+                    boxShadow: isActive 
+                      ? isDark 
+                        ? "0 4px 10px rgba(212, 115, 42, 0.2)" 
+                        : "0 4px 10px rgba(139, 31, 68, 0.15)" 
+                      : "none"
+                  }}
+                >
+                  {filter}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -159,8 +196,11 @@ export default function ProjectGrid() {
                 className="cursor-pointer group flex flex-col items-center"
               >
                 <div 
-                  className="w-full aspect-square rounded-xl overflow-hidden relative border border-[#DFCDBD]/50 transition-all duration-300 hover:shadow-md hover:border-[#8F102A]/40"
-                  style={{ background: "rgba(252, 246, 239, 0.95)" }}
+                  className="w-full aspect-square rounded-xl overflow-hidden relative border transition-all duration-300 hover:shadow-md"
+                  style={{ 
+                    background: isDark ? "rgba(30, 18, 8, 0.85)" : "rgba(252, 246, 239, 0.95)",
+                    border: isDark ? "1px solid rgba(201, 162, 39, 0.25)" : "1px solid rgba(223, 205, 189, 0.5)"
+                  }}
                 >
                   <Image
                     src={project.videoThumbnail}
@@ -174,8 +214,8 @@ export default function ProjectGrid() {
                 </div>
                 {/* Tiny Title Below Image */}
                 <span 
-                  className="text-xs font-semibold text-[#4B1F24] mt-2 text-center line-clamp-1 max-w-full px-1 hover:text-[#8F102A] transition-colors"
-                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                  className="text-xs font-semibold mt-2 text-center line-clamp-1 max-w-full px-1 hover:opacity-85 transition-colors"
+                  style={{ color: isDark ? "#F0C060" : "#4B1F24", fontFamily: "'Cormorant Garamond', serif" }}
                 >
                   {project.title}
                 </span>
@@ -190,16 +230,19 @@ export default function ProjectGrid() {
               <motion.div
                 key={project.id}
                 layoutId={`project-container-${project.id}`}
-                className="flex items-center gap-4 md:gap-6 p-4 rounded-xl border transition-all duration-300 hover:shadow-md hover:border-[#8F102A]/40 group"
+                className="flex items-center gap-4 md:gap-6 p-4 rounded-xl border transition-all duration-300 hover:shadow-md group"
                 style={{
-                  background: "rgba(252, 246, 239, 0.95)",
-                  borderColor: "rgba(223, 205, 189, 0.8)",
+                  background: isDark ? "rgba(30, 18, 8, 0.85)" : "rgba(252, 246, 239, 0.95)",
+                  borderColor: isDark ? "rgba(201, 162, 39, 0.25)" : "rgba(223, 205, 189, 0.8)",
                 }}
               >
                 {/* Square Left Thumbnail */}
                 <div 
                   onClick={() => setSelectedProject(project)}
-                  className="w-20 h-20 md:w-28 md:h-28 flex-shrink-0 relative aspect-square rounded-lg overflow-hidden border border-[#DFCDBD]/60 cursor-pointer"
+                  className="w-20 h-20 md:w-28 md:h-28 flex-shrink-0 relative aspect-square rounded-lg overflow-hidden border cursor-pointer"
+                  style={{
+                    borderColor: isDark ? "rgba(201, 162, 39, 0.3)" : "#DFCDBD",
+                  }}
                 >
                   <Image
                     src={project.videoThumbnail}
@@ -214,15 +257,21 @@ export default function ProjectGrid() {
                 <div className="flex-1 min-w-0">
                   <h3 
                     onClick={() => setSelectedProject(project)}
-                    className="text-base md:text-xl font-bold text-[#4B1F24] hover:text-[#8F102A] transition-colors cursor-pointer line-clamp-1"
-                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                    className="text-base md:text-xl font-bold cursor-pointer line-clamp-1 hover:opacity-85 transition-opacity"
+                    style={{ color: isDark ? "#F0C060" : "#4B1F24", fontFamily: "'Cormorant Garamond', serif" }}
                   >
                     {project.title}
                   </h3>
-                  <span className="text-[10px] md:text-xs text-[#A46A49] font-semibold tracking-wider uppercase">
+                  <span 
+                    className="text-[10px] md:text-xs font-semibold tracking-wider uppercase"
+                    style={{ color: isDark ? "#B89A85" : "#A46A49" }}
+                  >
                     {project.teamName}
                   </span>
-                  <p className="text-xs md:text-sm text-[#7A5A4A] mt-1 md:mt-2 line-clamp-2 leading-relaxed">
+                  <p 
+                    className="text-xs md:text-sm mt-1 md:mt-2 line-clamp-2 leading-relaxed"
+                    style={{ color: isDark ? "#DFCDBD" : "#7A5A4A" }}
+                  >
                     {project.shortIdea}
                   </p>
                 </div>
@@ -273,8 +322,8 @@ export default function ProjectGrid() {
                 exit={{ opacity: 0, scale: 0.95 }}
                 className="relative w-full max-w-2xl overflow-hidden rounded-2xl border shadow-2xl z-10 flex flex-col md:flex-row"
                 style={{
-                  background: "rgba(252, 246, 239, 0.98)",
-                  borderColor: "rgba(223, 205, 189, 0.9)",
+                  background: isDark ? "rgba(30, 18, 8, 0.98)" : "rgba(252, 246, 239, 0.98)",
+                  borderColor: isDark ? "rgba(201, 162, 39, 0.3)" : "rgba(223, 205, 189, 0.9)",
                 }}
               >
                 {/* Close Button */}
@@ -299,29 +348,50 @@ export default function ProjectGrid() {
                 <div className="w-full md:w-1/2 p-6 flex flex-col justify-between">
                   <div>
                     {/* Category tag */}
-                    <span className="inline-block px-2 py-0.5 rounded bg-[#8F102A]/10 border border-[#8F102A]/20 text-[#8F102A] text-[9px] font-bold uppercase tracking-wider mb-2">
+                    <span 
+                      className="inline-block px-2 py-0.5 rounded border text-[9px] font-bold uppercase tracking-wider mb-2"
+                      style={{
+                        background: isDark ? "rgba(212, 115, 42, 0.12)" : "rgba(143, 16, 42, 0.12)",
+                        borderColor: isDark ? "rgba(201, 162, 39, 0.25)" : "rgba(143, 16, 42, 0.22)",
+                        color: isDark ? "#F0C060" : "#8F102A"
+                      }}
+                    >
                       {selectedProject.category}
                     </span>
 
                     <h2 
-                      className="text-xl md:text-2xl font-bold text-[#4B1F24]"
-                      style={{ fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.2 }}
+                      className="text-xl md:text-2xl font-bold"
+                      style={{ color: isDark ? "#F0C060" : "#4B1F24", fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.2 }}
                     >
                       {selectedProject.title}
                     </h2>
 
-                    <span className="text-xs text-[#A46A49] font-semibold tracking-wider uppercase mt-1 block">
+                    <span 
+                      className="text-xs font-semibold tracking-wider uppercase mt-1 block"
+                      style={{ color: isDark ? "#B89A85" : "#A46A49" }}
+                    >
                       {selectedProject.teamName}
                     </span>
 
-                    <p className="text-xs text-[#7A5A4A] mt-3 leading-relaxed max-h-36 overflow-y-auto scrollbar-none pr-1">
+                    <p 
+                      className="text-xs mt-3 leading-relaxed max-h-36 overflow-y-auto scrollbar-none pr-1"
+                      style={{ color: isDark ? "#DFCDBD" : "#7A5A4A" }}
+                    >
                       {selectedProject.shortIdea}
                     </p>
 
                     {/* Tech stack badges */}
                     <div className="flex flex-wrap gap-1 mt-4">
                       {selectedProject.technologies.map((t: string) => (
-                        <span key={t} className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-[#FFF8F1] border border-[#DFCDBD] text-[#6D524A]">
+                        <span 
+                          key={t} 
+                          className="text-[9px] font-medium px-1.5 py-0.5 rounded border"
+                          style={{
+                            background: isDark ? "rgba(30, 18, 8, 0.6)" : "#FFF8F1",
+                            borderColor: isDark ? "rgba(201, 162, 39, 0.2)" : "#DFCDBD",
+                            color: isDark ? "#DFCDBD" : "#6D524A"
+                          }}
+                        >
                           {t}
                         </span>
                       ))}

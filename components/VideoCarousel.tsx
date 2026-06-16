@@ -21,7 +21,7 @@ function PrevArrow(props: any) {
   return (
     <button
       onClick={onClick}
-      className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-[#8F102A] hover:bg-[#6D1632] text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200 border border-[#D59B3D]/30 active:scale-95 group focus:outline-none"
+      className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-jaipur-primary hover:bg-jaipur-primary-light text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200 border border-jaipur-gold/30 active:scale-95 group focus:outline-none"
       aria-label="Previous slide"
     >
       <ChevronLeft className="w-6 h-6 text-[#FFF8F1] transition-transform group-hover:-translate-x-0.5" />
@@ -34,7 +34,7 @@ function NextArrow(props: any) {
   return (
     <button
       onClick={onClick}
-      className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-[#8F102A] hover:bg-[#6D1632] text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200 border border-[#D59B3D]/30 active:scale-95 group focus:outline-none"
+      className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-jaipur-primary hover:bg-jaipur-primary-light text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200 border border-jaipur-gold/30 active:scale-95 group focus:outline-none"
       aria-label="Next slide"
     >
       <ChevronRight className="w-6 h-6 text-[#FFF8F1] transition-transform group-hover:translate-x-0.5" />
@@ -77,17 +77,17 @@ export default function VideoCarousel({ videoUrl, title }: VideoCarouselProps){
     <section className="py-12 relative overflow-hidden">
       <div className="container mx-auto px-4">
         <motion.div
-          initial={{ opacity:0,y:20 }}
-          animate={{ opacity:1,y:0 }}
-          transition={{ duration:0.6 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-10"
         >
-          <span className="px-4 py-1.5 rounded-full bg-[#8F102A]/10 border border-[#8F102A]/20 text-[#8F102A] text-xs font-bold tracking-widest uppercase">
+          <span className="px-4 py-1.5 rounded-full bg-jaipur-primary/10 border border-jaipur-primary/20 text-jaipur-primary text-xs font-bold tracking-widest uppercase">
             🎬 The Video Chaupal
           </span>
 
           <h2 
-            className="text-3xl md:text-5xl font-bold text-[#4B1F24] mt-2"
+            className="text-3xl md:text-5xl font-bold text-foreground mt-2"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
             Explore Our Gallery
@@ -97,7 +97,7 @@ export default function VideoCarousel({ videoUrl, title }: VideoCarouselProps){
             <OrnamentalDivider />
           </div>
 
-          <p className="text-[#7A5A4A] text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             Watch project demos from Code-e-Manipal
           </p>
         </motion.div>
@@ -108,12 +108,7 @@ export default function VideoCarousel({ videoUrl, title }: VideoCarouselProps){
               <div key={project.id} className="px-4 focus:outline-none">
                 <div
                   onClick={()=>router.push(`/project/${project.id}`)}
-                  className="cursor-pointer rounded-2xl overflow-hidden transition-all duration-300 group"
-                  style={{
-                    background: "rgba(252, 246, 239, 0.95)",
-                    border: "1px solid rgba(223, 205, 189, 0.8)",
-                    boxShadow: "0 15px 35px rgba(60, 20, 20, 0.06)",
-                  }}
+                  className="cursor-pointer rounded-2xl overflow-hidden transition-all duration-300 group bg-jaipur-card border border-jaipur-secondary-light shadow-md hover:shadow-lg"
                 >
                   <div className="relative aspect-[16/9] overflow-hidden">
                     <Image

@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from "react"
 import { Trophy, Activity, RefreshCw } from "lucide-react"
+import { useTheme } from "next-themes"
 
 export default function ResultsPage() {
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const [ranked,      setRanked]      = useState<any[]>([])
   const [loading,     setLoading]     = useState(true)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   useEffect(() => {
+    setMounted(true)
     fetchResults()
     const interval = setInterval(fetchResults, 30000)
     return () => clearInterval(interval)
@@ -27,6 +31,8 @@ export default function ResultsPage() {
     }
   }
 
+  const isDark = mounted && resolvedTheme === "dark"
+
   return (
     <div style={{ maxWidth: 1100, width: "100%", margin: "0 auto", padding: "0 1px", boxSizing: "border-box" }}>
 
@@ -34,29 +40,31 @@ export default function ResultsPage() {
       <div className="flex items-center justify-between" style={{ marginBottom: 20 }}>
         <div className="flex items-end" style={{ gap: 12 }}>
           <Trophy size={32} style={{ color: "#C8941C" }} />
-          <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 36, fontWeight: 700, color: "#4B1F24" }}>
+          <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 36, fontWeight: 700, color: isDark ? "#F0C060" : "#4B1F24" }}>
             Hackathon Leaderboard
           </h1>
         </div>
-        <div className="flex items-center" style={{ gap: 3 }}>
-          <Activity size={14} style={{ color: "#7B8C3A" }} />
-          <span style={{ fontSize: 13, color: "#7B8C3A", fontWeight: 500 }}>Live</span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center" style={{ gap: 3 }}>
+            <Activity size={14} style={{ color: "#7B8C3A" }} />
+            <span style={{ fontSize: 13, color: "#7B8C3A", fontWeight: 500 }}>Live</span>
+          </div>
         </div>
       </div>
 
       {lastUpdated && (
-        <p style={{ fontSize: 12, color: "#A08070", marginBottom: 16 }}>
+        <p style={{ fontSize: 12, color: isDark ? "#B89A85" : "#A08070", marginBottom: 16 }}>
           Last updated: {lastUpdated.toLocaleTimeString()}
         </p>
       )}
 
       {loading ? (
         <div className="flex items-center justify-center" style={{ height: 200 }}>
-          <RefreshCw size={20} style={{ color: "#8B1C2E", animation: "spin 1s linear infinite" }} />
+          <RefreshCw size={20} style={{ color: isDark ? "#D4732A" : "#8B1C2E", animation: "spin 1s linear infinite" }} />
         </div>
       ) : ranked.length === 0 ? (
-        <div style={{ background: "white", border: "1px solid #EDD8CC", borderRadius: 14, padding: 40, textAlign: "center" }}>
-          <p style={{ fontSize: 14, color: "#A08070" }}>No reviewed submissions yet</p>
+        <div style={{ background: isDark ? "rgba(30,18,8,0.85)" : "white", border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #EDD8CC", borderRadius: 14, padding: 40, textAlign: "center" }}>
+          <p style={{ fontSize: 14, color: isDark ? "#B89A85" : "#A08070" }}>No reviewed submissions yet</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -64,11 +72,11 @@ export default function ResultsPage() {
             <div
               key={entry.id}
               style={{
-                background: "white",
-                border: "1px solid #EDD8CC",
+                background: isDark ? "rgba(30,18,8,0.85)" : "white",
+                border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #EDD8CC",
                 borderRadius: 14,
                 padding: "3px 24px",
-                boxShadow: "0 2px 8px rgba(90,40,20,0.04)",
+                boxShadow: isDark ? "0 4px 16px rgba(0,0,0,0.3)" : "0 2px 8px rgba(90,40,20,0.04)",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
@@ -78,29 +86,29 @@ export default function ResultsPage() {
                 {/* Rank badge */}
                 <div style={{
                   width: 44, height: 44, borderRadius: "50%",
-                  background: i === 0 ? "#C8941C" : i === 1 ? "#A0A0A0" : i === 2 ? "#A0664A" : "#F5EAE2",
+                  background: i === 0 ? "#C8941C" : i === 1 ? "#A0A0A0" : i === 2 ? "#A0664A" : isDark ? "rgba(30,18,8,0.6)" : "#F5EAE2",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   flexShrink: 0,
                   marginTop: 5,
                 }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: i < 3 ? "white" : "#8B1C2E" }}>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: i < 3 ? (isDark ? "#0F0A05" : "white") : (isDark ? "#F0C060" : "#8B1C2E") }}>
                     {entry.computed?.rank ?? i + 1}
                   </span>
                 </div>
                 <div>
-                  <p style={{ fontSize: 15, fontWeight: 600, color: "#2C1410" }}>{entry.title}</p>
-                  <p style={{ fontSize: 13, color: "#9B7060", marginTop: 2 }}>{entry.teams?.name ?? "Unknown Team"}</p>
-                  <p style={{ fontSize: 12, color: "#B09080", marginTop: 4 }}>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: isDark ? "#F5EFE0" : "#2C1410" }}>{entry.title}</p>
+                  <p style={{ fontSize: 13, color: isDark ? "#B89A85" : "#9B7060", marginTop: 2 }}>{entry.teams?.name ?? "Unknown Team"}</p>
+                  <p style={{ fontSize: 12, color: isDark ? "#DFCDBD" : "#B09080", marginTop: 4 }}>
                     I:{entry.computed?.avg_innovation?.toFixed(1) ?? "—"} · T:{entry.computed?.avg_technical?.toFixed(1) ?? "—"} · P:{entry.computed?.avg_presentation?.toFixed(1) ?? "—"} · M:{entry.computed?.avg_impact?.toFixed(1) ?? "—"}
                   </p>
                 </div>
               </div>
 
               <div style={{ textAlign: "right" }}>
-                <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 700, color: "#C8941C" }}>
+                <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 28, fontWeight: 700, color: isDark ? "#F0C060" : "#C8941C" }}>
                   {entry.computed?.total_score?.toFixed(2) ?? "0.00"}
                 </p>
-                <p style={{ fontSize: 12, color: "#9B7060" }}>{entry.computed?.review_count ?? 0} reviews</p>
+                <p style={{ fontSize: 12, color: isDark ? "#B89A85" : "#9B7060" }}>{entry.computed?.review_count ?? 0} reviews</p>
               </div>
             </div>
           ))}

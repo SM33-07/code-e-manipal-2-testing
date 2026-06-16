@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import {
   Send, Loader2, Code2, Users, FileText, Link, Video,
@@ -13,25 +14,20 @@ import {
 export interface Submission {
   id: string;
   submittedAt: string;
-  // 1. Project Overview
   projectName: string;
   tagline: string;
   problemSolved: string;
   solutionSummary: string;
-  // 2. Technical Details
   techStack: string[];
   architectureOverview: string;
   technicalChallenges: string;
-  // 3. External Links
   githubUrl: string;
   videoUrl: string;
   docsUrl: string;
-  // 4. Reflection
   whatWorkedWell: string;
   challengesFaced: string;
   lessonsLearned: string;
   futureRoadmap: string;
-  // 5. Team Info
   teamName: string;
   teamMembers: string[];
   category: string;
@@ -63,6 +59,9 @@ function SectionHeader({
 }: {
   number: number; title: string; subtitle: string; icon: React.ReactNode; completed?: boolean;
 }) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
   return (
     <div
       style={{
@@ -71,7 +70,7 @@ function SectionHeader({
         gap: "14px",
         marginBottom: "12px",
         paddingBottom: "18px",
-        borderBottom: "1px solid rgba(255,239,248,0.1)",
+        borderBottom: isDark ? "1px solid rgba(201,162,39,0.15)" : "1px solid rgba(173,114,55,0.15)",
       }}
     >
       <div
@@ -81,18 +80,22 @@ function SectionHeader({
           borderRadius: "10px",
           background: completed
             ? "linear-gradient(135deg,#059669,#10b981)"
+            : isDark
+            ? "linear-gradient(135deg,#D4732A,#C9A227)"
             : "linear-gradient(135deg,#8F102A,#A61B36)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
           boxShadow: completed
-            ? "0 0 14px rgba(16,185,129,0.35)"
-            : "0 0 14px rgba(143,16,42,0.3)",
+            ? "0 0 14px rgba(16,185,129,0.25)"
+            : isDark
+            ? "0 0 14px rgba(212,115,42,0.25)"
+            : "0 0 14px rgba(143,16,42,0.25)",
           transition: "all 0.4s ease",
           fontSize: "0.75rem",
           fontWeight: 700,
-          color: "white",
+          color: isDark && !completed ? "#0F0A05" : "white",
           position: "relative",
         }}
       >
@@ -104,6 +107,8 @@ function SectionHeader({
             borderRadius: "14px",
             border: completed
               ? "1px solid rgba(16,185,129,0.3)"
+              : isDark
+              ? "1px solid rgba(212,115,42,0.25)"
               : "1px solid rgba(143,16,42,0.2)",
             animation: "section-ring 3s ease-in-out infinite",
           }}
@@ -111,12 +116,12 @@ function SectionHeader({
       </div>
       <div style={{ flex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ color: "rgba(143,16,42,0.45)", display: "flex" }}>{icon}</span>
+          <span style={{ color: isDark ? "rgba(201,162,39,0.6)" : "rgba(143,16,42,0.6)", display: "flex" }}>{icon}</span>
           <h3
             style={{
               fontSize: "1rem",
               fontWeight: 700,
-              color: "#3A2820",
+              color: isDark ? "#F5EFE0" : "#6A4635",
               margin: 0,
               letterSpacing: "-0.01em",
             }}
@@ -124,7 +129,7 @@ function SectionHeader({
             {title}
           </h3>
         </div>
-        <p style={{ fontSize: "0.76rem", color: "rgba(122,90,74,0.65)", margin: "3px 0 0", lineHeight: 1.4 }}>
+        <p style={{ fontSize: "0.76rem", color: isDark ? "rgba(191,168,152,0.7)" : "rgba(122,90,74,0.65)", margin: "3px 0 0", lineHeight: 1.4 }}>
           {subtitle}
         </p>
       </div>
@@ -142,26 +147,30 @@ function Field({
   placeholder: string; required?: boolean; multiline?: boolean; rows?: number;
   maxWords?: number; hint?: string;
 }) {
+  const { resolvedTheme } = useTheme();
   const [focused, setFocused] = useState(false);
   const words = maxWords ? wordCount(value) : 0;
   const overLimit = maxWords ? words > maxWords : false;
+  const isDark = resolvedTheme === "dark";
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
     padding: icon ? "10px 14px 10px 38px" : "10px 14px",
     borderRadius: "10px",
-    background: focused ? "rgba(255,244,232,0.97)" : "rgba(255,252,247,0.82)",
+    background: isDark
+      ? (focused ? "#0F0A05" : "#1E1208")
+      : (focused ? "rgba(255,244,232,0.97)" : "rgba(255,252,247,0.82)"),
     border: overLimit
       ? "1px solid rgba(239,68,68,0.5)"
       : focused
-      ? "1px solid rgba(143,16,42,0.5)"
-      : "1px solid rgba(173,114,55,0.2)",
-    color: "#3A2820",
+      ? (isDark ? "1px solid #D4732A" : "1px solid rgba(143,16,42,0.5)")
+      : (isDark ? "1px solid rgba(201,162,39,0.2)" : "1px solid rgba(173,114,55,0.2)"),
+    color: isDark ? "#F5EFE0" : "#6A4635",
     fontSize: "0.875rem",
     outline: "none",
     transition: "all 0.25s ease",
     boxShadow: focused
-      ? "0 0 0 3px rgba(143,16,42,0.08), 0 0 20px rgba(143,16,42,0.05)"
+      ? (isDark ? "0 0 0 3px rgba(212,115,42,0.15), 0 0 20px rgba(212,115,42,0.05)" : "0 0 0 3px rgba(143,16,42,0.08), 0 0 20px rgba(143,16,42,0.05)")
       : "none",
     resize: multiline ? "vertical" : undefined,
     lineHeight: 1.6,
@@ -176,7 +185,9 @@ function Field({
           style={{
             fontSize: "0.8rem",
             fontWeight: 500,
-            color: focused ? "#8F102A" : "#8A6A5A",
+            color: focused
+              ? (isDark ? "#F0C060" : "#8F102A")
+              : (isDark ? "#A08070" : "#8A6A5A"),
             transition: "color 0.2s ease",
             display: "flex",
             alignItems: "center",
@@ -190,7 +201,11 @@ function Field({
           <span
             style={{
               fontSize: "0.7rem",
-              color: overLimit ? "#DC2626" : words > maxWords * 0.85 ? "#C2820A" : "rgba(138,106,90,0.5)",
+              color: overLimit
+                ? "#EF4444"
+                : words > maxWords * 0.85
+                ? "#F59E0B"
+                : (isDark ? "rgba(160,128,112,0.6)" : "rgba(138,106,90,0.5)"),
               transition: "color 0.2s",
             }}
           >
@@ -206,7 +221,9 @@ function Field({
               left: "11px",
               top: multiline ? "12px" : "50%",
               transform: multiline ? "none" : "translateY(-50%)",
-              color: focused ? "#8F102A" : "rgba(173,114,55,0.45)",
+              color: focused
+                ? (isDark ? "#F0C060" : "#8F102A")
+                : (isDark ? "rgba(201,162,39,0.4)" : "rgba(173,114,55,0.45)"),
               transition: "color 0.2s ease",
               pointerEvents: "none",
               display: "flex",
@@ -232,7 +249,7 @@ function Field({
         )}
       </div>
       {hint && (
-        <p style={{ fontSize: "0.71rem", color: "rgba(138,106,90,0.6)", margin: 0, lineHeight: 1.4 }}>
+        <p style={{ fontSize: "0.71rem", color: isDark ? "rgba(160,128,112,0.7)" : "rgba(138,106,90,0.6)", margin: 0, lineHeight: 1.4 }}>
           {hint}
         </p>
       )}
@@ -242,18 +259,23 @@ function Field({
 
 // ─── Section Wrapper ──────────────────────────────────────────────────────────
 function Section({ children, visible, delay = 0 }: { children: React.ReactNode; visible: boolean; delay?: number }) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
   return (
     <div
       style={{
         padding: "26px 28px",
         borderRadius: "16px",
-        background: "rgba(255,248,239,0.82)",
-        border: "1px solid rgba(173,114,55,0.15)",
+        background: isDark ? "rgba(30,18,8,0.82)" : "rgba(255,248,239,0.82)",
+        border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid rgba(173,114,55,0.15)",
         backdropFilter: "blur(10px)",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(16px)",
         transition: `opacity 0.5s ease ${delay}ms, transform 0.5s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
-        boxShadow: "0 4px 24px rgba(143,114,55,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
+        boxShadow: isDark
+          ? "0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03)"
+          : "0 4px 24px rgba(143,114,55,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
       }}
     >
       {children}
@@ -263,6 +285,9 @@ function Section({ children, visible, delay = 0 }: { children: React.ReactNode; 
 
 // ─── Main Form ────────────────────────────────────────────────────────────────
 export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
   const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
     projectName: "",
@@ -291,7 +316,9 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
   // Mount animation
-  useEffect(() => { setTimeout(() => setMounted(true), 50); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -367,6 +394,8 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
     }
   };
 
+  if (!mounted) return null;
+
   return (
     <form ref={formRef} onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
 
@@ -415,7 +444,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
           />
           {/* Category */}
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontSize: "0.8rem", fontWeight: 500, color: "#8A6A5A", display: "flex", alignItems: "center", gap: "5px" }}>
+            <label style={{ fontSize: "0.8rem", fontWeight: 500, color: isDark ? "#A08070" : "#8A6A5A", display: "flex", alignItems: "center", gap: "5px" }}>
               Category
               <span style={{ color: "#f87171", fontSize: "0.68rem" }}>*</span>
             </label>
@@ -429,12 +458,18 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
                     style={{
                       padding: "5px 13px", borderRadius: "999px", fontSize: "0.78rem",
                       fontWeight: active ? 600 : 400,
-                      background: active ? "rgba(143,16,42,0.12)" : "rgba(255,248,239,0.6)",
-                      border: active ? "1px solid rgba(143,16,42,0.4)" : "1px solid rgba(173,114,55,0.2)",
-                      color: active ? "#8F102A" : "#8A6A5A",
+                      background: active
+                        ? (isDark ? "rgba(212,115,42,0.15)" : "rgba(143,16,42,0.12)")
+                        : (isDark ? "rgba(30,18,8,0.6)" : "rgba(255,248,239,0.6)"),
+                      border: active
+                        ? (isDark ? "1px solid rgba(212,115,42,0.5)" : "1px solid rgba(143,16,42,0.4)")
+                        : (isDark ? "1px solid rgba(201,162,39,0.2)" : "1px solid rgba(173,114,55,0.2)"),
+                      color: active
+                        ? (isDark ? "#F0C060" : "#8F102A")
+                        : (isDark ? "#A08070" : "#8A6A5A"),
                       cursor: "pointer",
                       transition: "all 0.2s ease",
-                      boxShadow: active ? "0 0 10px rgba(143,16,42,0.12)" : "none",
+                      boxShadow: active ? (isDark ? "0 0 10px rgba(212,115,42,0.15)" : "0 0 10px rgba(143,16,42,0.12)") : "none",
                     }}
                   >
                     {cat}
@@ -458,11 +493,11 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {/* Tech Stack multi-select */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <label style={{ fontSize: "0.8rem", fontWeight: 500, color: "#8A6A5A", display: "flex", alignItems: "center", gap: "5px" }}>
+            <label style={{ fontSize: "0.8rem", fontWeight: 500, color: isDark ? "#A08070" : "#8A6A5A", display: "flex", alignItems: "center", gap: "5px" }}>
               <GitBranch style={{ width: "12px", height: "12px" }} />
               Tech Stack Used
               <span style={{ color: "#f87171", fontSize: "0.68rem" }}>*</span>
-              <span style={{ fontSize: "0.7rem", color: "rgba(138,106,90,0.5)", fontWeight: 400 }}>
+              <span style={{ fontSize: "0.7rem", color: isDark ? "rgba(160,128,112,0.6)" : "rgba(138,106,90,0.5)", fontWeight: 400 }}>
                 — {formData.techStack.length} selected
               </span>
             </label>
@@ -475,13 +510,19 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
                     style={{
                       padding: "4px 11px", borderRadius: "7px", fontSize: "0.76rem",
                       fontWeight: selected ? 600 : 400,
-                      background: selected ? "rgba(143,16,42,0.12)" : "rgba(255,248,239,0.55)",
-                      border: selected ? "1px solid rgba(143,16,42,0.38)" : "1px solid rgba(173,114,55,0.18)",
-                      color: selected ? "#8F102A" : "#8A6A5A",
+                      background: selected
+                        ? (isDark ? "rgba(212,115,42,0.15)" : "rgba(143,16,42,0.12)")
+                        : (isDark ? "rgba(30,18,8,0.55)" : "rgba(255,248,239,0.55)"),
+                      border: selected
+                        ? (isDark ? "1px solid rgba(212,115,42,0.5)" : "1px solid rgba(143,16,42,0.38)")
+                        : (isDark ? "1px solid rgba(201,162,39,0.2)" : "1px solid rgba(173,114,55,0.18)"),
+                      color: selected
+                        ? (isDark ? "#F0C060" : "#8F102A")
+                        : (isDark ? "#A08070" : "#8A6A5A"),
                       cursor: "pointer",
                       transition: "all 0.18s ease",
                       transform: selected ? "scale(1.02)" : "scale(1)",
-                      boxShadow: selected ? "0 0 8px rgba(143,16,42,0.1)" : "none",
+                      boxShadow: selected ? (isDark ? "0 0 8px rgba(212,115,42,0.1)" : "0 0 8px rgba(143,16,42,0.1)") : "none",
                     }}
                   >
                     {selected && <span style={{ marginRight: "4px" }}>✓</span>}
@@ -617,7 +658,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
           {/* Team members input */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             <label style={{
-              fontSize: "0.8rem", fontWeight: 500, color: "#8A6A5A",
+              fontSize: "0.8rem", fontWeight: 500, color: isDark ? "#A08070" : "#8A6A5A",
               display: "flex", alignItems: "center", gap: "5px",
             }}>
               <Users style={{ width: "12px", height: "12px" }} />
@@ -647,16 +688,18 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
                   placeholder="Enter team member name, press Enter"
                   style={{
                     flex: 1, padding: "9px 14px", borderRadius: "10px",
-                    background: "rgba(255,252,247,0.85)", border: "1px solid rgba(173,114,55,0.2)",
-                    color: "#3A2820", fontSize: "0.875rem", outline: "none", fontFamily: "inherit",
+                    background: isDark ? "#0F0A05" : "rgba(255,252,247,0.85)",
+                    border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid rgba(173,114,55,0.2)",
+                    color: isDark ? "#F5EFE0" : "#3A2820", fontSize: "0.875rem", outline: "none", fontFamily: "inherit",
                   }}
                 />
                 <button
                   type="button" onClick={addMember}
                   style={{
                     padding: "9px 14px", borderRadius: "10px",
-                    background: "rgba(143,16,42,0.1)", border: "1px solid rgba(143,16,42,0.3)",
-                    color: "#8F102A", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px",
+                    background: isDark ? "rgba(212,115,42,0.15)" : "rgba(143,16,42,0.1)",
+                    border: isDark ? "1px solid rgba(212,115,42,0.3)" : "1px solid rgba(143,16,42,0.3)",
+                    color: isDark ? "#F0C060" : "#8F102A", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px",
                     fontSize: "0.8rem", fontWeight: 500, transition: "all 0.2s ease",
                   }}
                 >
@@ -672,8 +715,12 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
                 style={{
                   padding: "14px",
                   borderRadius: "12px",
-                  background: lockedMembers ? "rgba(245,158,11,0.06)" : "rgba(255,248,239,0.6)",
-                  border: lockedMembers ? "1px solid rgba(245,158,11,0.2)" : "1px solid rgba(173,114,55,0.18)",
+                  background: lockedMembers
+                    ? "rgba(245,158,11,0.06)"
+                    : (isDark ? "rgba(30,18,8,0.6)" : "rgba(255,248,239,0.6)"),
+                  border: lockedMembers
+                    ? "1px solid rgba(245,158,11,0.2)"
+                    : (isDark ? "1px solid rgba(201,162,39,0.2)" : "1px solid rgba(173,114,55,0.18)"),
                   transition: "all 0.3s ease",
                 }}
               >
@@ -684,10 +731,16 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
                       style={{
                         display: "flex", alignItems: "center", gap: "6px",
                         padding: "5px 12px", borderRadius: "999px",
-                        background: lockedMembers ? "rgba(245,158,11,0.1)" : "rgba(143,16,42,0.08)",
-                        border: lockedMembers ? "1px solid rgba(245,158,11,0.25)" : "1px solid rgba(143,16,42,0.22)",
+                        background: lockedMembers
+                          ? "rgba(245,158,11,0.1)"
+                          : (isDark ? "rgba(212,115,42,0.15)" : "rgba(143,16,42,0.08)"),
+                        border: lockedMembers
+                          ? "1px solid rgba(245,158,11,0.25)"
+                          : (isDark ? "1px solid rgba(212,115,42,0.25)" : "1px solid rgba(143,16,42,0.22)"),
                         fontSize: "0.8rem",
-                        color: lockedMembers ? "#C2820A" : "#8F102A",
+                        color: lockedMembers
+                          ? "#C9A227"
+                          : (isDark ? "#F0C060" : "#8F102A"),
                         fontWeight: 500,
                         animation: "fade-in-badge 0.3s ease forwards",
                       }}
@@ -763,21 +816,21 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
             background: submitted
               ? "linear-gradient(135deg,#059669,#10b981)"
               : isSubmitting
-              ? "linear-gradient(135deg,#6B0D1F,#8F102A)"
+              ? (isDark ? "linear-gradient(135deg,#A5521A,#D4732A)" : "linear-gradient(135deg,#6B0D1F,#8F102A)")
               : btnHovered
-              ? "linear-gradient(135deg,#8F102A,#A61B36,#C0243F)"
-              : "linear-gradient(135deg,#8F102A,#A61B36)",
-            color: "#FFF6EE",
+              ? (isDark ? "linear-gradient(135deg,#D4732A,#E28945,#F0C060)" : "linear-gradient(135deg,#8F102A,#A61B36,#C0243F)")
+              : (isDark ? "linear-gradient(135deg,#D4732A,#C9A227)" : "linear-gradient(135deg,#8F102A,#A61B36)"),
+            color: isDark ? "#0F0A05" : "#FFF6EE",
             fontSize: "1rem", fontWeight: 700,
             cursor: isSubmitting ? "not-allowed" : "pointer",
             display: "flex", alignItems: "center", justifyContent: "center", gap: "9px",
             transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
             transform: btnHovered && !isSubmitting ? "translateY(-3px)" : "translateY(0)",
             boxShadow: submitted
-              ? "0 6px 24px rgba(16,185,129,0.45)"
+              ? "0 6px 24px rgba(16,185,129,0.4)"
               : btnHovered
-              ? "0 12px 40px rgba(143,16,42,0.5), 0 0 0 1px rgba(213,155,61,0.2)"
-              : "0 6px 24px rgba(143,16,42,0.35)",
+              ? (isDark ? "0 12px 40px rgba(212,115,42,0.4), 0 0 0 1px rgba(201,162,39,0.25)" : "0 12px 40px rgba(143,16,42,0.5), 0 0 0 1px rgba(213,155,61,0.2)")
+              : (isDark ? "0 6px 24px rgba(212,115,42,0.3)" : "0 6px 24px rgba(143,16,42,0.35)"),
             letterSpacing: "0.02em",
             position: "relative", overflow: "hidden",
           }}
@@ -798,7 +851,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
           )}
         </button>
 
-        <p style={{ textAlign: "center", fontSize: "0.73rem", color: "rgba(138,106,90,0.55)", marginTop: "10px" }}>
+        <p style={{ textAlign: "center", fontSize: "0.73rem", color: isDark ? "rgba(191,168,152,0.7)" : "rgba(138,106,90,0.55)", marginTop: "10px" }}>
           All 5 sections will be saved · Submissions are visible to all participants
         </p>
       </div>
@@ -808,8 +861,8 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
         @keyframes shimmer-btn { from { left: -60%; } to { left: 150%; } }
         @keyframes section-ring { 0%,100%{ opacity:0.4; transform:scale(1); } 50%{ opacity:0.8; transform:scale(1.05); } }
         @keyframes fade-in-badge { from{ opacity:0; transform:scale(0.85); } to{ opacity:1; transform:scale(1); } }
-        input::placeholder, textarea::placeholder { color: rgba(138,106,90,0.35) !important; }
-        select option { background: #FFF6EE; color: #3A2820; }
+        input::placeholder, textarea::placeholder { color: ${isDark ? "rgba(160,128,112,0.45)" : "rgba(138,106,90,0.35)"} !important; }
+        select option { background: ${isDark ? "#1E1208" : "#FFF6EE"}; color: ${isDark ? "#F5EFE0" : "#3A2820"}; }
         textarea { font-family: inherit !important; }
       `}</style>
     </form>

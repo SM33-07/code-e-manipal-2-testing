@@ -1,17 +1,24 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState, useEffect } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { projects } from "@/data/projects"
 import { Trophy } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import { useTheme } from "next-themes"
 import { OrnamentalDivider, MandalaWatermark } from "./ThemeOrnaments"
 
 export default function FeaturedProjects() {
   const router = useRouter()
   const sectionRef = useRef<HTMLDivElement>(null)
-  
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   // Track scroll progress of the section relative to viewport
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -31,11 +38,19 @@ export default function FeaturedProjects() {
   const p2 = projects.find(p => p.placement === '2nd')
   const p3 = projects.find(p => p.placement === '3rd')
 
-  const winners = [
-    { p: p2, place: "2nd", color: "#808588", bg: "rgba(240, 240, 240, 0.9)", border: "#B4B8B9" },
-    { p: p1, place: "1st", color: "#C8941C", bg: "rgba(255, 248, 230, 0.95)", border: "#E8B55A" },
-    { p: p3, place: "3rd", color: "#A0522D", bg: "rgba(245, 235, 225, 0.9)", border: "#D27D2D" }
-  ]
+  const isDark = mounted && resolvedTheme === "dark"
+
+  const winners = isDark
+    ? [
+        { p: p2, place: "2nd", color: "#808588", bg: "rgba(30, 18, 8, 0.9)", border: "rgba(201, 162, 39, 0.2)", text: "#DFCDBD", team: "#B89A85", link: "#F0C060" },
+        { p: p1, place: "1st", color: "#C8941C", bg: "rgba(30, 18, 8, 0.98)", border: "rgba(232, 181, 90, 0.6)", text: "#F0C060", team: "#DFCDBD", link: "#F0C060" },
+        { p: p3, place: "3rd", color: "#A0522D", bg: "rgba(30, 18, 8, 0.9)", border: "rgba(201, 162, 39, 0.2)", text: "#B89A85", team: "#B89A85", link: "#B89A85" }
+      ]
+    : [
+        { p: p2, place: "2nd", color: "#808588", bg: "rgba(240, 240, 240, 0.9)", border: "#B4B8B9", text: "#4B1F24", team: "#A46A49", link: "#8F102A" },
+        { p: p1, place: "1st", color: "#C8941C", bg: "rgba(255, 248, 230, 0.95)", border: "#E8B55A", text: "#4B1F24", team: "#A46A49", link: "#8F102A" },
+        { p: p3, place: "3rd", color: "#A0522D", bg: "rgba(245, 235, 225, 0.9)", border: "#D27D2D", text: "#4B1F24", team: "#A46A49", link: "#8F102A" }
+      ]
 
   return (
     <section ref={sectionRef} className="py-16 relative overflow-hidden">
@@ -115,7 +130,7 @@ export default function FeaturedProjects() {
 
               {/* Winners Columns */}
               <div className="flex-1 grid grid-cols-3 gap-2 md:gap-4 items-end pb-2">
-                {winners.map(({ p, place, color, bg, border }) => {
+                {winners.map(({ p, place, color, bg, border, text, team, link }) => {
                   if (!p) return null;
                   const isFirst = place === "1st";
 
@@ -157,16 +172,22 @@ export default function FeaturedProjects() {
                       <div className="p-1.5 md:p-3 flex-1 flex flex-col justify-between text-center">
                         <div>
                           <h3 
-                            className="text-[10px] md:text-xs font-bold text-[#4B1F24] line-clamp-2"
-                            style={{ fontFamily: "'Cormorant Garamond', serif" }}
+                            className="text-[10px] md:text-xs font-bold line-clamp-2"
+                            style={{ color: text, fontFamily: "'Cormorant Garamond', serif" }}
                           >
                             {p.title}
                           </h3>
-                          <p className="text-[8px] md:text-[9px] text-[#A46A49] font-medium tracking-wide uppercase mt-0.5">
+                          <p 
+                            className="text-[8px] md:text-[9px] font-medium tracking-wide uppercase mt-0.5"
+                            style={{ color: team }}
+                          >
                             {p.teamName}
                           </p>
                         </div>
-                        <span className="text-[7px] md:text-[8px] text-[#8F102A] font-bold underline mt-2 block">
+                        <span 
+                          className="text-[7px] md:text-[8px] font-bold underline mt-2 block"
+                          style={{ color: link }}
+                        >
                           View Project &rarr;
                         </span>
                       </div>

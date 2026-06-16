@@ -103,3 +103,35 @@ export const POST = withAuth(async (req, { user, profile }) => {
     return Errors.INTERNAL();
   }
 }, 'judge');
+
+/**
+ * GET /api/judging/reviews
+ * Judge/Admin — returns all reviews submitted by the current judge.
+ */
+export const GET = withAuth(async (req, { user }) => {
+  try {
+    const res = await query(
+      'SELECT * FROM public.judge_reviews WHERE judge_id = $1',
+      [user.id]
+    );
+
+    const mapped = res.rows.map((row: any) => ({
+      submissionId: row.submission_id,
+      judgeId: row.judge_id,
+      criteria: {
+        innovation: row.score_innovation,
+        technical: row.score_technical,
+        presentation: row.score_presentation,
+        impact: row.score_impact,
+      },
+      feedback: row.feedback || '',
+      isComplete: row.is_complete,
+    }));
+
+    return successResponse(mapped);
+  } catch (err) {
+    logger.error('GET /api/judging/reviews', { error: String(err) });
+    return Errors.INTERNAL();
+  }
+}, 'judge');
+

@@ -19,14 +19,15 @@
   --muted: #A08070;
   --jaipur-primary: #D4732A;
   --jaipur-primary-light: #E8924A;
-  --jaipur-secondary: #1A1F4B;
-  --jaipur-secondary-light: #2D3561;
+  --jaipur-secondary: #2A1D16;
+  --jaipur-secondary-light: #3D2E22;
   --jaipur-gold: #C9A227;
   --jaipur-gold-light: #F0C060;
   --jaipur-card: #1E1208;
   --jaipur-pink: #C2687A;
   --jaipur-terracotta: #C1440E;
 }
+
 
 body {
   color: var(--foreground);
@@ -81,19 +82,36 @@ body {
   color: var(--foreground);
 }
 
-
 /* Glass card improvement */
 
 .glass-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--jaipur-card);
+  border: 1px solid var(--jaipur-secondary-light);
   backdrop-filter: blur(14px);
   border-radius: 18px;
   box-shadow:
-    0 10px 40px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.05);
+    0 10px 40px rgba(60, 20, 20, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
 }
 
+.dark .glass-card {
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.glass-card:hover {
+  box-shadow:
+    0 20px 60px rgba(60, 20, 20, 0.12),
+    0 0 40px rgba(139, 31, 68, 0.05);
+}
+
+.dark .glass-card:hover {
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(212, 115, 42, 0.1);
+}
 
 /* Kaggle-style readable writeups */
 
@@ -102,18 +120,13 @@ body {
 }
 
 .prose strong {
-  color: #ffffff;
+  color: var(--foreground);
 }
 
 .prose a {
-  color: #60a5fa;
+  color: var(--jaipur-primary);
 }
 
-.glass-card:hover {
-  box-shadow:
-  0 20px 60px rgba(0,0,0,0.4),
-  0 0 40px rgba(59,130,246,0.15);
-}
 
 @keyframes shake {
   0%   { transform: translateX(0); }
@@ -187,5 +200,3 @@ body {
   border-bottom: 4px solid #9c9282;
   box-shadow: 0 20px 40px rgba(40, 10, 10, 0.15);
 }
-
-

@@ -2,14 +2,20 @@
 
 import { useEffect, useState } from "react"
 import { FileDown, FileText, Search, Trophy } from "lucide-react"
+import { useTheme } from "next-themes"
 
 export default function ReportPage() {
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const [ranked,  setRanked]  = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [minScore, setMinScore] = useState(0)
   const [search,   setSearch]   = useState("")
 
-  useEffect(() => { loadReport() }, [])
+  useEffect(() => {
+    setMounted(true)
+    loadReport()
+  }, [])
 
   const loadReport = async () => {
     setLoading(true)
@@ -24,6 +30,8 @@ export default function ReportPage() {
     }
   }
 
+  const isDark = mounted && resolvedTheme === "dark"
+
   const qualified = ranked.filter(r => {
     const score = r.computed?.total_score ?? 0
     const matchesSearch = search
@@ -35,13 +43,13 @@ export default function ReportPage() {
 
   const inputStyle = {
     height: 40,
-    border: "1px solid #DCC4B5",
+    border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #DCC4B5",
     borderRadius: 8,
     paddingLeft: 12,
     paddingRight: 12,
-    background: "white",
+    background: isDark ? "rgba(30,18,8,0.75)" : "white",
     fontSize: 14,
-    color: "#2C1410",
+    color: isDark ? "#F5EFE0" : "#2C1410",
     outline: "none",
     fontFamily: "'Inter',sans-serif",
   }
@@ -53,35 +61,37 @@ export default function ReportPage() {
       <div className="flex items-center justify-between" style={{ marginBottom: 20 }}>
         <div className="flex items-center" style={{ gap: 12 }}>
           <Trophy size={22} style={{ color: "#C8941C" }} />
-          <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 26, fontWeight: 700, color: "#4B1F24" }}>
+          <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 26, fontStyle: "normal", fontWeight: 700, color: isDark ? "#F0C060" : "#4B1F24" }}>
             Final Report
           </h1>
         </div>
-        <a
-          href="/api/admin/report/export"
-          className="flex items-center transition-opacity hover:opacity-80"
-          style={{
-            gap: 8,
-            background: "linear-gradient(135deg,#8B1C2E,#6B142F)",
-            color: "white",
-            padding: "8px 18px",
-            borderRadius: 10,
-            fontSize: 14,
-            fontWeight: 500,
-            fontFamily: "'Inter',sans-serif",
-            textDecoration: "none",
-          }}
-        >
-          <FileDown size={16} />
-          Export CSV
-        </a>
+        <div className="flex items-center gap-4">
+          <a
+            href="/api/admin/report/export"
+            className="flex items-center transition-opacity hover:opacity-80"
+            style={{
+              gap: 8,
+              background: isDark ? "linear-gradient(135deg,#D4732A,#C9A227)" : "linear-gradient(135deg,#8B1C2E,#6B142F)",
+              color: isDark ? "#0F0A05" : "white",
+              padding: "8px 18px",
+              borderRadius: 10,
+              fontSize: 14,
+              fontWeight: 500,
+              fontFamily: "'Inter',sans-serif",
+              textDecoration: "none",
+            }}
+          >
+            <FileDown size={16} />
+            Export CSV
+          </a>
+        </div>
       </div>
 
       {/* Filters */}
       <div
         style={{
-          background: "white",
-          border: "1px solid #EDD8CC",
+          background: isDark ? "rgba(30,18,8,0.85)" : "white",
+          border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #EDD8CC",
           borderRadius: 14,
           padding: "16px 20px",
           marginBottom: 16,
@@ -89,11 +99,11 @@ export default function ReportPage() {
           gap: 16,
           alignItems: "center",
           flexWrap: "wrap",
-          boxShadow: "0 2px 8px rgba(90,40,20,0.04)",
+          boxShadow: isDark ? "0 4px 16px rgba(0,0,0,0.3)" : "0 2px 8px rgba(90,40,20,0.04)",
         }}
       >
         <div className="flex items-center" style={{ gap: 8 }}>
-          <label style={{ fontSize: 13, color: "#8B6040" }}>Min Score:</label>
+          <label style={{ fontSize: 13, color: isDark ? "#B89A85" : "#8B6040" }}>Min Score:</label>
           <input
             type="number"
             min={0} max={40} step={0.5}
@@ -103,7 +113,7 @@ export default function ReportPage() {
           />
         </div>
         <div className="flex items-center flex-1" style={{ gap: 8 }}>
-          <Search size={15} style={{ color: "#A08070", flexShrink: 0 }} />
+          <Search size={15} style={{ color: isDark ? "#F0C060" : "#A08070", flexShrink: 0 }} />
           <input
             type="text"
             placeholder="Search by project or team…"
@@ -116,20 +126,20 @@ export default function ReportPage() {
 
       {/* Table */}
       {loading ? (
-        <p style={{ fontSize: 13, color: "#A08070" }}>Loading report…</p>
+        <p style={{ fontSize: 13, color: isDark ? "#B89A85" : "#A08070" }}>Loading report…</p>
       ) : qualified.length === 0 ? (
-        <div style={{ background: "white", border: "1px solid #EDD8CC", borderRadius: 14, padding: 40, textAlign: "center" }}>
-          <FileText size={28} style={{ color: "#DCC4B5", margin: "0 auto 8px" }} />
-          <p style={{ fontSize: 14, color: "#A08070" }}>
+        <div style={{ background: isDark ? "rgba(30,18,8,0.85)" : "white", border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #EDD8CC", borderRadius: 14, padding: 40, textAlign: "center" }}>
+          <FileText size={28} style={{ color: isDark ? "rgba(201,162,39,0.4)" : "#DCC4B5", margin: "0 auto 8px" }} />
+          <p style={{ fontSize: 14, color: isDark ? "#B89A85" : "#A08070" }}>
             {ranked.length === 0 ? "No reviewed submissions yet." : "No submissions match the current filters."}
           </p>
         </div>
       ) : (
-        <div style={{ background: "white", border: "1px solid #EDD8CC", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(90,40,20,0.04)" }}>
+        <div style={{ background: isDark ? "rgba(30,18,8,0.85)" : "white", border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #EDD8CC", borderRadius: 14, overflow: "hidden", boxShadow: isDark ? "0 4px 16px rgba(0,0,0,0.3)" : "0 2px 8px rgba(90,40,20,0.04)" }}>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ background: "#FBF3EC", borderBottom: "1px solid #EDD8CC" }}>
+                <tr style={{ background: isDark ? "rgba(15,10,5,0.4)" : "#FBF3EC", borderBottom: isDark ? "1px solid rgba(201,162,39,0.2)" : "1px solid #EDD8CC" }}>
                   {["Rank","Team","Project","Category","Status","Innovation","Technical","Presentation","Impact","Reviews","Total"].map(h => (
                     <th
                       key={h}
@@ -137,7 +147,7 @@ export default function ReportPage() {
                         padding: "12px 14px",
                         fontSize: 12,
                         fontWeight: 600,
-                        color: "#8B6040",
+                        color: isDark ? "#B89A85" : "#8B6040",
                         textAlign: h === "Total" ? "right" : ["Innovation","Technical","Presentation","Impact","Reviews","Status"].includes(h) ? "center" : "left",
                         whiteSpace: "nowrap",
                         fontFamily: "'Inter',sans-serif",
@@ -152,29 +162,29 @@ export default function ReportPage() {
                 {qualified.map((entry: any) => (
                   <tr
                     key={entry.id}
-                    style={{ borderBottom: "1px solid #F5EAE2" }}
+                    style={{ borderBottom: isDark ? "1px solid rgba(201,162,39,0.15)" : "1px solid #F5EAE2" }}
                   >
-                    <td style={{ padding: "12px 14px", fontSize: 14, fontWeight: 700, color: "#8B1C2E" }}>#{entry.computed?.rank}</td>
-                    <td style={{ padding: "12px 14px", fontSize: 14, color: "#2C1410" }}>{entry.teams?.name ?? "—"}</td>
-                    <td style={{ padding: "12px 14px", fontSize: 14, color: "#4A2010" }}>{entry.title}</td>
-                    <td style={{ padding: "12px 14px", fontSize: 13, color: "#9B7060" }}>{entry.category}</td>
+                    <td style={{ padding: "12px 14px", fontSize: 14, fontWeight: 700, color: isDark ? "#D4732A" : "#8B1C2E" }}>#{entry.computed?.rank}</td>
+                    <td style={{ padding: "12px 14px", fontSize: 14, color: isDark ? "#F5EFE0" : "#2C1410" }}>{entry.teams?.name ?? "—"}</td>
+                    <td style={{ padding: "12px 14px", fontSize: 14, color: isDark ? "#F5EFE0" : "#4A2010" }}>{entry.title}</td>
+                    <td style={{ padding: "12px 14px", fontSize: 13, color: isDark ? "#B89A85" : "#9B7060" }}>{entry.category}</td>
                     <td style={{ padding: "12px 14px", textAlign: "center" }}>
                       <span style={{
                         fontSize: 11, padding: "3px 10px", borderRadius: 20,
-                        background: entry.status === "reviewed" ? "#E8F5E9" : "#FFF8E7",
-                        color:      entry.status === "reviewed" ? "#2E7D32"  : "#A0720A",
+                        background: entry.status === "reviewed" ? (isDark ? "rgba(16,185,129,0.15)" : "#E8F5E9") : (isDark ? "rgba(245,158,11,0.15)" : "#FFF8E7"),
+                        color:      entry.status === "reviewed" ? (isDark ? "#34d399" : "#2E7D32")  : (isDark ? "#fbbf24" : "#A0720A"),
                         fontWeight: 500,
                       }}>
                         {entry.status}
                       </span>
                     </td>
                     {["avg_innovation","avg_technical","avg_presentation","avg_impact"].map(k => (
-                      <td key={k} style={{ padding: "12px 14px", textAlign: "center", fontSize: 14, color: "#5C3020" }}>
+                      <td key={k} style={{ padding: "12px 14px", textAlign: "center", fontSize: 14, color: isDark ? "#DFCDBD" : "#5C3020" }}>
                         {entry.computed?.[k]?.toFixed(1) ?? "—"}
                       </td>
                     ))}
-                    <td style={{ padding: "12px 14px", textAlign: "center", fontSize: 14, color: "#9B7060" }}>{entry.computed?.review_count ?? 0}</td>
-                    <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 15, fontWeight: 700, color: "#C8941C", fontFamily: "'Cormorant Garamond',serif" }}>
+                    <td style={{ padding: "12px 14px", textAlign: "center", fontSize: 14, color: isDark ? "#B89A85" : "#9B7060" }}>{entry.computed?.review_count ?? 0}</td>
+                    <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 15, fontWeight: 700, color: isDark ? "#F0C060" : "#C8941C", fontFamily: "'Cormorant Garamond',serif" }}>
                       {entry.computed?.total_score?.toFixed(2) ?? "0.00"}
                     </td>
                   </tr>
@@ -184,8 +194,8 @@ export default function ReportPage() {
           </div>
 
           {/* Footer */}
-          <div style={{ padding: "12px 20px", borderTop: "1px solid #F5EAE2", background: "#FDFAF7" }}>
-            <p style={{ fontSize: 12, color: "#A08070" }}>
+          <div style={{ padding: "12px 20px", borderTop: isDark ? "1px solid rgba(201,162,39,0.15)" : "1px solid #F5EAE2", background: isDark ? "rgba(15,10,5,0.2)" : "#FDFAF7" }}>
+            <p style={{ fontSize: 12, color: isDark ? "#B89A85" : "#A08070" }}>
               Showing {qualified.length} of {ranked.length} submissions
               {minScore > 0 && ` · min score: ${minScore}`}
             </p>

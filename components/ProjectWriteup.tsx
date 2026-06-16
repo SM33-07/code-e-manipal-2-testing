@@ -35,21 +35,16 @@ const sections = [
   { key: "reflection", title: "Reflection & Learnings", icon: BookOpen, color: "text-cyan-400" },
 ] as const;
 
-
-
 /* ---------- Simple markdown parser ---------- */
 
 function renderMarkdownLite(text: string) {
-
   const paragraphs = text.split("\n\n");
 
   return paragraphs.map((p, i) => {
-
     const trimmed = p.trim();
     if (!trimmed) return null;
 
     const lines = trimmed.split("\n");
-
     const isList = lines.every((l) => l.trim().startsWith("-"));
 
     if (isList) {
@@ -82,28 +77,22 @@ function renderMarkdownLite(text: string) {
 function formatBold(text: string) {
   return text.replace(
     /\*\*(.*?)\*\*/g,
-    '<strong class="text-white font-semibold">$1</strong>'
+    '<strong class="text-foreground font-semibold">$1</strong>'
   );
 }
-
-
 
 /* ---------- Main Component ---------- */
 
 export default function ProjectWriteup({ writeup }: Props) {
   return (
-
     <motion.div
       initial={{ opacity: 0, y: 25 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
       className="glass-card p-8 md:p-10 rounded-2xl"
     >
-
       {/* Header */}
-
       <div className="flex items-center gap-3 mb-8">
-
         <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2 rounded-lg shadow-md">
           <Image
             src="/logo.png"
@@ -112,59 +101,38 @@ export default function ProjectWriteup({ writeup }: Props) {
             height={24}
           />
         </div>
-
-        <h2 className="text-xl font-semibold text-white">
+        <h2 className="text-xl font-semibold text-foreground">
           Project Write-up
         </h2>
-
       </div>
 
-
       {/* Writeup Sections */}
-
       <div className="space-y-10">
-
         {sections.map(({ key, title, icon: Icon, color }, i) => (
-
           <motion.div
             key={key}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 * i }}
           >
-
             {/* Section title */}
-
-            <h3 className="flex items-center gap-2 text-white font-medium mb-2">
-
+            <h3 className="flex items-center gap-2 text-foreground font-medium mb-2">
               <Icon className={`w-5 h-5 ${color}`} />
-
               {title}
-
             </h3>
 
-
             {/* Kaggle-style readable content */}
-
-            <div className="prose prose-invert max-w-none text-slate-300">
-
-              {renderMarkdownLite(writeup[key])}
-
+            <div className="prose dark:prose-invert max-w-none text-foreground/80 dark:text-slate-300">
+              {renderMarkdownLite(writeup[key] || "No description provided.")}
             </div>
 
-
             {/* divider */}
-
             {i < sections.length - 1 && (
-              <div className="mt-8 border-t border-white/10" />
+              <div className="mt-8 border-t border-muted" />
             )}
-
           </motion.div>
-
         ))}
-
       </div>
-
     </motion.div>
   );
 }
