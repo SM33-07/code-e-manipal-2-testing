@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Image from "next/image"
 import { projects } from "@/data/projects"
@@ -14,15 +13,6 @@ import { MandalaWatermark, CornerOrnament, OrnamentalDivider, JharokhaDivider } 
 export default function Gallery() {
   const { scrollY } = useScroll()
   
-  // Override body background on mount to prevent the default dark theme from leaking at the edges
-  useEffect(() => {
-    const originalBg = document.body.style.background
-    document.body.style.background = "#FAF6F0"
-    return () => {
-      document.body.style.background = originalBg
-    }
-  }, [])
-
   // Fade out and scale down the background isometric grid on scroll
   const gridOpacity = useTransform(scrollY, [0, 450], [0.38, 0])
   const gridScale = useTransform(scrollY, [0, 450], [1.02, 0.96])
@@ -37,7 +27,7 @@ export default function Gallery() {
   const bgGridProjects = [...projects, ...projects, ...projects, ...projects].slice(0, 16)
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] relative overflow-hidden">
+    <div className="min-h-screen bg-transparent text-foreground relative overflow-hidden transition-colors duration-300">
       {/* Scroll-fade Isometric Project Grid Background */}
       <motion.div
         style={{ opacity: gridOpacity, scale: gridScale, y: gridTranslateY }}
@@ -45,7 +35,7 @@ export default function Gallery() {
       >
         <div className="isometric-grid">
           {bgGridProjects.map((project, idx) => (
-            <div key={idx} className="isometric-card bg-[#FAF5EE]">
+            <div key={idx} className="isometric-card bg-jaipur-card">
               <div className="relative w-full h-full opacity-75">
                 <Image
                   src={project.videoThumbnail}
@@ -58,7 +48,7 @@ export default function Gallery() {
           ))}
         </div>
         {/* Soft parchment gradient mask at the bottom to blend with background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FAF6F0]/60 to-[#FAF6F0]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background" />
       </motion.div>
 
       {/* Scroll-fade Hawa Mahal Monument Watermark Backdrop */}
@@ -88,8 +78,8 @@ export default function Gallery() {
             <div 
               className="relative overflow-hidden"
               style={{
-                background: "rgba(252, 246, 239, 0.96)",
-                border: "1px solid rgba(223, 205, 189, 0.9)",
+                background: "var(--jaipur-card)",
+                border: "1px solid var(--jaipur-secondary-light)",
                 borderRadius: 24,
                 boxShadow: "0 16px 48px rgba(60, 20, 20, 0.06)",
                 padding: "48px 40px",

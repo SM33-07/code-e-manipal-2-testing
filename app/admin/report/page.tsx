@@ -47,7 +47,7 @@ export default function ReportPage() {
   }
 
   return (
-    <div style={{ maxWidth: 980, width: "100%", margin: "300px auto 0", padding: "0 20px", boxSizing: "border-box" }}>
+    <div style={{ maxWidth: 980, width: "100%", margin: "0 auto", padding: "0 20px", boxSizing: "border-box" }}>
 
       {/* Header */}
       <div className="flex items-center justify-between" style={{ marginBottom: 20 }}>

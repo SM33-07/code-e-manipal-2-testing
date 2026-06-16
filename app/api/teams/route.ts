@@ -77,7 +77,9 @@ export const POST = withAuth(async (req, { user }) => {
     const name = sanitizeString(body.name, 100);
     if (!name) return Errors.BAD_REQUEST('name must be 1–100 characters');
 
-    const team = await createTeam(name, user.id);
+    const leaderName = sanitizeString(body.leader_name, 100) || undefined;
+
+    const team = await createTeam(name, user.id, leaderName);
     logger.info('POST /api/teams (create)', { teamId: team.id, userId: user.id });
     return successResponse(team, undefined, 201);
 

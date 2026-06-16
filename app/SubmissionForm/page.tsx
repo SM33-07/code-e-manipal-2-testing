@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 import { useAuth } from "@/components/AuthProvider";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import type { Submission } from "@/components/SubmissionForm";
-import Image from "next/image";
 import { toast } from "sonner";
 import {
   Code2,
@@ -19,7 +18,7 @@ import {
   Github,
   Globe,
 } from "lucide-react";
-import { projectId, publicAnonKey } from "@/lib/supabase/info";
+
 
 // ─── Dynamic Imports (SSR disabled) ──────────────────────────────────────────
 // SubmissionForm: Main form component with 5 sections (Project, Tech, Links, Reflection, Team)
@@ -43,15 +42,7 @@ const AnimatedCounter = dynamic(
   { ssr: false }
 );
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-// SERVER_URL: Supabase edge function endpoint for submissions
-// HEADERS: Auth headers for API calls
-// CATEGORY_FILTERS: Dropdown options for category filtering in Browse tab
-const SERVER_URL = "https://ihnclawnbtkwvbfqwxfe.supabase.co/functions/v1/make-server-f5beda68";
-const HEADERS = {
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${publicAnonKey}`,
-};
+
 
 const CATEGORY_FILTERS = [
   "All",
@@ -66,17 +57,23 @@ const CATEGORY_FILTERS = [
 
 // ─── Stat Card Component ──────────────────────────────────────────────────────
 // Renders animated stat boxes in hero (Submissions, Categories, Hours Left)
-// Controls: background, border, shadow, number color, label text, animation delay
+// Design: left accent border, left-aligned label + large value + subtitle, badge pill top-right
 function StatCard({
   value,
   label,
   suffix = "",
   delay = 0,
+  subtitle = "",
+  badge = "",
+  accentColor = "#8F102A",
 }: {
   value: number;
   label: string;
   suffix?: string;
   delay?: number;
+  subtitle?: string;
+  badge?: string;
+  accentColor?: string;
 }) {
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -90,45 +87,80 @@ function StatCard({
     <div
       ref={ref}
       style={{
-        textAlign: "center",
-        padding: "20px 28px",
-        borderRadius: "14px",
-        background: "rgba(255,248,239,0.88)",
-        border: "1px solid #EBCFB5",
-        backdropFilter: "blur(10px)",
+        position: "relative",
+        padding: "24px 28px 22px",
+        borderRadius: "16px",
+        background: "var(--card)",
+        border: "1px solid var(--jaipur-secondary-light)",
+        borderLeft: `4px solid ${accentColor}`,
+        backdropFilter: "blur(12px)",
         opacity: visible ? 1 : 0,
-        transform: visible
-          ? "translateY(0)"
-          : "translateY(20px)",
+        transform: visible ? "translateY(0)" : "translateY(20px)",
         transition: `opacity 0.6s ease ${delay}ms, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
-        boxShadow: "0 6px 24px rgba(173,114,55,0.06)",
+        boxShadow: "0 4px 20px rgba(143,16,42,0.08)",
+        minWidth: "210px",
+        textAlign: "left",
       }}
     >
+      {/* Badge pill — top right */}
+      {badge && (
+        <div
+          style={{
+            position: "absolute",
+            top: 14,
+            right: 14,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            padding: "3px 10px",
+            borderRadius: "999px",
+            background: `${accentColor}18`,
+            color: accentColor,
+            fontSize: "0.72rem",
+            fontWeight: 600,
+          }}
+        >
+          ↗ {badge}
+        </div>
+      )}
+
+      {/* Label */}
+      <div
+        style={{
+          fontSize: "0.75rem",
+          color: "var(--muted-foreground)",
+          fontWeight: 500,
+          marginBottom: "6px",
+        }}
+      >
+        {label}
+      </div>
+
+      {/* Value */}
       <div
         style={{
           fontSize: "2rem",
-          fontWeight: 700,
-          background:
-            "linear-gradient(135deg, #8F102A, #D59B3D)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          lineHeight: 1,
+          fontWeight: 800,
+          color: "var(--foreground)",
+          lineHeight: 1.1,
           marginBottom: "6px",
         }}
       >
         <AnimatedCounter target={value} suffix={suffix} />
       </div>
-      <div
-        style={{
-          fontSize: "0.78rem",
-          color: "#7A5A4A",
-          fontWeight: 500,
-          letterSpacing: "0.04em",
-          textTransform: "uppercase",
-        }}
-      >
-        {label}
-      </div>
+
+      {/* Subtitle */}
+      {subtitle && (
+        <div
+          style={{
+            fontSize: "0.72rem",
+            color: "var(--muted-foreground)",
+            opacity: 0.7,
+          }}
+        >
+          {subtitle}
+        </div>
+      )}
     </div>
   );
 }
@@ -382,14 +414,12 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
-  const [headerVisible, setHeaderVisible] = useState(false);
   const [heroVisible, setHeroVisible] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Entrance animations on mount - staggers header then hero
+  // Entrance animations on mount
   useEffect(() => {
-    setTimeout(() => setHeaderVisible(true), 100);
-    setTimeout(() => setHeroVisible(true), 300);
+    setTimeout(() => setHeroVisible(true), 100);
   }, []);
 
   // Fetch submissions from server on mount
@@ -525,171 +555,31 @@ export default function Home() {
       <div
         style={{
           minHeight: "100vh",
-          background: "transparent",
-          color: "#7A5A4A",
+          color: "var(--foreground)",
           position: "relative",
+          zIndex: 2,
           fontFamily: "'Inter', system-ui, sans-serif",
-          overflowX: "hidden",
         }}
       >
-        {/* ── Header ── */}
-        <header
-          style={{
-            position: "sticky",
-            top: 0,
-            zIndex: 50,
-            borderBottom: "1px solid #EBCFB5",
-            background: "rgba(255,248,239,0.88)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            opacity: headerVisible ? 1 : 0,
-            transform: headerVisible
-              ? "translateY(0)"
-              : "translateY(-20px)",
-            transition:
-              "opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1)",
-          }}
-        >
-          <div
-            style={{
-              maxWidth: "1200px",
-              margin: "0 auto",
-              padding: "0 24px",
-              height: "64px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            {/* Logo */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "22px",
-              }}
-            >
-              <div
-                style={{
-                  width: "38px",
-                  height: "38px",
-                  borderRadius: "10px",
-                  background: "linear-gradient(135deg, #8F102A, #A61B36)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: "0 0 20px rgba(143,16,42,0.4)",
-                  flexShrink: 0,
-                }}
-              >
-                <Image
-                  src="/logo.png"
-                  alt="LearnIT Logo"
-                  width={30}
-                  height={30}
-                  style={{
-                    objectFit: "contain",
-                    width: "auto",
-                    height: "auto",
-                  }}
-                />
-              </div>
-              <div>
-                <div
-                  style={{
-                    fontSize: "1.05rem",
-                    fontWeight: 700,
-                    color: "#8F102A",
-                    letterSpacing: "-0.01em",
-                  }}
-                >
-                  
-                </div>
-                <div
-                  style={{
-                    fontSize: "0.7rem",
-                    color: "#B89A85",
-                    letterSpacing: "0.04em",
-                  }}
-                >
-                  POWERED BY LEARNIT MUJ
-                </div>
-              </div>
-            </div>
 
-            {/* Nav tabs */}
-            <div style={{ display: "flex", gap: "36px" }}>
-              <TabButton
-                active={activeTab === "submit"}
-                onClick={() => setActiveTab("submit")}
-              >
-                <Zap style={{ width: "14px", height: "14px" }} />
-                Submit
-              </TabButton>
-              <TabButton
-                active={activeTab === "browse"}
-                onClick={() => setActiveTab("browse")}
-                count={submissions.length}
-              >
-                <Trophy
-                  style={{ width: "14px", height: "14px" }}
-                />
-                Browse
-              </TabButton>
-            </div>
-
-            {/* Live badge */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "7px",
-                  padding: "6px 14px",
-                  borderRadius: "999px",
-                  background: "rgba(255,239,248,0.22)",
-                  border: "1px solid #E9C39B",
-                }}
-              >
-                <PulseRing />
-                <span
-                  style={{
-                    fontSize: "0.75rem",
-                    color: "#A15C2E",
-                    fontWeight: 500,
-                  }}
-                >
-                  Live
-                </span>
-              </div>
-
-              {/* User menu */}
-              <UserMenu />
-            </div>
-          </div>
-        </header>
-
-        {/* ── Hero ── Centered, animated entrance, gold badge, maroon/gold heading, stats */}
+        {/* ── Hero ── */}
         <section
           style={{
             position: "relative",
             zIndex: 10,
             textAlign: "center",
-            padding: "22px 24px 56px",
-            maxWidth: "1000px",
+            paddingTop: "128px",
+            paddingBottom: "40px",
+            paddingLeft: "80px",
+            paddingRight: "32px",
+            maxWidth: "1280px",
             margin: "0 auto",
             opacity: heroVisible ? 1 : 0,
             transform: heroVisible
               ? "translateY(0)"
               : "translateY(30px)",
             transition:
-              "opacity 0.8s ease 0.2s, transform 0.8s cubic-bezier(0.22,1,0.36,1) 0.2s",
+              "opacity 0.8s ease 0.1s, transform 0.8s cubic-bezier(0.22,1,0.36,1) 0.1s",
           }}
         >
           {/* Badge */}
@@ -704,7 +594,7 @@ export default function Home() {
               border: "1px solid #E9C39B",
               marginBottom: "24px",
               fontSize: "1.48rem",
-              color: "#A15C2E",
+              color: "#FFF6EE",
               fontWeight: 500,
               letterSpacing: "0.03em",
             }}
@@ -724,17 +614,12 @@ export default function Home() {
               letterSpacing: "-0.02em",
             }}
           >
-            <span
-              style={{
-                color: "#8F102A",
-                display: "block",
-              }}
-            >
+            <span style={{ color: "var(--jaipur-primary)", display: "block" }}>
               Build the Future,
             </span>
             <span
               style={{
-                color: "#D59B3D",
+                color: "var(--jaipur-gold)",
                 display: "block",
                 animation: "header-glow 3s ease-in-out infinite",
               }}
@@ -753,9 +638,9 @@ export default function Home() {
           <p
             style={{
               fontSize: "1.05rem",
-              color: "#7A5A4A",
+              color: "var(--muted-foreground)",
               maxWidth: "560px",
-              margin: "0 auto 40px",
+              margin: "0 auto 36px",
               lineHeight: 1.7,
             }}
           >
@@ -767,29 +652,65 @@ export default function Home() {
           {/* Stats */}
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "170px",
-              maxWidth: "480px",
-              margin: "0 auto",
+              display: "flex",
+              justifyContent: "flex-start",
+              gap: "16px",
+              flexWrap: "wrap",
+              margin: "0 0 36px",
+              marginLeft: "calc((100% - 560px) / 2 - 70px)",
             }}
           >
             <StatCard
               value={submissions.length}
-              label="Submissions"
-              delay={500}
+              label="Total Submissions"
+              subtitle="registered projects"
+              badge="Live"
+              accentColor="#8F102A"
+              delay={400}
             />
             <StatCard
               value={categories.length || 6}
-              label="Categories"
-              delay={650}
+              label="Active Tracks"
+              subtitle="tech categories"
+              badge="Open"
+              accentColor="#C9A227"
+              delay={550}
             />
             <StatCard
               value={48}
-              label="Hours Left"
+              label="Time Remaining"
               suffix="h"
-              delay={800}
+              subtitle="until deadline"
+              badge="Ongoing"
+              accentColor="#D4732A"
+              delay={700}
             />
+          </div>
+
+          {/* ── Tab Buttons below hero ── */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-start",
+              gap: "12px",
+              marginLeft: "calc((100% - 560px) / 2 + 20px)",
+            }}
+          >
+            <TabButton
+              active={activeTab === "submit"}
+              onClick={() => setActiveTab("submit")}
+            >
+              <Zap style={{ width: "14px", height: "14px" }} />
+              Submit Project
+            </TabButton>
+            <TabButton
+              active={activeTab === "browse"}
+              onClick={() => setActiveTab("browse")}
+              count={submissions.length}
+            >
+              <Trophy style={{ width: "14px", height: "14px" }} />
+              Browse Submissions
+            </TabButton>
           </div>
         </section>
 
@@ -798,9 +719,9 @@ export default function Home() {
           style={{
             position: "relative",
             zIndex: 10,
-            maxWidth: "1200px",
+            maxWidth: "1280px",
             margin: "0 auto",
-            padding: "0 24px 80px",
+            padding: "0px 32px 80px 0px",
           }}
         >
           {/* ── Submit Tab ── */}
@@ -810,9 +731,9 @@ export default function Home() {
                 animation:
                   "float-up 0.5s cubic-bezier(0.22,1,0.36,1) forwards",
                 display: "flex",
-                justifyContent: "flex-end",
+                justifyContent: "flex-start",
                 width: "100%",
-                paddingRight: "80px",
+                marginLeft: "calc((100% - 560px) / 2 - 10px)",
               }}
             >
               <div style={{ maxWidth: "720px", width: "100%" }}>
@@ -962,6 +883,7 @@ export default function Home() {
               style={{
                 animation:
                   "float-up 0.5s cubic-bezier(0.22,1,0.36,1) forwards",
+                marginLeft: "80px",
               }}
             >
               {/* Browse header */}

@@ -24,14 +24,14 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white/50 text-sm">
+      <div className="min-h-screen flex items-center justify-center text-[#A08070] text-sm">
         Checking session...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center text-white/50 text-sm">
+    <div className="min-h-screen flex items-center justify-center text-[#D4732A] text-sm font-medium">
       Redirecting...
     </div>
   );

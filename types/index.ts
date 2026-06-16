@@ -15,6 +15,7 @@ export interface Profile {
 export interface Team {
   id: string;
   name: string;
+  leader_name: string | null;
   hackathon: string;
   invite_code: string;
   created_by: string | null;

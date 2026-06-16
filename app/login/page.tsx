@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Users, Scale, ShieldCheck, Images } from "lucide-react";
 import clsx from "clsx";
+import { useTheme } from "next-themes";
 import { useAuth } from "@/components/AuthProvider";
 
 function OrnamentalDivider() {
@@ -30,6 +31,8 @@ function WideDivider() {
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
+  const { resolvedTheme } = useTheme();
+  const [isDark, setIsDark] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,6 +42,10 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [shake, setShake] = useState(false);
+
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains("dark"));
+  }, [resolvedTheme]);
 
   const triggerError = (msg: string) => {
     setError(msg);
@@ -76,31 +83,30 @@ export default function LoginPage() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-
       {/* Background */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 transition-all duration-300"
         style={{
           backgroundImage: "url(/images/backgrounds/login.webp)",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       />
-      <div className="absolute inset-0 bg-black/25" />
+      <div className={clsx("absolute inset-0 transition-colors duration-300", isDark ? "bg-black/60" : "bg-black/25")} />
 
       {/* Shift card right on desktop, center on smaller screens */}
       <div className="relative z-10 w-full h-full flex items-center justify-center px-4 lg:justify-end lg:px-20">
 
         <div
-          className={clsx("relative overflow-hidden flex flex-col", shake && "animate-shake")}
+          className={clsx("relative overflow-hidden flex flex-col transition-colors duration-300", shake && "animate-shake")}
           style={{
             width: "min(480px, 92vw)",
             padding: "36px 40px 32px",
-            background: "rgba(252,246,239,0.97)",
-            border: "1px solid rgba(233,216,199,0.8)",
+            background: isDark ? "rgba(15,10,5,0.85)" : "rgba(252,246,239,0.97)",
+            border: isDark ? "1px solid rgba(201,162,39,0.3)" : "1px solid rgba(233,216,199,0.8)",
             borderRadius: 24,
-            boxShadow: "0 16px 48px rgba(60,20,20,0.16)",
-            backdropFilter: "blur(8px)",
+            boxShadow: isDark ? "0 16px 48px rgba(0,0,0,0.5)" : "0 16px 48px rgba(60,20,20,0.16)",
+            backdropFilter: "blur(12px)",
           }}
         >
 
@@ -123,8 +129,8 @@ export default function LoginPage() {
 
           {/* Title */}
           <h1
-            className="text-center leading-none"
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 40, fontWeight: 700, color: "#4B1F24" }}
+            className="text-center leading-none transition-colors duration-300"
+            style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 40, fontWeight: 700, color: isDark ? "#F5EFE0" : "#4B1F24" }}
           >
             Welcome Back
           </h1>
@@ -136,8 +142,8 @@ export default function LoginPage() {
 
           {/* Subtitle */}
           <p
-            className="text-center mt-2.5"
-            style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: "#6E5A55" }}
+            className="text-center mt-2.5 transition-colors duration-300"
+            style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: isDark ? "#A08070" : "#6E5A55" }}
           >
             Access the Code-e-Manipal portal
           </p>
@@ -146,61 +152,61 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="flex flex-col mt-7">
 
             {/* Email */}
-            <label style={{ fontFamily: "'Inter',sans-serif", fontSize: 12, fontWeight: 500, color: "#5C4944", marginBottom: 6 }}>
+            <label style={{ fontFamily: "'Inter',sans-serif", fontSize: 12, fontWeight: 500, color: isDark ? "#F5EFE0" : "#5C4944", marginBottom: 6 }}>
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute text-[#9A7B73]" style={{ left: 14, top: "50%", transform: "translateY(-50%)", width: 16, height: 16 }} />
+              <Mail className="absolute transition-colors duration-300" style={{ left: 14, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: isDark ? "#A08070" : "#9A7B73" }} />
               <input
                 type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="w-full outline-none"
+                className={clsx("w-full outline-none transition-colors duration-300", isDark ? "placeholder-[#A08070]/60" : "placeholder-[#9A7B73]/60")}
                 style={{
                   height: 48,
-                  background: "rgba(255,250,245,0.92)",
-                  border: "1px solid #DFCDBD",
+                  background: isDark ? "rgba(15,10,5,0.6)" : "rgba(255,250,245,0.92)",
+                  border: isDark ? "1px solid rgba(201,162,39,0.3)" : "1px solid #DFCDBD",
                   borderRadius: 11,
                   paddingLeft: 40,
                   paddingRight: 14,
                   fontSize: 14,
-                  color: "#5B4640",
+                  color: isDark ? "#F5EFE0" : "#5B4640",
                   fontFamily: "'Inter',sans-serif",
                 }}
               />
             </div>
 
             {/* Password */}
-            <label style={{ fontFamily: "'Inter',sans-serif", fontSize: 12, fontWeight: 500, color: "#5C4944", marginTop: 16, marginBottom: 6 }}>
+            <label style={{ fontFamily: "'Inter',sans-serif", fontSize: 12, fontWeight: 500, color: isDark ? "#F5EFE0" : "#5C4944", marginTop: 16, marginBottom: 6 }}>
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute text-[#9A7B73]" style={{ left: 14, top: "50%", transform: "translateY(-50%)", width: 16, height: 16 }} />
+              <Lock className="absolute transition-colors duration-300" style={{ left: 14, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: isDark ? "#A08070" : "#9A7B73" }} />
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                className="w-full outline-none"
+                className={clsx("w-full outline-none transition-colors duration-300", isDark ? "placeholder-[#A08070]/60" : "placeholder-[#9A7B73]/60")}
                 style={{
                   height: 48,
-                  background: "rgba(255,250,245,0.92)",
-                  border: "1px solid #DFCDBD",
+                  background: isDark ? "rgba(15,10,5,0.6)" : "rgba(255,250,245,0.92)",
+                  border: isDark ? "1px solid rgba(201,162,39,0.3)" : "1px solid #DFCDBD",
                   borderRadius: 11,
                   paddingLeft: 40,
                   paddingRight: 40,
                   fontSize: 14,
-                  color: "#5B4640",
+                  color: isDark ? "#F5EFE0" : "#5B4640",
                   fontFamily: "'Inter',sans-serif",
                 }}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(v => !v)}
-                className="absolute text-[#9A7B73] hover:text-[#4B1F24] transition-colors"
+                className={clsx("absolute transition-colors", isDark ? "text-[#A08070] hover:text-[#C9A227]" : "text-[#9A7B73] hover:text-[#4B1F24]")}
                 style={{ right: 14, top: "50%", transform: "translateY(-50%)" }}
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -221,13 +227,17 @@ export default function LoginPage() {
                     fontSize: 13,
                     fontWeight: 500,
                     fontFamily: "'Inter',sans-serif",
-                    background: role === value ? "linear-gradient(135deg,#8B1F44,#6D1632)" : "rgba(255,251,247,0.85)",
-                    border: role === value ? "none" : "1px solid #E2D0C1",
-                    color: role === value ? "#FFFFFF" : "#6D524A",
-                    boxShadow: role === value ? "0 4px 12px rgba(139,31,68,0.28)" : "none",
+                    background: role === value 
+                      ? (isDark ? "linear-gradient(135deg,#D4732A,#C1440E)" : "linear-gradient(135deg,#8B1F44,#6D1632)") 
+                      : (isDark ? "rgba(15,10,5,0.4)" : "rgba(255,251,247,0.85)"),
+                    border: role === value ? "none" : (isDark ? "1px solid rgba(201,162,39,0.2)" : "1px solid #E2D0C1"),
+                    color: role === value ? "#FFFFFF" : (isDark ? "#A08070" : "#6D524A"),
+                    boxShadow: role === value 
+                      ? (isDark ? "0 4px 12px rgba(212,115,42,0.3)" : "0 4px 12px rgba(139,31,68,0.28)") 
+                      : "none",
                   }}
                 >
-                  <Icon size={14} style={{ color: role === value ? "#F6D8B4" : "#B48870" }} />
+                  <Icon size={14} style={{ color: role === value ? (isDark ? "#F5EFE0" : "#F6D8B4") : (isDark ? "#A08070" : "#B48870") }} />
                   {label}
                 </button>
               ))}
@@ -247,9 +257,9 @@ export default function LoginPage() {
               className="relative flex items-center justify-center transition-opacity disabled:opacity-70 mt-5"
               style={{
                 height: 50,
-                background: "linear-gradient(135deg,#8B1F44,#6B142F)",
+                background: isDark ? "linear-gradient(135deg,#D4732A,#C1440E)" : "linear-gradient(135deg,#8B1F44,#6B142F)",
                 borderRadius: 12,
-                boxShadow: "0 10px 24px rgba(107,20,47,0.28)",
+                boxShadow: isDark ? "0 10px 24px rgba(212,115,42,0.3)" : "0 10px 24px rgba(107,20,47,0.28)",
                 fontSize: 16,
                 fontWeight: 600,
                 color: "white",
@@ -267,13 +277,14 @@ export default function LoginPage() {
                   type="checkbox"
                   checked={remember}
                   onChange={e => setRemember(e.target.checked)}
-                  style={{ width: 14, height: 14, accentColor: "#8B1F44" }}
+                  style={{ width: 14, height: 14, accentColor: isDark ? "#D4732A" : "#8B1F44" }}
                 />
-                <span style={{ fontSize: 12, color: "#6A5650", fontFamily: "'Inter',sans-serif" }}>Remember me</span>
+                <span style={{ fontSize: 12, color: isDark ? "#A08070" : "#6A5650", fontFamily: "'Inter',sans-serif" }}>Remember me</span>
               </label>
               <button
                 type="button"
-                style={{ fontSize: 12, fontWeight: 500, color: "#8A3150", fontFamily: "'Inter',sans-serif", background: "none", border: "none", cursor: "pointer" }}
+                className={clsx("transition-colors", isDark ? "hover:text-[#F0C060]" : "hover:text-[#4B1F24]")}
+                style={{ fontSize: 12, fontWeight: 500, color: isDark ? "#D4732A" : "#8A3150", fontFamily: "'Inter',sans-serif", background: "none", border: "none", cursor: "pointer" }}
               >
                 Forgot password?
               </button>
@@ -287,7 +298,7 @@ export default function LoginPage() {
           </div>
 
           {/* Demo mode */}
-          <p className="text-center mt-4" style={{ fontSize: 12, color: "#7A655D", fontFamily: "'Inter',sans-serif" }}>
+          <p className="text-center mt-4 transition-colors duration-300" style={{ fontSize: 12, color: isDark ? "#A08070" : "#7A655D", fontFamily: "'Inter',sans-serif" }}>
             Demo mode enabled
           </p>
 
@@ -297,8 +308,8 @@ export default function LoginPage() {
               href="/gallery"
               className="flex items-center justify-center gap-2 hover:opacity-75 transition-opacity"
             >
-              <Images size={16} style={{ color: "#7B1E3A" }} />
-              <span style={{ fontSize: 14, fontWeight: 600, color: "#7B1E3A", fontFamily: "'Inter',sans-serif" }}>
+              <Images size={16} style={{ color: isDark ? "#F0C060" : "#7B1E3A" }} />
+              <span style={{ fontSize: 14, fontWeight: 600, color: isDark ? "#F0C060" : "#7B1E3A", fontFamily: "'Inter',sans-serif" }}>
                 View Public Gallery
               </span>
             </Link>

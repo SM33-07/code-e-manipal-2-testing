@@ -53,7 +53,7 @@ export default function ProjectDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#050816]">
+      <div className="min-h-screen flex items-center justify-center bg-transparent">
         <h1 className="text-white text-xl">Loading project...</h1>
       </div>
     )
@@ -61,7 +61,7 @@ export default function ProjectDetail() {
 
   if (!project) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#050816]">
+      <div className="min-h-screen flex items-center justify-center bg-transparent">
         <h1 className="text-white text-2xl">Project not found</h1>
       </div>
     )
@@ -75,7 +75,7 @@ export default function ProjectDetail() {
           <div className="container mx-auto px-4 py-10">
             <motion.button
               onClick={() => router.push("/gallery")}
-              className="flex items-center gap-2 text-white mb-8 hover:text-purple-400"
+              className="flex items-center gap-2 text-white mb-8 hover:text-[#D4732A]"
             >
               <ArrowLeft className="w-5 h-5" />
               Back to Gallery
@@ -87,7 +87,7 @@ export default function ProjectDetail() {
                   <h1 className="text-4xl text-white font-bold">
                     {project.title}
                   </h1>
-                  <p className="text-purple-400 mt-2">
+                  <p className="text-[#D4732A] mt-2">
                     by {project.teams?.name ?? "Unknown Team"}
                   </p>
                 </GlassCard>
@@ -99,7 +99,6 @@ export default function ProjectDetail() {
                       src={project.demo_video_url}
                       controls
                       autoPlay
-                      muted
                       loop
                       className="rounded-lg w-full"
                     />
@@ -144,7 +143,7 @@ export default function ProjectDetail() {
               <div className="space-y-6">
                 <GlassCard className="p-6">
                   <h3 className="text-white text-lg mb-3 flex items-center gap-2">
-                    <Star className="text-yellow-400" />
+                    <Star className="text-[#C9A227]" />
                     Project Details
                   </h3>
                   <div className="space-y-3 text-sm">
@@ -165,17 +164,17 @@ export default function ProjectDetail() {
                 {(project.github_url || project.demo_url || project.docs_url) && (
                   <GlassCard className="p-6 space-y-4">
                     {project.github_url && (
-                      <a href={project.github_url} target="_blank" className="flex items-center gap-2 text-purple-400 hover:text-purple-300">
+                      <a href={project.github_url} target="_blank" className="flex items-center gap-2 text-[#D4732A] hover:text-[#E8924A]">
                         <Github className="w-5 h-5" /> GitHub Repository
                       </a>
                     )}
                     {project.demo_url && (
-                      <a href={project.demo_url} target="_blank" className="flex items-center gap-2 text-purple-400 hover:text-purple-300">
+                      <a href={project.demo_url} target="_blank" className="flex items-center gap-2 text-[#D4732A] hover:text-[#E8924A]">
                         <Globe className="w-5 h-5" /> Live Demo
                       </a>
                     )}
                     {project.docs_url && (
-                      <a href={project.docs_url} target="_blank" className="flex items-center gap-2 text-purple-400 hover:text-purple-300">
+                      <a href={project.docs_url} target="_blank" className="flex items-center gap-2 text-[#D4732A] hover:text-[#E8924A]">
                         <BookOpen className="w-5 h-5" /> Documentation
                       </a>
                     )}

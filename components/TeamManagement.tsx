@@ -33,6 +33,7 @@ interface TeamMember {
 interface TeamInfo {
   id: string
   name: string
+  leaderName: string
   leaderId: string
   members: TeamMember[]
   inviteCode: string
@@ -65,6 +66,7 @@ function mapApiTeamToInfo(team: any): TeamInfo {
   return {
     id: team.id,
     name: team.name,
+    leaderName: team.leader_name || "",
     leaderId: leader?.user_id || team.created_by || "",
     members,
     inviteCode: team.invite_code || "",
@@ -82,6 +84,7 @@ export function TeamManagement() {
   const [allTeams, setAllTeams]       = useState<TeamInfo[]>([])
   const [myTeam, setMyTeam]           = useState<TeamInfo | null>(null)
   const [teamName, setTeamName]       = useState("")
+  const [leaderName, setLeaderName]   = useState("")
   const [inviteCode, setInviteCode]   = useState("")
   const [copiedCode, setCopiedCode]   = useState(false)
   const [email, setEmail]             = useState("")
@@ -158,13 +161,13 @@ export function TeamManagement() {
       const res = await fetch("/api/teams", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "create", name: teamName.trim() }),
+        body: JSON.stringify({ action: "create", name: teamName.trim(), leader_name: leaderName.trim() || undefined }),
       })
       if (!res.ok) {
         const data = await res.json()
         return setError(data.error || "Failed to create team")
       }
-      setTeamName(""); setError("")
+      setTeamName(""); setLeaderName(""); setError("")
       await refreshAll()
     } catch {
       setError("Failed to create team. Please try again.")
@@ -253,23 +256,25 @@ export function TeamManagement() {
   // ── LOGIN WALL ─────────────────────────────────────────────────────────────
   if (!isAuthenticated) {
     return (
-      <div style={{ position: "absolute", left: 654, top: 359, width: 420 }}>
-        <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <input
-            type="email" value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email" required
-            style={inputStyle}
-          />
-          <input
-            type="password" value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password" required
-            style={inputStyle}
-          />
-          {error && <span style={errorStyle}>{error}</span>}
-          <button type="submit" style={primaryBtn}>Sign In with SSO</button>
-        </form>
+      <div className="min-h-screen flex items-center justify-center pt-20">
+        <div style={{ width: 420 }}>
+          <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <input
+              type="email" value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email" required
+              style={inputStyle}
+            />
+            <input
+              type="password" value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password" required
+              style={inputStyle}
+            />
+            {error && <span style={errorStyle}>{error}</span>}
+            <button type="submit" style={primaryBtn}>Sign In with SSO</button>
+          </form>
+        </div>
       </div>
     )
   }
@@ -277,66 +282,63 @@ export function TeamManagement() {
   // ── LOADING STATE ──────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div style={{
-        position: "absolute", left: 300, top: 420, width: 540, height: 370,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontFamily: F, fontSize: 16, color: "#8B1C2E",
-      }}>
-        Loading your team...
+      <div className="min-h-screen flex items-center justify-center pt-20">
+        <div style={{
+          width: 540, height: 370,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontFamily: F, fontSize: 16, color: "#8B1C2E",
+        }}>
+          Loading your team...
+        </div>
       </div>
     )
   }
 
   // ── AUTHENTICATED DASHBOARD ───────────────────────────────────────────────
   return (
-    <>
+    <div className="max-w-6xl mx-auto pt-24 px-6 flex flex-col gap-6 pb-20">
 
       {/* ── HERO TEXT BLOCK ────────────────────────────────────────────────── */}
-      <div style={{ position: "absolute", left: 200, top: 118, width: 1040, height: 230 }}>
+      <div className="relative w-full">
         <h1 style={{
-          position: "absolute", left: 80, top: 48,
-          fontFamily: SERIF, fontSize: 62, fontWeight: 700,
-          color: "#8B1C2E", lineHeight: 1.1, margin: 0,
+          fontFamily: SERIF, fontSize: 48, fontWeight: 700,
+          color: "#D4732A", lineHeight: 1.1, margin: 0,
         }}>
-          
+          Team Dashboard
         </h1>
         <p style={{
-          position: "absolute", left: 92, top: 155,
-          fontFamily: F, fontSize: 18, color: "#7A4B38", margin: 0,
+          fontFamily: F, fontSize: 18, color: "#A08070", margin: "8px 0 0 0",
         }}>
-          {HACKATHON_CONFIG.name}
+          {HACKATHON_CONFIG.name || "Code-E-Manipal Hackathon"}
         </p>
         <div style={{
-          position: "absolute", left: 92, top: 220,
-          width: 0, height: 2,
-          background: "linear-gradient(to right, #C8941C, transparent)",
+          width: "100%", height: 1, marginTop: 16,
+          background: "linear-gradient(to right, #C9A227, transparent)",
         }} />
       </div>
 
       {/* ── PHASE BAR ──────────────────────────────────────────────────────── */}
       <div style={{
-        position: "absolute", left: 220, top: 350,
-        width: 1100, height: 60,
-        background: "transparent",
-        backdropFilter: "blur(14px)",
-        WebkitBackdropFilter: "blur(14px)",
-        border: "1px solid rgba(200,160,110,0.25)",
-        borderRadius: 20,
-        boxShadow: "0 4px 20px rgba(120,70,40,0.07)",
-        display: "flex", alignItems: "center", gap: 20, paddingInline: 28,
+        width: "100%", height: "auto", minHeight: 60,
+        background: "#1E1208",
+        border: "1px solid #C9A227",
+        borderRadius: 16,
+        boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+        display: "flex", alignItems: "center", gap: 20, padding: "16px 28px",
+        flexWrap: "wrap"
       }}>
         <div style={{
           width: 36, height: 36, borderRadius: "50%",
-          background: "rgba(139,28,46,0.85)",
+          background: "#2D1B10", border: "1px solid #C9A227",
           display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
         }}>
-          <Shield size={24} style={{ color: "#C8941C" }} />
+          <Shield size={20} style={{ color: "#D4732A" }} />
         </div>
-        <div style={{ flex: 1 }}>
-          <span style={{ fontSize: 23, fontWeight: 700, color: "#8B1C2E", fontFamily: F }}>
+        <div style={{ flex: 1, minWidth: 250 }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: "#F5EFE0", fontFamily: F }}>
             Phase {HACKATHON_CONFIG.phase}:
           </span>
-          <span style={{ fontSize: 23, color: "#7A4B38", fontFamily: F, marginLeft: 5 }}>
+          <span style={{ fontSize: 16, color: "#A08070", fontFamily: F, marginLeft: 8 }}>
             {HACKATHON_CONFIG.phase === 1 ? "Team Registration Open" : "Submission Period — Teams Locked"}
             {" — "}Team size: {HACKATHON_CONFIG.minTeamSize}–{HACKATHON_CONFIG.maxTeamSize} members
           </span>
@@ -347,39 +349,41 @@ export function TeamManagement() {
           style={{
             flexShrink: 0, display: "flex", alignItems: "center", gap: 6,
             height: 38, padding: "0 18px", borderRadius: 10,
-            background: "transparent", border: "none", boxShadow: "none",
-            color: "#8B1C2E", fontSize: 23, fontWeight: 600,
-            fontFamily: F, cursor: "pointer",
+            background: "#2D1B10", border: "1px solid #D4732A",
+            color: "#F5EFE0", fontSize: 15, fontWeight: 600,
+            fontFamily: F, cursor: "pointer", transition: "all 0.2s"
           }}
+          onMouseOver={(e) => e.currentTarget.style.background = "#D4732A"}
+          onMouseOut={(e) => e.currentTarget.style.background = "#2D1B10"}
         >
-          <LogOut size={20} /> Logout
+          <LogOut size={16} /> Logout
         </button>
       </div>
 
       {/* ── ERROR BANNER ───────────────────────────────────────────────────── */}
       {error && (
         <div style={{
-          position: "absolute", left: 260, top: 492,
-          width: 1040,
-          padding: "10px 18px",
-          background: "rgba(254,240,238,0.9)", borderRadius: 10,
-          border: "1px solid #F5C6C0",
-          fontSize: 13, color: "#8B1C2E", fontFamily: F,
+          width: "100%",
+          padding: "12px 18px",
+          background: "rgba(212,115,42,0.1)", borderRadius: 10,
+          border: "1px solid #D4732A",
+          fontSize: 14, color: "#F5EFE0", fontFamily: F,
         }}>
           {error}
         </div>
       )}
 
+      {/* ── CONTENT GRID ───────────────────────────────────────────────────── */}
+      <div className="flex flex-col md:flex-row gap-6 items-start w-full">
+
       {/* ── LEFT CARD ──────────────────────────────────────────────────────── */}
       <div style={{
-        position: "absolute", left: 300, top: 420,
-        width: 540, height: 370,
-        background: "rgba(255,252,248,0.45)",
-        backdropFilter: "blur(18px)",
-        WebkitBackdropFilter: "blur(18px)",
-        border: "1px solid rgba(200,160,110,0.22)",
-        borderRadius: 24,
-        boxShadow: "0 8px 40px rgba(120,70,40,0.10)",
+        flex: "1 1 540px",
+        minHeight: 370,
+        background: "#1E1208",
+        border: "1px solid #C9A227",
+        borderRadius: 20,
+        boxShadow: "0 8px 40px rgba(0,0,0,0.4)",
         overflow: "visible",
       }}>
         {myTeam ? (
@@ -401,6 +405,11 @@ export function TeamManagement() {
                   <p style={{ fontSize: 16, color: "#9A6B56", margin: "4px 0 0", fontFamily: F }}>
                     {isTeamLeader ? "You are the team leader" : "Team member"}
                   </p>
+                  {myTeam.leaderName && (
+                    <p style={{ fontSize: 13, color: "#8B5A1A", margin: "2px 0 0", fontFamily: F, fontWeight: 600 }}>
+                      Leader: {myTeam.leaderName}
+                    </p>
+                  )}
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8, flexShrink: 0, marginTop: 6 }}>
@@ -531,16 +540,24 @@ export function TeamManagement() {
                 Create a Team
               </h2>
             </div>
-            <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <input
                 value={teamName}
                 onChange={(e) => setTeamName(e.target.value)}
                 placeholder="Enter team name"
-                style={inputStyle}
+                style={{ ...inputStyle, flex: "unset", width: "100%" }}
               />
-              <button type="button" onClick={createTeam} style={primaryBtn}>
-                <UserPlus size={15} /> Create
-              </button>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <input
+                  value={leaderName}
+                  onChange={(e) => setLeaderName(e.target.value)}
+                  placeholder="Team leader name"
+                  style={inputStyle}
+                />
+                <button type="button" onClick={createTeam} style={primaryBtn}>
+                  <UserPlus size={15} /> Create
+                </button>
+              </div>
             </div>
             <div style={{ borderTop: "1px solid rgba(234,215,202,0.4)", margin: "24px 0" }} />
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
@@ -567,17 +584,15 @@ export function TeamManagement() {
       {/* ── RIGHT CARD — All Teams List (admin only) ────────────────────────── */}
       {role === "admin" && (
         <div style={{
-          position: "absolute", left: 860, top: 420,
-          width: 380, height: 370,
-          background: "rgba(255,252,248,0.40)",
-          backdropFilter: "blur(18px)",
-          WebkitBackdropFilter: "blur(18px)",
-          border: "1px solid rgba(200,160,110,0.22)",
-          borderRadius: 24,
-          boxShadow: "0 8px 40px rgba(120,70,40,0.10)",
+          flex: "0 1 380px",
+          height: 500,
+          background: "#1E1208",
+          border: "1px solid #C9A227",
+          borderRadius: 20,
+          boxShadow: "0 8px 40px rgba(0,0,0,0.4)",
           overflow: "hidden",
           display: "flex", flexDirection: "column",
-          padding: "15px 24px",
+          padding: "20px 24px",
           boxSizing: "border-box",
         }}>
           <h2 style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 700, color: "#8B1C2E", margin: 0 }}>
@@ -627,7 +642,8 @@ export function TeamManagement() {
         </div>
       )}
 
-    </>
+      </div>
+    </div>
   )
 }
 
@@ -638,8 +654,8 @@ export function TeamManagement() {
 const inputStyle: React.CSSProperties = {
   flex: 1, height: 48, borderRadius: 12,
   border: "1px solid rgba(220,200,185,0.35)",
-  background: "rgba(255,253,251,0.15)",
-  paddingLeft: 14, fontSize: 14, color: "#5B2D1F",
+  background: "rgba(255,253,251,0.08)",
+  paddingLeft: 14, fontSize: 14, color: "#F5EFE0",
   fontFamily: "'Inter', sans-serif", outline: "none",
 }
 

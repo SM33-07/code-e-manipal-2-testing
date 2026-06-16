@@ -83,7 +83,6 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
 
       if (!res.ok) throw new Error("Save failed");
 
-      // Mark submission as judged locally
       setSubmissions((prev) =>
         prev.map((s) =>
           s.id === score.submissionId ? { ...s, judged: true } : s
@@ -101,8 +100,8 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
 
   if (loading) {
     return (
-      <div className="min-h-screen p-6 flex items-center justify-center">
-        <p className="text-white/50 text-sm">Loading your assignments...</p>
+      <div className="min-h-[60vh] p-6 flex items-center justify-center">
+        <p className="text-[#A08070] font-medium text-sm">Loading your assignments...</p>
       </div>
     );
   }
@@ -120,110 +119,92 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4 ml-24 mt-4">
-            <Image src="/logo.png" alt="logo" width={60} height={60} />
+    <div className="w-full pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-8 mt-4">
+          <div className="flex items-center gap-4">
+            <Image src="/logo.png" alt="logo" width={60} height={60} className="w-12 h-12 sm:w-[60px] sm:h-[60px]" />
             <div>
-             <h1
-  className="text-[52px] leading-[0.95] font-bold tracking-[-1.5px] text-[#7A002C]"
-  style={{
-    fontFamily: "Cormorant Garamond, serif",
-    textShadow: "0 2px 4px rgba(255,255,255,0.3)",
-  }}
->
+              <h1
+                className="text-3xl sm:text-[42px] md:text-[52px] leading-none font-bold tracking-tight text-[#F5EFE0]"
+                style={{
+                  fontFamily: "Cormorant Garamond, serif",
+                  textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+                }}
+              >
                 Judge Panel
               </h1>
-             <p className="text-[20px] font-medium text-[#8A6A50] mt-2">
+              <p className="text-lg sm:text-[20px] font-medium text-[#A08070] mt-1 sm:mt-2">
                 Welcome, {judgeName}
               </p>
             </div>
           </div>
           <Button
-  variant="outline"
-  onClick={onLogout}
-  className="
-    mr-24 mt-4
-    w-[120px]
-    h-[60px]
-    rounded-[18px]
-    border-2
-    border-[#D6A654]
-    bg-gradient-to-b
-    from-[#9C0038]
-    to-[#7C002B]
-    text-[#FFF7ED]
-    text-[18px]
-    font-bold
-    shadow-[0_8px_18px_rgba(122,0,44,0.22)]
-    hover:translate-y-[-1px]
-    hover:from-[#AD0040]
-    hover:to-[#850030]
-    transition-all
-  "
->
-            <LogOut className="w-5 h-5 mr-2 text-[#E2B45D]" />
+            variant="outline"
+            onClick={onLogout}
+            className="
+              w-full sm:w-auto
+              h-12 sm:h-[50px]
+              rounded-xl sm:rounded-[14px]
+              border border-[#C9A227]/30
+              bg-transparent
+              text-[#D4732A] text-base sm:text-[16px] font-bold
+              shadow-md hover:-translate-y-[1px]
+              hover:bg-[#C9A227]/10
+              transition-all px-6
+            "
+          >
+            <LogOut className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#C9A227]" />
             Logout
           </Button>
         </div>
 
-        <Tabs defaultValue="submissions" className="space-y-10 ml-24">
-          <TabsList className="bg-transparent gap-5 h-auto p-0">
-           <TabsTrigger
-  value="submissions"
-  className="
-    w-[230px]
-    h-[52px]
-    rounded-[18px]
-    border
-    border-[#D4A14B]
-    bg-gradient-to-b
-    from-[#A0003A]
-    to-[#87002F]
-    text-[#FFF6EC]
-    text-[18px]
-    font-bold
-    shadow-[0_8px_20px_rgba(122,0,44,0.22)]
-    data-[state=active]:bg-gradient-to-b
-    data-[state=active]:from-[#A0003A]
-    data-[state=active]:to-[#87002F]
-    hover:translate-y-[-1px]
-    transition-all
-  "
->
-              <Award className="w-5 h-5 mr-3 text-[#B57D2F]" />
+        <Tabs defaultValue="submissions" className="w-full">
+          <TabsList className="bg-transparent flex flex-col sm:flex-row gap-3 sm:gap-5 h-auto p-0 mb-8 overflow-x-auto">
+            <TabsTrigger
+              value="submissions"
+              className="
+                w-full sm:w-auto px-6
+                h-12 sm:h-[52px]
+                rounded-xl sm:rounded-[14px]
+                border border-[#C9A227]/30
+                bg-[#1A1F4B]
+                text-[#F5EFE0] text-base sm:text-[18px] font-bold
+                shadow-md data-[state=active]:bg-[#1A1F4B]
+                data-[state=active]:border-[#F0C060] data-[state=active]:text-[#F0C060]
+                hover:-translate-y-[1px] transition-all
+                whitespace-nowrap flex-1 sm:flex-none
+              "
+            >
+              <Award className="w-5 h-5 mr-2 sm:mr-3 text-[#F0C060]" />
               My Submissions
             </TabsTrigger>
-           <TabsTrigger
-  value="leaderboard"
-  className="
-    w-[230px]
-    h-[52px]
-    rounded-[18px]
-    border-2
-    border-[#D9AE63]
-    bg-[rgba(255,250,244,0.88)]
-    text-[#A26A22]
-    text-[18px]
-    font-semibold
-    hover:bg-[#FFF4E6]
-    transition-all
-  "
->
-              <FileText className="w-5 h-5 mr-3 text-[#E2B45D]" />
+            <TabsTrigger
+              value="leaderboard"
+              className="
+                w-full sm:w-auto px-6
+                h-12 sm:h-[52px]
+                rounded-xl sm:rounded-[14px]
+                border border-[#C9A227]/20
+                bg-[#1E1208]
+                text-[#A08070] text-base sm:text-[18px] font-semibold
+                hover:bg-[#C9A227]/10 transition-all shadow-sm
+                whitespace-nowrap flex-1 sm:flex-none
+              "
+            >
+              <FileText className="w-5 h-5 mr-2 sm:mr-3 text-[#C9A227]" />
               Leaderboard
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="submissions">
+          <TabsContent value="submissions" className="mt-0 outline-none">
             <SubmissionList
               submissions={submissions}
               onSelectSubmission={setSelectedSubmissionId}
             />
           </TabsContent>
 
-          <TabsContent value="leaderboard">
+          <TabsContent value="leaderboard" className="mt-0 outline-none">
             <Leaderboard submissions={submissions} scores={allScores} />
           </TabsContent>
         </Tabs>

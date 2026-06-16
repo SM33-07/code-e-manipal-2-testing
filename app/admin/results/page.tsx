@@ -28,7 +28,7 @@ export default function ResultsPage() {
   }
 
   return (
-    <div style={{ maxWidth: 1100, width: "100%", margin: "310px auto 0", padding: "0 1px", boxSizing: "border-box" }}>
+    <div style={{ maxWidth: 1100, width: "100%", margin: "0 auto", padding: "0 1px", boxSizing: "border-box" }}>
 
       {/* Header */}
       <div className="flex items-center justify-between" style={{ marginBottom: 20 }}>

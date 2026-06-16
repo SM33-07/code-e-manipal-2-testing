@@ -30,7 +30,7 @@ export default function ProjectOverview({ title, summary, category, technologies
       <div className="grid sm:grid-cols-2 gap-6">
         {/* Category */}
         <div>
-          <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+          <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[#A08070]-foreground mb-2">
             <Tag className="w-4 h-4" /> Category
           </h3>
           <span className="tech-badge inline-block">{category}</span>
@@ -38,7 +38,7 @@ export default function ProjectOverview({ title, summary, category, technologies
 
         {/* Tech Stack */}
         <div>
-          <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+          <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[#A08070]-foreground mb-2">
             <Cpu className="w-4 h-4" /> Tech Stack
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -59,7 +59,7 @@ export default function ProjectOverview({ title, summary, category, technologies
 
       {/* Team Members */}
       <div>
-        <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+        <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[#A08070]-foreground mb-3">
           <Users className="w-4 h-4" /> Team Members
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -69,15 +69,15 @@ export default function ProjectOverview({ title, summary, category, technologies
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 + i * 0.1 }}
-              className="flex items-center gap-3 p-3 rounded-xl bg-muted/50"
+              className="flex items-center gap-3 p-3 rounded-xl bg-[#A08070]/50"
             >
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0"
                 style={{ background: "linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)))" }}>
                 {member.name.charAt(0)}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{member.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{member.role}</p>
+                <p className="text-sm font-medium text-[#F5EFE0] truncate">{member.name}</p>
+                <p className="text-xs text-[#A08070]-foreground truncate">{member.role}</p>
               </div>
             </motion.div>
           ))}

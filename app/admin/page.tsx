@@ -4,33 +4,11 @@ import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import {
   ArrowRight, ChevronDown, CheckCircle, FileText,
-  Flame, Scale, Shuffle, Trophy, UserCircle, Users, Trash2,
+  Scale, Shuffle, Trophy, UserCircle, Users, Trash2,
 } from "lucide-react"
 
 const F     = "'Inter', sans-serif"
 const SERIF = "'Cormorant Garamond', serif"
-
-/*
-  Canvas: 1500×900. Main content origin: left=225, top=12.
-  So page coords = canvas coords minus (225, 12).
-
-  From pixel analysis (canvas coords):
-    Hero card:     cy ≈ 96–210   → page top = 96-12  = 84,  height=114
-    Hero content starts at canvas left ≈ 270 → page left = 270-225 = 45
-    Hero card right edge ≈ cx=1460 → width = 1460-270 = 1190
-
-    Stat cards:    cy ≈ 306–406  → page top = 294,  height=100
-    Stat left ≈ cx=270 → page left=45
-    Stat right ≈ cx=1460 → width=1190
-
-    Judge panel:   cy ≈ 400–870  → page top=388, height=470
-    Judge left ≈ cx=270 → page left=45
-    Judge right ≈ cx=1050 → width=780
-
-    Results panel: cy ≈ 400–870  → page top=388, height=470
-    Results left ≈ cx=1070 → page left=845
-    Results right ≈ cx=1460 → width=390
-*/
 
 export default function AdminPage() {
   const router = useRouter()
@@ -131,80 +109,29 @@ export default function AdminPage() {
     loadAssignments()
   }
 
-  const dropStyle: React.CSSProperties = {
-    height: 38, width: "100%",
-    border: "1px solid rgba(225,210,198,0.85)", borderRadius: 10,
-    background: "rgba(253,246,241,0.92)",
-    paddingLeft: 11, paddingRight: 30,
-    fontSize: 13, color: "#44211A",
-    fontFamily: F, outline: "none", appearance: "none", cursor: "pointer",
-  }
-
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%", fontFamily: F }}>
+    <div className="w-full max-w-7xl mx-auto flex flex-col gap-8 pb-12">
 
-      {/* ═══════════════════════════════════════════
-          HERO BANNER
-          Canvas: cy=96–210, cx=270–1460
-          Page:   top=84,    left=45, w=1190, h=114
-      ═══════════════════════════════════════════ */}
-      <div style={{
-        position: "absolute",
-        left: 45, top: 84,
-        width: 1190, height: 114,
-        display: "flex", alignItems: "center",
-        background: "transparent",
-        pointerEvents: "none",
-      }}>
-        <div style={{
-          width: 0, height: 0, flexShrink: 0, borderRadius: 14,
-          background: "rgba(139,23,48,0.10)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          marginLeft: 24,
-        }}>
-
-        </div>
-        <div style={{ marginLeft: 18 }}>
-          <h1 style={{
-            fontFamily: SERIF, fontSize: 24, fontWeight: 700,
-            color: "#5A1420", margin: 0, lineHeight: 1.2,
-          }}>
-
-          </h1>
-          <p style={{ fontSize: 13, color: "#A36F55", margin: "4px 0 0", fontFamily: F }}>
-
-          </p>
-        </div>
+      {/* Hero Header */}
+      <div>
+        <h1 className="text-3xl md:text-4xl font-bold text-[#F5EFE0] mb-2" style={{ fontFamily: SERIF }}>
+          Admin Dashboard
+        </h1>
+        <p className="text-[#A08070]" style={{ fontFamily: F }}>
+          Manage hackathon operations, assign judges, and review results.
+        </p>
       </div>
 
-      {/* ═══════════════════════════════════════════
-          STAT CARDS ROW
-          Canvas: cy=306–406, cx=270–1460
-          Page:   top=294,    left=45, w=1190, h=100
-      ═══════════════════════════════════════════ */}
-      <div style={{
-        position: "absolute",
-        left: 65, top: 298,
-        width: 1190, height: 100,
-        display: "flex", gap: 18,
-      }}>
+      {/* STAT CARDS ROW */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map(({ label, value, Icon }) => (
-          <div key={label} style={{
-            flex: 1, height: 100,
-            background: "transparent",
-            display: "flex", alignItems: "center",
-            padding: "0 16px", gap: 12,
-          }}>
-            <div style={{
-              width: 40, height: 38, flexShrink: 0, borderRadius: "50%",
-              background: "rgba(138,30,53,0.12)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <Icon size={18} style={{ color: "#8A1E35" }} />
+          <div key={label} className="bg-[#1E1208] border border-[#C9A227]/30 rounded-xl p-5 flex items-center gap-4 shadow-sm hover:shadow-[0_4px_16px_rgba(201,162,39,0.1)] transition-shadow">
+            <div className="w-12 h-12 rounded-full bg-[#1A1F4B] flex items-center justify-center shrink-0 border border-[#2D3561]">
+              <Icon size={24} className="text-[#F0C060]" />
             </div>
             <div>
-              <p style={{ fontSize: 12, color: "#8D6B61", margin: 0, fontWeight: 500 }}>{label}</p>
-              <p style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 700, color: "#44211A", margin: "1px 0 0", lineHeight: 1 }}>
+              <p className="text-sm font-medium text-[#A08070] mb-1">{label}</p>
+              <p className="text-3xl font-bold text-[#F5EFE0] leading-none" style={{ fontFamily: SERIF }}>
                 {value}
               </p>
             </div>
@@ -212,179 +139,145 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {/* ═══════════════════════════════════════════
-          JUDGE ASSIGNMENT PANEL
-          Canvas: cy=400–870, cx=270–1050
-          Page:   top=388,    left=45, w=780, h=470
-      ═══════════════════════════════════════════ */}
-      <div style={{
-        position: "absolute",
-        left: 55, top: 375,
-        width: 700, height: 470,
-        display: "flex", flexDirection: "column",
-        padding: "20px 22px",
-        background: "transparent",
-        overflow: "hidden",
-      }}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, flexShrink: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-            <UserCircle size={32} style={{ color: "#8A1E35" }} />
-            <div>
-              <h2 style={{ fontSize: 24, fontWeight: 600, color: "#6E1628", margin: 0, fontFamily: SERIF }}>Judge Assignment</h2>
-              <p style={{ fontSize: 13, color: "#8D6B61", margin: "2px 0 0" }}>
-                Assign judges to submissions quickly, with a shuffle option to randomize.
-              </p>
-            </div>
-          </div>
-          <button type="button" onClick={handleShuffle} style={{
-            flexShrink: 0, display: "flex", alignItems: "center", gap: 5,
-            height: 34, padding: "0 13px", borderRadius: 10,
-            border: "1px solid rgba(225,210,198,0.9)",
-            background: "rgba(253,240,232,0.9)", color: "#6D1B2E",
-            fontSize: 14, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap",
-          }}>
-            <Shuffle size={14} /> Auto-Assign
-          </button>
-        </div>
-
-        <div style={{ display: "flex", gap: 9, marginTop: 13, alignItems: "center", flexShrink: 0 }}>
-          <div style={{ flex: 1, position: "relative" }}>
-            <select value={selSub} onChange={e => setSelSub(e.target.value)} style={dropStyle}>
-              <option value="">Select Submission</option>
-              {submissions.map(s => (
-                <option key={s.id} value={s.id}>{s.title}</option>
-              ))}
-            </select>
-            <ChevronDown size={12} style={{ position: "absolute", right: 9, top: "50%", transform: "translateY(-50%)", color: "#8A1E35", pointerEvents: "none" }} />
-          </div>
-          <div style={{ flex: 1, position: "relative" }}>
-            <select value={selJudge} onChange={e => setSelJudge(e.target.value)} style={dropStyle}>
-              <option value="">Select Judge</option>
-              {judges.map(j => (
-                <option key={j.id} value={j.id}>{j.name || j.email}</option>
-              ))}
-            </select>
-            <ChevronDown size={12} style={{ position: "absolute", right: 9, top: "50%", transform: "translateY(-50%)", color: "#8A1E35", pointerEvents: "none" }} />
-          </div>
-          <button type="button" onClick={handleAssign} disabled={!canAssign} style={{
-            height: 38, padding: "0 18px", borderRadius: 10, border: "none",
-            background: canAssign ? "rgba(138,30,53,0.88)" : "rgba(190,155,150,0.7)",
-            color: "#fff", fontSize: 13, fontWeight: 600,
-            display: "flex", alignItems: "center", gap: 5,
-            cursor: canAssign ? "pointer" : "not-allowed", flexShrink: 0,
-          }}>
-            Assign <ArrowRight size={12} />
-          </button>
-        </div>
-
-        <div style={{ flex: 1, overflowY: "auto", marginTop: 11, display: "flex", flexDirection: "column", gap: 6 }}>
-          {assignments.map((item, i) => (
-            <div key={`${item.judge_id}-${item.submission_id}`} style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 9,
-              background: "rgba(251,243,238,0.80)", border: "1px solid rgba(238,220,208,0.75)",
-              borderRadius: 10, padding: "8px 12px",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-                <div style={{
-                  width: 30, height: 30, borderRadius: "50%",
-                  background: "rgba(241,217,209,0.85)", flexShrink: 0,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <UserCircle size={16} style={{ color: "#8A1E35" }} />
-                </div>
-                <div>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: "#44211A", margin: 0 }}>
-                    {item.submissions?.title ?? "Unknown"}
-                  </p>
-                  <p style={{ fontSize: 11, color: "#8D6B61", margin: "1px 0 0" }}>
-                    Assigned to: {item.profiles?.name || item.profiles?.email || "Unknown"}
-                  </p>
-                </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* JUDGE ASSIGNMENT PANEL */}
+        <div className="lg:col-span-2 bg-[#1E1208] border border-[#C9A227]/30 rounded-2xl p-6 md:p-8 relative overflow-hidden flex flex-col min-h-[500px]">
+          
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 shrink-0">
+            <div className="flex items-center gap-4">
+              <div className="bg-[#1A1F4B] p-3 rounded-full shrink-0 border border-[#2D3561]">
+                <UserCircle size={32} className="text-[#F0C060]" />
               </div>
-              <button type="button" onClick={() => handleUnassign(item.judge_id, item.submission_id)} style={{
-                width: 26, height: 26, flexShrink: 0, borderRadius: 7,
-                border: "1px solid rgba(228,210,198,0.8)", background: "rgba(255,255,255,0.55)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", color: "#8A1E35",
-              }}>
-                <Trash2 size={11} />
-              </button>
+              <div>
+                <h2 className="text-2xl font-bold text-[#F5EFE0]" style={{ fontFamily: SERIF }}>Judge Assignment</h2>
+                <p className="text-sm text-[#A08070] mt-1" style={{ fontFamily: F }}>
+                  Assign judges to submissions quickly, with a shuffle option to randomize.
+                </p>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ═══════════════════════════════════════════
-          RESULTS MANAGEMENT PANEL
-          Canvas: cy=400–870, cx=1070–1460
-          Page:   top=388,    left=845, w=390, h=470
-      ═══════════════════════════════════════════ */}
-      <div style={{
-        position: "absolute",
-        left: 785, top: 375,
-        width: 450, height: 328,
-        display: "flex", flexDirection: "column",
-        padding: "20px 22px",
-        background: "transparent",
-        overflow: "hidden",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 9, flexShrink: 0 }}>
-          <Trophy size={28} style={{ color: "#C89A4A" }} />
-          <div>
-            <h2 style={{ fontSize: 24, fontWeight: 600, color: "#6E1628", margin: 0, fontFamily: SERIF }}>Results Management</h2>
-            <p style={{ fontSize: 13, color: "#8D6B61", margin: "2px 0 0" }}>
-              View the final ranked report with scores and export data.
-            </p>
+            <button 
+              type="button" 
+              onClick={handleShuffle} 
+              className="shrink-0 flex items-center justify-center gap-2 h-10 px-4 rounded-lg border border-[#C9A227]/50 bg-transparent text-[#F0C060] text-sm font-semibold hover:bg-[#C9A227]/10 transition-colors"
+            >
+              <Shuffle size={16} /> Auto-Assign
+            </button>
           </div>
-        </div>
 
-        <button type="button" onClick={() => router.push("/admin/report")} style={{
-          marginTop: 14, height: 38, padding: "0 16px", borderRadius: 10, border: "none",
-          background: "rgba(138,30,53,0.88)", color: "#fff",
-          fontSize: 12, fontWeight: 600, cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 5,
-          flexShrink: 0,
-        }}>
-          View Full Report <ArrowRight size={12} />
-        </button>
+          <div className="flex flex-col md:flex-row gap-4 mt-8 shrink-0">
+            <div className="flex-1 relative">
+              <select value={selSub} onChange={e => setSelSub(e.target.value)} className="w-full h-11 bg-[#0F0A05] border border-[#C9A227]/30 rounded-lg pl-4 pr-10 text-sm text-[#F5EFE0] focus:outline-none focus:border-[#F0C060] appearance-none cursor-pointer">
+                <option value="">Select Submission</option>
+                {submissions.map(s => (
+                  <option key={s.id} value={s.id}>{s.title}</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#D4732A] pointer-events-none" />
+            </div>
+            <div className="flex-1 relative">
+              <select value={selJudge} onChange={e => setSelJudge(e.target.value)} className="w-full h-11 bg-[#0F0A05] border border-[#C9A227]/30 rounded-lg pl-4 pr-10 text-sm text-[#F5EFE0] focus:outline-none focus:border-[#F0C060] appearance-none cursor-pointer">
+                <option value="">Select Judge</option>
+                {judges.map(j => (
+                  <option key={j.id} value={j.id}>{j.name || j.email}</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#D4732A] pointer-events-none" />
+            </div>
+            <button 
+              type="button" 
+              onClick={handleAssign} 
+              disabled={!canAssign} 
+              className="h-11 px-6 rounded-lg bg-gradient-to-r from-[#D4732A] to-[#C1440E] hover:from-[#E8924A] hover:to-[#D4732A] text-white text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0"
+            >
+              Assign <ArrowRight size={14} />
+            </button>
+          </div>
 
-        <svg width="44" height="7" viewBox="0 0 44 7" fill="none" style={{ marginTop: 11, flexShrink: 0 }}>
-          <line x1="0" y1="3.5" x2="16" y2="3.5" stroke="#D3A64F" strokeWidth="0.9"/>
-          <polygon points="22,0.5 25.5,3.5 22,6.5 18.5,3.5" fill="#D3A64F"/>
-          <line x1="28" y1="3.5" x2="44" y2="3.5" stroke="#D3A64F" strokeWidth="0.9"/>
-        </svg>
-
-        <div style={{
-          marginTop: 12, flex: 1,
-          background: "rgba(251,243,238,0.78)",
-          border: "1px solid rgba(238,220,208,0.65)",
-          borderRadius: 12, padding: "13px 15px",
-          overflow: "hidden",
-        }}>
-          <p style={{
-            fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em",
-            color: "#8D6B61", margin: 0, fontWeight: 500,
-          }}>
-            Summary
-          </p>
-          <div style={{ marginTop: 11, display: "flex", flexDirection: "column", gap: 9 }}>
-            {[
-              { label: "Projects reviewed", val: String(reviewedCount) },
-              { label: "Pending reports",   val: String(pendingCount) },
-              { label: "Export ready",      val: reviewedCount > 0 ? "Yes" : "No" },
-            ].map(({ label, val }) => (
-              <div key={label} style={{
-                display: "flex", justifyContent: "space-between", alignItems: "center",
-                paddingBottom: 9, borderBottom: "1px solid rgba(238,224,214,0.8)",
-              }}>
-                <span style={{ fontSize: 12, color: "#6B4840" }}>{label}</span>
-                <span style={{ fontSize: 14, fontWeight: 600, color: "#44211A", fontFamily: SERIF }}>{val}</span>
+          <div className="flex-1 overflow-y-auto mt-6 flex flex-col gap-3 pr-2">
+            {assignments.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-[#A08070] py-10">
+                <FileText size={48} className="mb-4 opacity-50 text-[#C9A227]" />
+                <p>No assignments yet.</p>
+              </div>
+            ) : assignments.map((item, i) => (
+              <div key={`${item.judge_id}-${item.submission_id}`} className="flex items-center justify-between gap-4 bg-[#0F0A05] border border-[#C9A227]/20 rounded-xl p-3 sm:p-4 hover:border-[#C9A227]/50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-[#1A1F4B] shrink-0 flex items-center justify-center hidden sm:flex border border-[#2D3561]">
+                    <UserCircle size={20} className="text-[#F0C060]" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-[#F5EFE0] line-clamp-1">
+                      {item.submissions?.title ?? "Unknown"}
+                    </p>
+                    <p className="text-xs text-[#A08070] mt-1 line-clamp-1">
+                      Assigned to: <span className="font-medium text-[#C9A227]">{item.profiles?.name || item.profiles?.email || "Unknown"}</span>
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => handleUnassign(item.judge_id, item.submission_id)} 
+                  className="w-8 h-8 shrink-0 rounded-lg border border-[#C2687A]/30 bg-transparent flex items-center justify-center text-[#C2687A] hover:bg-[#C2687A]/10 transition-colors focus:outline-none"
+                  title="Remove Assignment"
+                >
+                  <Trash2 size={14} />
+                </button>
               </div>
             ))}
           </div>
         </div>
-      </div>
 
+        {/* RESULTS MANAGEMENT PANEL */}
+        <div className="bg-[#1E1208] border border-[#C9A227]/30 rounded-2xl p-6 md:p-8 flex flex-col relative overflow-hidden">
+          <div className="flex items-start gap-4 shrink-0">
+            <div className="bg-[#1A1F4B] p-3 rounded-full shrink-0 border border-[#2D3561]">
+              <Trophy size={32} className="text-[#F0C060]" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-[#F5EFE0]" style={{ fontFamily: SERIF }}>Results</h2>
+              <p className="text-sm text-[#A08070] mt-1" style={{ fontFamily: F }}>
+                View final ranked report and export data.
+              </p>
+            </div>
+          </div>
+
+          <button 
+            type="button" 
+            onClick={() => router.push("/admin/report")} 
+            className="w-full mt-8 h-12 rounded-xl bg-gradient-to-r from-[#D4732A] to-[#C1440E] hover:from-[#E8924A] hover:to-[#D4732A] text-white text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-[0_4px_16px_rgba(212,115,42,0.3)]"
+          >
+            View Full Report <ArrowRight size={16} />
+          </button>
+
+          <div className="flex justify-center mt-8 mb-4">
+             <svg width="60" height="10" viewBox="0 0 60 10" fill="none">
+               <line x1="0" y1="5" x2="22" y2="5" stroke="#C9A227" strokeWidth="1"/>
+               <polygon points="30,1 35,5 30,9 25,5" fill="#C9A227"/>
+               <line x1="38" y1="5" x2="60" y2="5" stroke="#C9A227" strokeWidth="1"/>
+             </svg>
+          </div>
+
+          <div className="mt-4 flex-1 bg-[#0F0A05] border border-[#C9A227]/20 rounded-xl p-5 overflow-hidden shadow-inner">
+            <p className="text-xs uppercase tracking-widest text-[#C9A227] font-semibold mb-4">
+              Summary
+            </p>
+            <div className="flex flex-col gap-4">
+              {[
+                { label: "Projects reviewed", val: String(reviewedCount) },
+                { label: "Pending reports",   val: String(pendingCount) },
+                { label: "Export ready",      val: reviewedCount > 0 ? "Yes" : "No" },
+              ].map(({ label, val }) => (
+                <div key={label} className="flex justify-between items-center pb-3 border-b border-[#C9A227]/10 last:border-0 last:pb-0">
+                  <span className="text-sm text-[#A08070]">{label}</span>
+                  <span className="text-lg font-bold text-[#F5EFE0]" style={{ fontFamily: SERIF }}>{val}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   )
 }

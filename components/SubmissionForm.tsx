@@ -81,14 +81,14 @@ function SectionHeader({
           borderRadius: "10px",
           background: completed
             ? "linear-gradient(135deg,#059669,#10b981)"
-            : "linear-gradient(135deg,#1d4ed8,#3b82f6)",
+            : "linear-gradient(135deg,#8F102A,#A61B36)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
           boxShadow: completed
             ? "0 0 14px rgba(16,185,129,0.35)"
-            : "0 0 14px rgba(59,130,246,0.35)",
+            : "0 0 14px rgba(143,16,42,0.3)",
           transition: "all 0.4s ease",
           fontSize: "0.75rem",
           fontWeight: 700,
@@ -104,19 +104,19 @@ function SectionHeader({
             borderRadius: "14px",
             border: completed
               ? "1px solid rgba(16,185,129,0.3)"
-              : "1px solid rgba(59,130,246,0.2)",
+              : "1px solid rgba(143,16,42,0.2)",
             animation: "section-ring 3s ease-in-out infinite",
           }}
         />
       </div>
       <div style={{ flex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ color: "rgba(148,163,184,0.4)", display: "flex" }}>{icon}</span>
+          <span style={{ color: "rgba(143,16,42,0.45)", display: "flex" }}>{icon}</span>
           <h3
             style={{
               fontSize: "1rem",
               fontWeight: 700,
-              color: "#f0f4ff",
+              color: "#3A2820",
               margin: 0,
               letterSpacing: "-0.01em",
             }}
@@ -124,7 +124,7 @@ function SectionHeader({
             {title}
           </h3>
         </div>
-        <p style={{ fontSize: "0.76rem", color: "rgba(148,163,184,0.5)", margin: "3px 0 0", lineHeight: 1.4 }}>
+        <p style={{ fontSize: "0.76rem", color: "rgba(122,90,74,0.65)", margin: "3px 0 0", lineHeight: 1.4 }}>
           {subtitle}
         </p>
       </div>
@@ -150,18 +150,18 @@ function Field({
     width: "100%",
     padding: icon ? "10px 14px 10px 38px" : "10px 14px",
     borderRadius: "10px",
-    background: focused ? "rgba(58,12,29,0.88)" : "rgba(8,14,38,0.7)",
+    background: focused ? "rgba(255,244,232,0.97)" : "rgba(255,252,247,0.82)",
     border: overLimit
       ? "1px solid rgba(239,68,68,0.5)"
       : focused
-      ? "1px solid rgba(59,130,246,0.6)"
-      : "1px solid rgba(255,255,255,0.07)",
-    color: "#e2e8f0",
+      ? "1px solid rgba(143,16,42,0.5)"
+      : "1px solid rgba(173,114,55,0.2)",
+    color: "#3A2820",
     fontSize: "0.875rem",
     outline: "none",
     transition: "all 0.25s ease",
     boxShadow: focused
-      ? "0 0 0 3px rgba(59,130,246,0.1), 0 0 20px rgba(59,130,246,0.06)"
+      ? "0 0 0 3px rgba(143,16,42,0.08), 0 0 20px rgba(143,16,42,0.05)"
       : "none",
     resize: multiline ? "vertical" : undefined,
     lineHeight: 1.6,
@@ -176,7 +176,7 @@ function Field({
           style={{
             fontSize: "0.8rem",
             fontWeight: 500,
-            color: focused ? "#93c5fd" : "rgba(148,163,184,0.75)",
+            color: focused ? "#8F102A" : "#8A6A5A",
             transition: "color 0.2s ease",
             display: "flex",
             alignItems: "center",
@@ -190,7 +190,7 @@ function Field({
           <span
             style={{
               fontSize: "0.7rem",
-              color: overLimit ? "#f87171" : words > maxWords * 0.85 ? "#fbbf24" : "rgba(148,163,184,0.4)",
+              color: overLimit ? "#DC2626" : words > maxWords * 0.85 ? "#C2820A" : "rgba(138,106,90,0.5)",
               transition: "color 0.2s",
             }}
           >
@@ -206,7 +206,7 @@ function Field({
               left: "11px",
               top: multiline ? "12px" : "50%",
               transform: multiline ? "none" : "translateY(-50%)",
-              color: focused ? "#60a5fa" : "rgba(148,163,184,0.35)",
+              color: focused ? "#8F102A" : "rgba(173,114,55,0.45)",
               transition: "color 0.2s ease",
               pointerEvents: "none",
               display: "flex",
@@ -232,7 +232,7 @@ function Field({
         )}
       </div>
       {hint && (
-        <p style={{ fontSize: "0.71rem", color: "rgba(148,163,184,0.38)", margin: 0, lineHeight: 1.4 }}>
+        <p style={{ fontSize: "0.71rem", color: "rgba(138,106,90,0.6)", margin: 0, lineHeight: 1.4 }}>
           {hint}
         </p>
       )}
@@ -247,13 +247,13 @@ function Section({ children, visible, delay = 0 }: { children: React.ReactNode; 
       style={{
         padding: "26px 28px",
         borderRadius: "16px",
-        background: "rgba(8,14,38,0.65)",
-        border: "1px solid rgba(255,239,248,0.06)",
+        background: "rgba(255,248,239,0.82)",
+        border: "1px solid rgba(173,114,55,0.15)",
         backdropFilter: "blur(10px)",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(16px)",
         transition: `opacity 0.5s ease ${delay}ms, transform 0.5s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
-        boxShadow: "0 4px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.03)",
+        boxShadow: "0 4px 24px rgba(143,114,55,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
       }}
     >
       {children}
@@ -328,15 +328,24 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
 
     // Validate required fields
     if (!formData.projectName) { toast.error("Project Name is required"); return; }
+    if (!formData.tagline) { toast.error("Tagline is required"); return; }
     if (!formData.problemSolved) { toast.error("Problem Solved is required"); return; }
     if (!formData.solutionSummary) { toast.error("Solution Summary is required"); return; }
     if (wordCount(formData.solutionSummary) > 500) { toast.error("Solution Summary exceeds 500 words"); return; }
+    if (!formData.category) { toast.error("Please select a Category"); return; }
     if (formData.techStack.length === 0) { toast.error("Please select at least one tech stack item"); return; }
     if (!formData.architectureOverview) { toast.error("Architecture Overview is required"); return; }
     if (wordCount(formData.architectureOverview) > 300) { toast.error("Architecture Overview exceeds 300 words"); return; }
+    if (!formData.technicalChallenges) { toast.error("Unique Technical Challenges is required"); return; }
     if (!formData.githubUrl) { toast.error("GitHub/Code Repository link is required"); return; }
     if (!formData.videoUrl) { toast.error("Presentation/Demo Video link is required"); return; }
+    if (!formData.docsUrl) { toast.error("Documentation/Slides link is required"); return; }
+    if (!formData.whatWorkedWell) { toast.error("'What Worked Well' is required"); return; }
+    if (!formData.challengesFaced) { toast.error("'What Failed / Challenges Encountered' is required"); return; }
+    if (!formData.lessonsLearned) { toast.error("Lessons Learned is required"); return; }
+    if (!formData.futureRoadmap) { toast.error("Future Roadmap / Next Steps is required"); return; }
     if (!formData.teamName) { toast.error("Team Name is required"); return; }
+    if (formData.teamMembers.length === 0) { toast.error("Please add at least one team member"); return; }
 
     setIsSubmitting(true);
     try {
@@ -380,7 +389,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
               placeholder="My Awesome Project"
             />
             <Field
-              label="Tagline"
+              label="Tagline" required
               icon={<Zap style={{ width: "13px", height: "13px" }} />}
               id="tagline" name="tagline"
               value={formData.tagline} onChange={handleChange}
@@ -406,8 +415,9 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
           />
           {/* Category */}
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontSize: "0.8rem", fontWeight: 500, color: "rgba(148,163,184,0.75)" }}>
+            <label style={{ fontSize: "0.8rem", fontWeight: 500, color: "#8A6A5A", display: "flex", alignItems: "center", gap: "5px" }}>
               Category
+              <span style={{ color: "#f87171", fontSize: "0.68rem" }}>*</span>
             </label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
               {CATEGORIES.map((cat) => {
@@ -419,12 +429,12 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
                     style={{
                       padding: "5px 13px", borderRadius: "999px", fontSize: "0.78rem",
                       fontWeight: active ? 600 : 400,
-                      background: active ? "rgba(29,78,216,0.28)" : "rgba(255,255,255,0.04)",
-                      border: active ? "1px solid rgba(59,130,246,0.5)" : "1px solid rgba(255,255,255,0.07)",
-                      color: active ? "#93c5fd" : "rgba(148,163,184,0.55)",
+                      background: active ? "rgba(143,16,42,0.12)" : "rgba(255,248,239,0.6)",
+                      border: active ? "1px solid rgba(143,16,42,0.4)" : "1px solid rgba(173,114,55,0.2)",
+                      color: active ? "#8F102A" : "#8A6A5A",
                       cursor: "pointer",
                       transition: "all 0.2s ease",
-                      boxShadow: active ? "0 0 10px rgba(59,130,246,0.2)" : "none",
+                      boxShadow: active ? "0 0 10px rgba(143,16,42,0.12)" : "none",
                     }}
                   >
                     {cat}
@@ -448,11 +458,11 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {/* Tech Stack multi-select */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <label style={{ fontSize: "0.8rem", fontWeight: 500, color: "rgba(148,163,184,0.75)", display: "flex", alignItems: "center", gap: "5px" }}>
+            <label style={{ fontSize: "0.8rem", fontWeight: 500, color: "#8A6A5A", display: "flex", alignItems: "center", gap: "5px" }}>
               <GitBranch style={{ width: "12px", height: "12px" }} />
               Tech Stack Used
               <span style={{ color: "#f87171", fontSize: "0.68rem" }}>*</span>
-              <span style={{ fontSize: "0.7rem", color: "rgba(148,163,184,0.35)", fontWeight: 400 }}>
+              <span style={{ fontSize: "0.7rem", color: "rgba(138,106,90,0.5)", fontWeight: 400 }}>
                 — {formData.techStack.length} selected
               </span>
             </label>
@@ -465,13 +475,13 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
                     style={{
                       padding: "4px 11px", borderRadius: "7px", fontSize: "0.76rem",
                       fontWeight: selected ? 600 : 400,
-                      background: selected ? "rgba(29,78,216,0.25)" : "rgba(255,255,255,0.03)",
-                      border: selected ? "1px solid rgba(59,130,246,0.45)" : "1px solid rgba(255,255,255,0.06)",
-                      color: selected ? "#93c5fd" : "rgba(148,163,184,0.5)",
+                      background: selected ? "rgba(143,16,42,0.12)" : "rgba(255,248,239,0.55)",
+                      border: selected ? "1px solid rgba(143,16,42,0.38)" : "1px solid rgba(173,114,55,0.18)",
+                      color: selected ? "#8F102A" : "#8A6A5A",
                       cursor: "pointer",
                       transition: "all 0.18s ease",
                       transform: selected ? "scale(1.02)" : "scale(1)",
-                      boxShadow: selected ? "0 0 8px rgba(59,130,246,0.15)" : "none",
+                      boxShadow: selected ? "0 0 8px rgba(143,16,42,0.1)" : "none",
                     }}
                   >
                     {selected && <span style={{ marginRight: "4px" }}>✓</span>}
@@ -491,7 +501,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
             maxWords={300}
           />
           <Field
-            label="Unique Technical Challenges Solved"
+            label="Unique Technical Challenges Solved" required
             icon={<Lightbulb style={{ width: "13px", height: "13px" }} />}
             id="technicalChallenges" name="technicalChallenges"
             value={formData.technicalChallenges} onChange={handleChange}
@@ -528,12 +538,12 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
             hint="Required — link to your demo video or presentation recording"
           />
           <Field
-            label="Documentation / Slides"
+            label="Documentation / Slides" required
             icon={<BookOpen style={{ width: "13px", height: "13px" }} />}
             id="docsUrl" name="docsUrl" type="url"
             value={formData.docsUrl} onChange={handleChange}
             placeholder="https://docs.google.com/... or similar"
-            hint="Optional — technical documentation, slides, or Notion page"
+            hint="Required — technical documentation, slides, or Notion page"
           />
         </div>
       </Section>
@@ -550,7 +560,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
             <Field
-              label="What Worked Well?"
+              label="What Worked Well?" required
               icon={<Lightbulb style={{ width: "13px", height: "13px" }} />}
               id="whatWorkedWell" name="whatWorkedWell"
               value={formData.whatWorkedWell} onChange={handleChange}
@@ -558,7 +568,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
               multiline rows={4}
             />
             <Field
-              label="What Failed / Challenges Encountered?"
+              label="What Failed / Challenges Encountered?" required
               icon={<AlertTriangle style={{ width: "13px", height: "13px" }} />}
               id="challengesFaced" name="challengesFaced"
               value={formData.challengesFaced} onChange={handleChange}
@@ -568,7 +578,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
             <Field
-              label="Lessons Learned"
+              label="Lessons Learned" required
               icon={<GraduationCap style={{ width: "13px", height: "13px" }} />}
               id="lessonsLearned" name="lessonsLearned"
               value={formData.lessonsLearned} onChange={handleChange}
@@ -576,7 +586,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
               multiline rows={4}
             />
             <Field
-              label="Future Roadmap / Next Steps"
+              label="Future Roadmap / Next Steps" required
               icon={<Map style={{ width: "13px", height: "13px" }} />}
               id="futureRoadmap" name="futureRoadmap"
               value={formData.futureRoadmap} onChange={handleChange}
@@ -607,11 +617,12 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
           {/* Team members input */}
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             <label style={{
-              fontSize: "0.8rem", fontWeight: 500, color: "rgba(148,163,184,0.75)",
+              fontSize: "0.8rem", fontWeight: 500, color: "#8A6A5A",
               display: "flex", alignItems: "center", gap: "5px",
             }}>
               <Users style={{ width: "12px", height: "12px" }} />
               Team Members
+              <span style={{ color: "#f87171", fontSize: "0.68rem" }}>*</span>
               {lockedMembers && (
                 <span style={{
                   display: "flex", alignItems: "center", gap: "3px",
@@ -636,16 +647,16 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
                   placeholder="Enter team member name, press Enter"
                   style={{
                     flex: 1, padding: "9px 14px", borderRadius: "10px",
-                    background: "rgba(8,14,38,0.7)", border: "1px solid rgba(255,255,255,0.07)",
-                    color: "#e2e8f0", fontSize: "0.875rem", outline: "none", fontFamily: "inherit",
+                    background: "rgba(255,252,247,0.85)", border: "1px solid rgba(173,114,55,0.2)",
+                    color: "#3A2820", fontSize: "0.875rem", outline: "none", fontFamily: "inherit",
                   }}
                 />
                 <button
                   type="button" onClick={addMember}
                   style={{
                     padding: "9px 14px", borderRadius: "10px",
-                    background: "rgba(29,78,216,0.25)", border: "1px solid rgba(59,130,246,0.35)",
-                    color: "#93c5fd", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px",
+                    background: "rgba(143,16,42,0.1)", border: "1px solid rgba(143,16,42,0.3)",
+                    color: "#8F102A", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px",
                     fontSize: "0.8rem", fontWeight: 500, transition: "all 0.2s ease",
                   }}
                 >
@@ -661,8 +672,8 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
                 style={{
                   padding: "14px",
                   borderRadius: "12px",
-                  background: lockedMembers ? "rgba(245,158,11,0.04)" : "rgba(255,255,255,0.02)",
-                  border: lockedMembers ? "1px solid rgba(245,158,11,0.15)" : "1px solid rgba(255,255,255,0.05)",
+                  background: lockedMembers ? "rgba(245,158,11,0.06)" : "rgba(255,248,239,0.6)",
+                  border: lockedMembers ? "1px solid rgba(245,158,11,0.2)" : "1px solid rgba(173,114,55,0.18)",
                   transition: "all 0.3s ease",
                 }}
               >
@@ -673,10 +684,10 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
                       style={{
                         display: "flex", alignItems: "center", gap: "6px",
                         padding: "5px 12px", borderRadius: "999px",
-                        background: lockedMembers ? "rgba(245,158,11,0.1)" : "rgba(29,78,216,0.15)",
-                        border: lockedMembers ? "1px solid rgba(245,158,11,0.25)" : "1px solid rgba(59,130,246,0.25)",
+                        background: lockedMembers ? "rgba(245,158,11,0.1)" : "rgba(143,16,42,0.08)",
+                        border: lockedMembers ? "1px solid rgba(245,158,11,0.25)" : "1px solid rgba(143,16,42,0.22)",
                         fontSize: "0.8rem",
-                        color: lockedMembers ? "#fcd34d" : "#93c5fd",
+                        color: lockedMembers ? "#C2820A" : "#8F102A",
                         fontWeight: 500,
                         animation: "fade-in-badge 0.3s ease forwards",
                       }}
@@ -702,7 +713,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
                   ))}
                 </div>
                 {lockedMembers && (
-                  <p style={{ fontSize: "0.71rem", color: "rgba(245,158,11,0.5)", margin: 0 }}>
+                  <p style={{ fontSize: "0.71rem", color: "rgba(180,120,20,0.7)", margin: 0 }}>
                     Team roster is locked and will be submitted as read-only.
                   </p>
                 )}
@@ -752,11 +763,11 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
             background: submitted
               ? "linear-gradient(135deg,#059669,#10b981)"
               : isSubmitting
-              ? "linear-gradient(135deg,#1e3a8a,#1d4ed8)"
+              ? "linear-gradient(135deg,#6B0D1F,#8F102A)"
               : btnHovered
-              ? "linear-gradient(135deg,#1d4ed8,#3b82f6,#60a5fa)"
-              : "linear-gradient(135deg,#1d4ed8,#2563eb)",
-            color: "#ffffff",
+              ? "linear-gradient(135deg,#8F102A,#A61B36,#C0243F)"
+              : "linear-gradient(135deg,#8F102A,#A61B36)",
+            color: "#FFF6EE",
             fontSize: "1rem", fontWeight: 700,
             cursor: isSubmitting ? "not-allowed" : "pointer",
             display: "flex", alignItems: "center", justifyContent: "center", gap: "9px",
@@ -765,8 +776,8 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
             boxShadow: submitted
               ? "0 6px 24px rgba(16,185,129,0.45)"
               : btnHovered
-              ? "0 12px 40px rgba(37,99,235,0.55), 0 0 0 1px rgba(96,165,250,0.2)"
-              : "0 6px 24px rgba(37,99,235,0.35)",
+              ? "0 12px 40px rgba(143,16,42,0.5), 0 0 0 1px rgba(213,155,61,0.2)"
+              : "0 6px 24px rgba(143,16,42,0.35)",
             letterSpacing: "0.02em",
             position: "relative", overflow: "hidden",
           }}
@@ -787,7 +798,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
           )}
         </button>
 
-        <p style={{ textAlign: "center", fontSize: "0.73rem", color: "rgba(148,163,184,0.35)", marginTop: "10px" }}>
+        <p style={{ textAlign: "center", fontSize: "0.73rem", color: "rgba(138,106,90,0.55)", marginTop: "10px" }}>
           All 5 sections will be saved · Submissions are visible to all participants
         </p>
       </div>
@@ -797,8 +808,8 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
         @keyframes shimmer-btn { from { left: -60%; } to { left: 150%; } }
         @keyframes section-ring { 0%,100%{ opacity:0.4; transform:scale(1); } 50%{ opacity:0.8; transform:scale(1.05); } }
         @keyframes fade-in-badge { from{ opacity:0; transform:scale(0.85); } to{ opacity:1; transform:scale(1); } }
-        input::placeholder, textarea::placeholder { color: rgba(148,163,184,0.3) !important; }
-        select option { background: #0f172a; color: #e2e8f0; }
+        input::placeholder, textarea::placeholder { color: rgba(138,106,90,0.35) !important; }
+        select option { background: #FFF6EE; color: #3A2820; }
         textarea { font-family: inherit !important; }
       `}</style>
     </form>

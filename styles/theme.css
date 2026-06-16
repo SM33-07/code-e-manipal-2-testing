@@ -2,18 +2,18 @@
 
 :root {
   --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
-  --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.0058 264.53);
-  --secondary-foreground: #030213;
-  --muted: #ececf0;
-  --muted-foreground: #717182;
+  --background: #FCF6EF;
+  --foreground: #4B1F24;
+  --card: #FCF6EF;
+  --card-foreground: #4B1F24;
+  --popover: #FFF8F1;
+  --popover-foreground: #4B1F24;
+  --primary: #8B1F44;
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFF8F1;
+  --secondary-foreground: #4B1F24;
+  --muted: #F1E3D6;
+  --muted-foreground: #6E5A55;
   --accent: #e9ebef;
   --accent-foreground: #030213;
   --destructive: #d4183d;
@@ -42,18 +42,18 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
+  --background: #0F0A05;
+  --foreground: #F5EFE0;
+  --card: #1E1208;
+  --card-foreground: #F5EFE0;
+  --popover: #1E1208;
+  --popover-foreground: #F5EFE0;
+  --primary: #D4732A;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1A1F4B;
+  --secondary-foreground: #F5EFE0;
+  --muted: #2A1D16;
+  --muted-foreground: #A08070;
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.396 0.141 25.723);
@@ -91,6 +91,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-muted-text: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
@@ -114,9 +115,17 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-jaipur-primary: var(--jaipur-primary);
+  --color-jaipur-primary-light: var(--jaipur-primary-light);
+  --color-jaipur-secondary: var(--jaipur-secondary);
+  --color-jaipur-secondary-light: var(--jaipur-secondary-light);
+  --color-jaipur-gold: var(--jaipur-gold);
+  --color-jaipur-gold-light: var(--jaipur-gold-light);
+  --color-jaipur-card: var(--jaipur-card);
+  --color-jaipur-pink: var(--jaipur-pink);
+  --color-jaipur-terracotta: var(--jaipur-terracotta);
 }
 
 @layer base {
@@ -179,3 +188,76 @@
     line-height: 1.5;
   }
 }
+
+/*
+ * Older screens still use the original palette as arbitrary Tailwind values.
+ * These mappings keep those screens theme-aware while they migrate to tokens.
+ */
+:root:not(.dark) [class~="bg-[#0F0A05]"] { background-color: var(--background); }
+:root:not(.dark) [class~="bg-[#0F0A05]/40"] { background-color: rgb(252 246 239 / 0.4); }
+:root:not(.dark) [class~="bg-[#0F0A05]/50"] { background-color: rgb(252 246 239 / 0.5); }
+:root:not(.dark) [class~="bg-[#0F0A05]/80"] { background-color: rgb(252 246 239 / 0.8); }
+:root:not(.dark) [class~="bg-[#1E1208]"] { background-color: var(--jaipur-card); }
+:root:not(.dark) [class~="bg-[#1A1F4B]"] { background-color: var(--jaipur-secondary); }
+:root:not(.dark) [class~="bg-[#A08070]"] { background-color: var(--muted); }
+:root:not(.dark) [class~="bg-[#A08070]/30"] { background-color: rgb(110 90 85 / 0.3); }
+:root:not(.dark) [class~="bg-[#A08070]/50"] { background-color: rgb(110 90 85 / 0.5); }
+:root:not(.dark) [class~="bg-[#C9A227]/10"] { background-color: rgb(164 106 73 / 0.1); }
+:root:not(.dark) [class~="bg-[#C9A227]/20"] { background-color: rgb(164 106 73 / 0.2); }
+:root:not(.dark) [class~="bg-[#D4732A]"] { background-color: var(--jaipur-primary); }
+
+:root:not(.dark) [class~="text-[#F5EFE0]"],
+:root:not(.dark) [class~="text-[#1E1208]"] { color: var(--foreground); }
+:root:not(.dark) [class~="text-[#F5EFE0]/50"] { color: rgb(75 31 36 / 0.5); }
+:root:not(.dark) [class~="text-[#F5EFE0]/70"] { color: rgb(75 31 36 / 0.7); }
+:root:not(.dark) [class~="text-[#A08070]"] { color: var(--muted-foreground); }
+:root:not(.dark) [class~="text-[#A08070]/50"] { color: rgb(110 90 85 / 0.5); }
+:root:not(.dark) [class~="text-[#A08070]/60"] { color: rgb(110 90 85 / 0.6); }
+:root:not(.dark) [class~="text-[#D4732A]"],
+:root:not(.dark) [class~="text-[#C1440E]"] { color: var(--jaipur-primary); }
+:root:not(.dark) [class~="text-[#C9A227]"],
+:root:not(.dark) [class~="text-[#F0C060]"] { color: var(--jaipur-gold); }
+
+:root:not(.dark) [class~="border-[#1A1F4B]"],
+:root:not(.dark) [class~="border-[#2D3561]"] { border-color: var(--jaipur-secondary-light); }
+:root:not(.dark) [class~="border-[#C9A227]/10"] { border-color: rgb(164 106 73 / 0.1); }
+:root:not(.dark) [class~="border-[#C9A227]/20"] { border-color: rgb(164 106 73 / 0.2); }
+:root:not(.dark) [class~="border-[#C9A227]/30"] { border-color: rgb(164 106 73 / 0.3); }
+:root:not(.dark) [class~="border-[#C9A227]/50"] { border-color: rgb(164 106 73 / 0.5); }
+:root:not(.dark) [class~="border-[#D4732A]"],
+:root:not(.dark) [class~="border-[#F0C060]"] { border-color: var(--jaipur-primary); }
+
+:root:not(.dark) [class~="hover:bg-[#1A1F4B]/50"]:hover,
+:root:not(.dark) [class~="hover:bg-[#2D3561]"]:hover { background-color: var(--jaipur-secondary-light); }
+:root:not(.dark) [class~="hover:bg-[#C9A227]/10"]:hover,
+:root:not(.dark) [class~="hover:bg-[#D4732A]/10"]:hover { background-color: rgb(139 31 68 / 0.1); }
+:root:not(.dark) [class~="hover:bg-[#E8924A]"]:hover { background-color: var(--jaipur-primary-light); }
+:root:not(.dark) [class~="hover:text-[#C9A227]"]:hover,
+:root:not(.dark) [class~="hover:text-[#D4732A]"]:hover,
+:root:not(.dark) [class~="hover:text-[#E8924A]"]:hover,
+:root:not(.dark) [class~="hover:text-[#F0C060]"]:hover { color: var(--jaipur-primary); }
+:root:not(.dark) [class~="hover:text-[#F5EFE0]"]:hover { color: var(--foreground); }
+
+.dark [class~="bg-[#FAF5EE]"],
+.dark [class~="bg-[#FFF8F1]"] { background-color: var(--jaipur-card); }
+.dark [class~="bg-[#FFF8F1]/40"] { background-color: rgb(30 18 8 / 0.4); }
+.dark [class~="bg-[#8F102A]"] { background-color: var(--jaipur-primary); }
+.dark [class~="bg-[#8F102A]/5"] { background-color: rgb(212 115 42 / 0.05); }
+.dark [class~="bg-[#8F102A]/10"] { background-color: rgb(212 115 42 / 0.1); }
+.dark [class~="text-[#4B1F24]"],
+.dark [class~="text-[#FFF8F1]"] { color: var(--foreground); }
+.dark [class~="text-[#7A5A4A]"],
+.dark [class~="text-[#A46A49]"] { color: var(--muted-foreground); }
+.dark [class~="text-[#7A5A4A]/80"] { color: rgb(160 128 112 / 0.8); }
+.dark [class~="text-[#8F102A]"] { color: var(--jaipur-primary); }
+.dark [class~="border-[#DFCDBD]"],
+.dark [class~="border-[#DFCDBD]/40"],
+.dark [class~="border-[#DFCDBD]/50"],
+.dark [class~="border-[#DFCDBD]/60"],
+.dark [class~="border-[#DFCDBD]/80"],
+.dark [class~="border-[#EBCFB5]/50"] { border-color: rgb(201 162 39 / 0.3); }
+.dark [class~="hover:bg-[#6D1632]"]:hover,
+.dark [class~="hover:bg-[#8F102A]"]:hover { background-color: var(--jaipur-primary-light); }
+.dark [class~="hover:bg-[#8F102A]/5"]:hover { background-color: rgb(212 115 42 / 0.08); }
+.dark [class~="hover:text-[#4B1F24]"]:hover,
+.dark [class~="hover:text-[#8F102A]"]:hover { color: var(--jaipur-primary-light); }

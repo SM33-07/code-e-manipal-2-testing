@@ -59,7 +59,7 @@ export default function AnalyticsPage() {
   ]
 
   return (
-    <div style={{ maxWidth: 1100, margin: "305px auto 40px", padding: "0 18px" }}>
+    <div style={{ maxWidth: 1100, margin: "0 auto 40px", padding: "0 18px" }}>
 
       <div className="flex items-center" style={{ gap: 12, marginBottom: 2 }}>
         <BarChart3 size={22} style={{ color: "#8B1C2E" }} />

@@ -1,30 +1,84 @@
 :root {
-  --foreground: #e2e8f0;
-  --background: #020817;
-  --muted: #94a3b8;
+  --foreground: #4B1F24;
+  --background: #FCF6EF;
+  --muted: #6E5A55;
+  --jaipur-primary: #8B1F44;
+  --jaipur-primary-light: #6B142F;
+  --jaipur-secondary: rgba(255, 250, 245, 0.92); /* Input background */
+  --jaipur-secondary-light: rgba(233, 216, 199, 0.8); /* Borders */
+  --jaipur-gold: #A46A49;
+  --jaipur-gold-light: #8A3150;
+  --jaipur-card: rgba(252, 246, 239, 0.97); /* Card background */
+  --jaipur-pink: #DFCDBD;
+  --jaipur-terracotta: #8A3150;
+}
+
+.dark {
+  --foreground: #F5EFE0;
+  --background: #0F0A05;
+  --muted: #A08070;
+  --jaipur-primary: #D4732A;
+  --jaipur-primary-light: #E8924A;
+  --jaipur-secondary: #1A1F4B;
+  --jaipur-secondary-light: #2D3561;
+  --jaipur-gold: #C9A227;
+  --jaipur-gold-light: #F0C060;
+  --jaipur-card: #1E1208;
+  --jaipur-pink: #C2687A;
+  --jaipur-terracotta: #C1440E;
 }
 
 body {
   color: var(--foreground);
-  background: linear-gradient(
-    135deg,
-    #020817 0%,
-    #050d24 35%,
-    #04091d 70%,
-    #020817 100%
-  );
+  background-color: var(--background);
   font-family: 'Inter', system-ui, sans-serif;
+}
+
+.route-background,
+.route-background-veil {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.route-background {
+  z-index: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transform: scale(1.01);
+}
+
+.route-background-veil {
+  z-index: 1;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(252 246 239 / 0.52),
+      rgb(252 246 239 / 0.7)
+    );
+  backdrop-filter: saturate(0.9);
+}
+
+.dark .route-background-veil {
+  background:
+    linear-gradient(
+      180deg,
+      rgb(15 10 5 / 0.56),
+      rgb(15 10 5 / 0.72)
+    );
+  backdrop-filter: saturate(0.8);
 }
 
 
 /* Fix black text across the app — only for non-admin/non-login routes */
 
 .text-muted-foreground {
-  color: #94a3b8;
+  color: var(--muted-foreground);
 }
 
 .text-foreground {
-  color: #e2e8f0;
+  color: var(--foreground);
 }
 
 

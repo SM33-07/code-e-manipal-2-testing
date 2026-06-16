@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, Scale, Trophy, FileSpreadsheet, BarChart3, Settings } from "lucide-react"
+import { LayoutDashboard, Users, Scale, Trophy, FileSpreadsheet, BarChart3 } from "lucide-react"
 
 const links = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -11,7 +11,6 @@ const links = [
   { name: "Results", href: "/admin/results", icon: Trophy },
   { name: "Report", href: "/admin/report", icon: FileSpreadsheet },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
 ]
 
 export default function AdminSidebar() {

@@ -37,11 +37,11 @@ export default function ResourceLinks({ githubUrl, demoUrl, docsUrl }: Props) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 + i * 0.1 }}
-            className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors group"
+            className="flex items-center gap-3 p-4 rounded-xl bg-[#A08070]/50 hover:bg-[#A08070] transition-colors group"
           >
             <Icon className="w-5 h-5 text-primary" />
-            <span className="text-sm font-medium text-foreground flex-1">{label}</span>
-            <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+            <span className="text-sm font-medium text-[#F5EFE0] flex-1">{label}</span>
+            <ExternalLink className="w-4 h-4 text-[#A08070]-foreground group-hover:text-[#F5EFE0] transition-colors" />
           </motion.a>
         ))}
       </div>

@@ -2,22 +2,64 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { useAuth } from "@/components/AuthProvider"
+import { ThemeToggle } from "@/components/ThemeToggle"
+import { toast } from "sonner"
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect } from "react"
-import { Menu, X, Bell } from "lucide-react"
+import { Bell, Clock, AlertCircle, Info, X } from "lucide-react"
+
+import {
+  Navbar as ResizableNavbar,
+  NavBody,
+  NavItems,
+  MobileNav,
+  MobileNavHeader,
+  MobileNavToggle,
+  MobileNavMenu,
+} from "@/components/ui/resizable-navbar"
+
+const mockNotifications = [
+  { id: 1, type: "time", icon: Clock, title: "Time Remaining", text: "2 hours left for Round 1 submissions. Make sure your repo is public.", time: "Just now" },
+  { id: 2, type: "alert", icon: AlertCircle, title: "Notice", text: "Judging criteria updated for the AI category.", time: "1h ago" },
+  { id: 3, type: "info", icon: Info, title: "Welcome", text: "Welcome to Code-E-Manipal! Hack away.", time: "2h ago" },
+]
 
 export default function Navbar() {
   const { role, logout, user } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   const [menuOpen, setMenuOpen] = useState(false)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [notifsOpen, setNotifsOpen] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
 
+  // Notifications state management
+  const [notifications, setNotifications] = useState(
+    mockNotifications.map((n) => ({ ...n, read: false }))
+  )
+  const [hasUnread, setHasUnread] = useState(true)
+
+  const handleMarkAllRead = () => {
+    setHasUnread(false)
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+    toast.success("All notifications marked as read.")
+  }
+
+  const handleViewAllNotifications = () => {
+    setNotifsOpen(false)
+    setSheetOpen(true)
+  }
+
+  // Close menus when route changes
   useEffect(() => {
     setMenuOpen(false)
+    setMobileNavOpen(false)
+    setSheetOpen(false)
   }, [pathname])
 
   const handleLogout = async () => {
@@ -25,115 +67,136 @@ export default function Navbar() {
     router.push("/login")
   }
 
-  const linkClass = (path: string) =>
-    pathname === path
-      ? "text-[#8B1C2E] font-semibold"
-      : "text-[#7A5A50] hover:text-[#8B1C2E]"
+  const mobileLinkClass = (path: string) => {
+    const isActive = pathname === path
+    return isActive
+      ? "block py-3 px-4 text-jaipur-primary font-semibold bg-jaipur-primary/10 rounded-lg text-center"
+      : "block py-3 px-4 text-muted-foreground hover:text-jaipur-primary hover:bg-jaipur-primary/10 rounded-lg transition-colors duration-200 text-center"
+  }
 
   if (pathname === "/login") return null
 
+  // Generate dynamic links based on user role
+  const navItems = []
+  if (role === "admin" || role === "participant") {
+    navItems.push({ name: "Team", link: "/team" })
+    navItems.push({ name: "Submit", link: "/SubmissionForm" })
+  }
+  if (role === "admin" || role === "judge") {
+    navItems.push({ name: "Judging", link: "/judging" })
+  }
+  if (role === "admin") {
+    navItems.push({ name: "Admin", link: "/admin" })
+  }
+  navItems.push({ name: "Gallery", link: "/gallery" })
+
+  const isSubmissionForm = pathname?.startsWith("/SubmissionForm")
+
   return (
-    <nav style={{
-      position: "sticky", top: 0, zIndex: 50,
-      background: "rgba(255,248,239,0.88)",
-      backdropFilter: "blur(18px)",
-      WebkitBackdropFilter: "blur(18px)",
-      borderBottom: "1px solid rgba(232,216,204,0.2)",
-    }}>
-      <div style={{
-        maxWidth: 1280, margin: "0 auto",
-        padding: "0 32px",
-        height: 60,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-      }}>
+    <ResizableNavbar isSubmissionForm={isSubmissionForm}>
+      {/* ── Desktop Navigation ── */}
+      <NavBody className="bg-background/90 border border-jaipur-gold/30 shadow-md backdrop-blur-md">
         {/* Logo */}
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+        <Link href="/" className="flex items-center no-underline h-12 flex-shrink-0 z-20">
           <Image
-            src="/logo.png"
-            width={40}
-            height={40}
-            alt="LearnIT"
+            src="/logo-2.0-full.png"
+            width={200}
+            height={52}
+            alt="Code-e-Manipal 2.0"
+            className="h-13 w-auto object-contain"
+            priority
           />
-          <span style={{
-            fontFamily: "'Playfair Display', 'Cormorant Garamond', Georgia, serif",
-            fontSize: 32,
-            fontWeight: 700,
-            color: "#8B1C2E",
-          }}>
-            Code-e-Manipal
-          </span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <div style={{ display: "flex", alignItems: "center", gap: 35 }}>
-          {(role === "admin" || role === "participant") && (
-            <Link href="/team" className={linkClass("/team")} style={{ fontSize: 20, fontFamily: "'Inter', sans-serif", transition: "color 0.15s", textDecoration: "none" }}>
-              Team
-            </Link>
-          )}
-          {(role === "admin" || role === "participant") && (
-            <Link href="/SubmissionForm" className={linkClass("/SubmissionForm")} style={{ fontSize: 20, fontFamily: "'Inter', sans-serif", transition: "color 0.15s", textDecoration: "none" }}>
-              Submit
-            </Link>
-          )}
-          {(role === "admin" || role === "judge") && (
-            <Link href="/judging" className={linkClass("/judging")} style={{ fontSize: 20, fontFamily: "'Inter', sans-serif", transition: "color 0.15s", textDecoration: "none" }}>
-              Judging
-            </Link>
-          )}
-          {role === "admin" && (
-            <Link href="/admin" className={linkClass("/admin")} style={{ fontSize: 20, fontFamily: "'Inter', sans-serif", transition: "color 0.15s", textDecoration: "none" }}>
-              Admin
-            </Link>
-          )}
-          <Link href="/gallery" className={linkClass("/gallery")} style={{ fontSize: 20, fontFamily: "'Inter', sans-serif", transition: "color 0.15s", textDecoration: "none" }}>
-            Gallery
-          </Link>
-        </div>
+        {/* Dynamic Navigation Links */}
+        <NavItems items={navItems} pathname={pathname} />
 
-        {/* Right Side */}
-        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+        {/* Desktop Actions */}
+        <div className="flex items-center gap-4 flex-shrink-0 z-20">
           {/* Role Badge */}
-          <span style={{
-            fontSize: 14, padding: "4px 10px", borderRadius: 999,
-            background: "rgba(139,28,46,0.1)",
-            border: "1px solid rgba(139,28,46,0.2)",
-            color: "#8B1C2E",
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 500,
-            textTransform: "capitalize",
-          }}>
-            {role}
-          </span>
+          {role && (
+            <span className="hidden xl:inline-block text-xs px-3 py-1 rounded-full bg-jaipur-secondary border border-jaipur-secondary-light text-foreground font-medium capitalize">
+              {role}
+            </span>
+          )}
 
-          {/* Notification */}
-          <div style={{ position: "relative", cursor: "pointer" }}>
-            <Bell size={22} style={{ color: "#7A5A50" }} />
-            <div style={{
-              position: "absolute", top: -3, right: -3,
-              width: 14, height: 14, borderRadius: "50%",
-              background: "#C8941C",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <span style={{ fontSize: 8, color: "#fff", fontWeight: 700 }}>3</span>
-            </div>
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
+          {/* Notifications Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => {
+                setNotifsOpen(!notifsOpen);
+                if (menuOpen) setMenuOpen(false);
+              }}
+              className="relative p-1.5 rounded-full hover:bg-jaipur-secondary transition-colors focus:outline-none cursor-pointer flex items-center justify-center"
+            >
+              <Bell size={isSubmissionForm ? 24 : 20} className="text-muted-foreground transition-all duration-300" />
+              {hasUnread && (
+                <div className={`absolute rounded-full bg-jaipur-pink transition-all duration-300 ${isSubmissionForm ? "top-1 right-2.5 w-2.5 h-2.5" : "top-1 right-1.5 w-2 h-2"}`} />
+              )}
+            </button>
+
+            <AnimatePresence>
+              {notifsOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  style={{ backgroundColor: "var(--background)", transform: "translateZ(0)" }}
+                  className="absolute right-0 mt-3 w-80 border border-jaipur-gold/30 rounded-xl shadow-xl overflow-hidden z-50 isolate"
+                >
+                  <div className="px-4 py-3 border-b border-jaipur-gold/20 flex justify-between items-center">
+                    <span className="text-sm font-semibold text-foreground">Notifications</span>
+                    <button 
+                      onClick={handleMarkAllRead}
+                      className="text-xs text-jaipur-primary cursor-pointer hover:underline bg-transparent border-none p-0 focus:outline-none"
+                    >
+                      Mark all read
+                    </button>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {notifications.map((notif) => {
+                      const Icon = notif.icon;
+                      return (
+                        <div key={notif.id} className={`px-4 py-3 border-b border-jaipur-gold/10 hover:bg-jaipur-secondary/50 transition-colors cursor-pointer flex gap-3 ${notif.read ? 'opacity-50' : ''}`}>
+                          <div className={`mt-0.5 p-2 rounded-full h-fit ${notif.read ? 'bg-muted text-muted-foreground' : notif.type === 'time' ? 'bg-jaipur-primary/20 text-jaipur-primary' : notif.type === 'alert' ? 'bg-jaipur-pink/20 text-jaipur-pink' : 'bg-jaipur-gold/20 text-jaipur-gold'}`}>
+                            <Icon size={14} />
+                          </div>
+                          <div>
+                            <div className="flex justify-between items-start gap-2">
+                              <h4 className={`text-sm font-medium leading-none ${notif.read ? 'text-muted-foreground' : 'text-foreground'}`}>{notif.title}</h4>
+                              <span className="text-[10px] text-muted-foreground whitespace-nowrap">{notif.time}</span>
+                            </div>
+                            <p className={`text-xs mt-1 leading-snug ${notif.read ? 'text-muted-foreground/80' : 'text-muted-foreground'}`}>{notif.text}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="px-4 py-2 bg-jaipur-secondary/30 text-center">
+                    <button 
+                      onClick={handleViewAllNotifications}
+                      className="text-xs text-jaipur-primary cursor-pointer hover:underline bg-transparent border-none p-0 focus:outline-none"
+                    >
+                      View all notifications
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Avatar */}
-          <div style={{ position: "relative" }}>
+          {/* User Avatar Menu */}
+          <div className="relative">
             <button
               type="button"
-              onClick={() => setMenuOpen(!menuOpen)}
-              style={{
-                width: 34, height: 34, borderRadius: "50%",
-                background: "#8B1C2E",
-                border: "none",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer",
-                boxShadow: "0 0 0 2px rgba(255,255,255,0.5), 0 2px 8px rgba(139,28,46,0.2)",
-                fontSize: 16, fontWeight: 700, color: "#fff",
-                fontFamily: "'Inter', sans-serif",
+              onClick={() => {
+                setMenuOpen(!menuOpen);
+                if (notifsOpen) setNotifsOpen(false);
               }}
+              className="w-8 h-8 rounded-full bg-jaipur-secondary text-jaipur-primary flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-jaipur-gold/30 focus:outline-none cursor-pointer"
             >
               {user?.email?.charAt(0).toUpperCase()}
             </button>
@@ -144,35 +207,16 @@ export default function Navbar() {
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
-                  style={{
-                    position: "absolute", right: 0, marginTop: 10,
-                    width: 180,
-                    background: "#FFFDFB",
-                    border: "1px solid #EAD7CA",
-                    borderRadius: 14,
-                    boxShadow: "0 8px 24px rgba(120,60,20,0.10)",
-                    overflow: "hidden",
-                  }}
+                  style={{ backgroundColor: "var(--background)", transform: "translateZ(0)" }}
+                  className="absolute right-0 mt-3 w-48 border border-jaipur-gold/30 rounded-xl shadow-xl overflow-hidden z-50 isolate"
                 >
-                  <div style={{
-                    padding: "10px 14px",
-                    borderBottom: "1px solid #EAD7CA",
-                    fontSize: 12, color: "#9A6B56",
-                    fontFamily: "'Inter', sans-serif",
-                  }}>
+                  <div className="px-4 py-3 border-b border-jaipur-gold/20 text-xs text-muted-foreground truncate">
                     {user?.email}
                   </div>
                   <button
                     type="button"
                     onClick={handleLogout}
-                    style={{
-                      width: "100%", textAlign: "left",
-                      padding: "10px 14px",
-                      background: "none", border: "none",
-                      fontSize: 13, color: "#8B1C2E",
-                      fontFamily: "'Inter', sans-serif",
-                      fontWeight: 500, cursor: "pointer",
-                    }}
+                    className="w-full text-left px-4 py-3 text-sm text-jaipur-primary font-medium hover:bg-jaipur-primary/10 transition-colors cursor-pointer"
                   >
                     Logout
                   </button>
@@ -181,7 +225,200 @@ export default function Navbar() {
             </AnimatePresence>
           </div>
         </div>
-      </div>
-    </nav>
+      </NavBody>
+
+      {/* ── Mobile Navigation ── */}
+      <MobileNav className="bg-background/95 border-b border-jaipur-gold/20 shadow-sm">
+        <MobileNavHeader>
+          <Link href="/" className="flex items-center no-underline h-10">
+            <Image
+              src="/logo-2.0-full.png"
+              width={160}
+              height={40}
+              alt="Code-e-Manipal 2.0"
+              className="h-10 w-auto object-contain"
+              priority
+            />
+          </Link>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <MobileNavToggle
+              isOpen={mobileNavOpen}
+              onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            />
+          </div>
+        </MobileNavHeader>
+
+        <MobileNavMenu
+          isOpen={mobileNavOpen}
+          onClose={() => setMobileNavOpen(false)}
+          className="border border-jaipur-gold/20"
+        >
+          {navItems.map((item) => (
+            <Link
+              key={item.link}
+              href={item.link}
+              onClick={() => setMobileNavOpen(false)}
+              className={mobileLinkClass(item.link)}
+            >
+              {item.name}
+            </Link>
+          ))}
+          
+          <div className="flex w-full flex-col gap-4 pt-4 border-t border-jaipur-gold/10 items-center">
+            {role && (
+              <span className="text-xs px-3 py-1 rounded-full bg-jaipur-secondary border border-jaipur-secondary-light text-foreground font-medium capitalize">
+                Role: {role}
+              </span>
+            )}
+            {user?.email && (
+              <span className="text-xs text-muted-foreground truncate max-w-full">
+                {user.email}
+              </span>
+            )}
+            <button
+              onClick={handleLogout}
+              className="w-full py-2.5 rounded-lg bg-jaipur-primary/10 hover:bg-jaipur-primary/20 text-jaipur-primary font-semibold text-sm transition duration-200 cursor-pointer"
+            >
+              Logout
+            </button>
+          </div>
+        </MobileNavMenu>
+      </MobileNav>
+
+      {/* ── Side Notifications Sheet ── */}
+      <AnimatePresence>
+        {sheetOpen && (
+          <>
+            {/* Backdrop Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSheetOpen(false)}
+              className="fixed inset-0 bg-black/50 z-[90] backdrop-blur-sm"
+            />
+
+            {/* Slide-out Panel */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              style={{ backgroundColor: "var(--background)", transform: "translateZ(0)" }}
+              className="fixed inset-y-0 right-0 w-full max-w-md shadow-2xl z-[100] border-l border-jaipur-gold/20 flex flex-col h-screen isolate"
+            >
+              {/* Header */}
+              <div className="p-6 border-b border-jaipur-gold/20 flex justify-between items-center bg-card/10">
+                <div className="text-left">
+                  <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                    <Bell className="text-jaipur-primary" />
+                    All Notifications
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Stay updated on Code-e-Manipal 2.0 hackathon events
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSheetOpen(false)}
+                  className="p-1.5 rounded-full hover:bg-jaipur-secondary/80 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
+                  <X className="size-6" />
+                </button>
+              </div>
+
+              {/* Toolbar */}
+              <div className="px-6 py-3 border-b border-jaipur-gold/10 bg-jaipur-secondary/20 flex justify-between items-center">
+                <span className="text-xs text-muted-foreground font-medium">
+                  {notifications.filter(n => !n.read).length} unread notifications
+                </span>
+                <button
+                  onClick={handleMarkAllRead}
+                  disabled={!hasUnread}
+                  className="text-xs text-jaipur-primary font-semibold hover:underline disabled:opacity-40 disabled:no-underline bg-transparent border-none cursor-pointer p-0"
+                >
+                  Mark all as read
+                </button>
+              </div>
+
+              {/* List */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                {notifications.length === 0 ? (
+                  <div className="h-64 flex flex-col items-center justify-center text-center space-y-3">
+                    <div className="p-4 bg-jaipur-secondary/20 rounded-full">
+                      <Bell size={28} className="text-muted-foreground/60" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">All caught up!</p>
+                      <p className="text-xs text-muted-foreground">You have no new notifications.</p>
+                    </div>
+                  </div>
+                ) : (
+                  notifications.map((notif) => {
+                    const Icon = notif.icon;
+                    return (
+                      <div
+                        key={notif.id}
+                        className={`p-4 rounded-xl border transition-all duration-300 relative flex gap-4 text-left ${
+                          notif.read
+                            ? "bg-transparent border-jaipur-gold/10 opacity-60"
+                            : "bg-jaipur-secondary/10 border-jaipur-primary/20 shadow-sm"
+                        }`}
+                      >
+                        {/* Type Icon indicator */}
+                        <div className={`p-2.5 rounded-full h-fit flex-shrink-0 ${
+                          notif.read 
+                            ? "bg-muted text-muted-foreground/60"
+                            : notif.type === 'time' 
+                            ? 'bg-jaipur-primary/20 text-jaipur-primary' 
+                            : notif.type === 'alert' 
+                            ? 'bg-jaipur-pink/20 text-jaipur-pink' 
+                            : 'bg-jaipur-gold/20 text-jaipur-gold'
+                        }`}>
+                          <Icon size={18} />
+                        </div>
+
+                        {/* Details */}
+                        <div className="space-y-1 flex-1">
+                          <div className="flex justify-between items-baseline gap-2">
+                            <h4 className={`text-sm font-semibold leading-tight ${notif.read ? 'text-muted-foreground' : 'text-foreground'}`}>
+                              {notif.title}
+                            </h4>
+                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">{notif.time}</span>
+                          </div>
+                          <p className={`text-xs leading-relaxed ${notif.read ? 'text-muted-foreground/80' : 'text-muted-foreground'}`}>
+                            {notif.text}
+                          </p>
+                          
+                          {/* Visual Unread Accent Dot */}
+                          {!notif.read && (
+                            <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-jaipur-primary" />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="p-6 border-t border-jaipur-gold/20 bg-card/10 text-center">
+                <button
+                  onClick={() => {
+                    setNotifications([]);
+                    setHasUnread(false);
+                    toast.success("Notification log cleared.");
+                  }}
+                  disabled={notifications.length === 0}
+                  className="w-full py-2.5 rounded-xl border border-jaipur-gold/30 hover:bg-jaipur-primary/10 hover:text-jaipur-primary text-sm font-semibold text-muted-foreground transition duration-200 cursor-pointer disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                >
+                  Clear All Notifications
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </ResizableNavbar>
   )
 }

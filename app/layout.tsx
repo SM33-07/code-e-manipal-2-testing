@@ -3,6 +3,7 @@ import "@/styles/index.css"
 import "@/styles/tailwind.css"
 import "@/styles/theme.css"
 
+import { ThemeProvider } from "@/components/ThemeProvider"
 import RootClient from "./RootClient"
 
 export const metadata = {
@@ -16,9 +17,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-[#050816] text-white relative overflow-x-hidden">
-        <RootClient>{children}</RootClient>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning className="min-h-screen bg-background text-foreground relative overflow-x-hidden transition-colors duration-300">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          storageKey="code-e-manipal-theme"
+        >
+          <RootClient>{children}</RootClient>
+        </ThemeProvider>
       </body>
     </html>
   )

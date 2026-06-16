@@ -9,7 +9,14 @@ export async function getTeamById(id: string): Promise<Team | null> {
   const team = teamRes.rows[0];
   if (!team) return null;
 
-  const membersRes = await query('SELECT * FROM public.team_members WHERE team_id = $1', [id]);
+  const membersRes = await query(
+    `SELECT tm.*,
+            json_build_object('name', p.name, 'avatar_url', p.avatar_url, 'email', p.email) AS profiles
+     FROM public.team_members tm
+     JOIN public.profiles p ON p.id = tm.user_id
+     WHERE tm.team_id = $1`,
+    [id]
+  );
   team.team_members = membersRes.rows;
   return team as Team;
 }
@@ -31,15 +38,28 @@ export async function getTeamByUserId(userId: string): Promise<Team | null> {
 /**
  * Create a new team and add the user as leader
  */
-export async function createTeam(name: string, userId: string): Promise<Team> {
+export async function createTeam(name: string, userId: string, leaderName?: string): Promise<Team> {
   // Clean up any stale team_members records for this user (ensure they can join a new one)
   await query('DELETE FROM public.team_members WHERE user_id = $1', [userId]);
 
-  // Insert the team
-  const teamRes = await query(
-    'INSERT INTO public.teams (name, created_by) VALUES ($1, $2) RETURNING *',
-    [name, userId]
-  );
+  // Insert the team — try with leader_name first; fall back if the column doesn't exist yet
+  let teamRes;
+  try {
+    teamRes = await query(
+      'INSERT INTO public.teams (name, leader_name, created_by) VALUES ($1, $2, $3) RETURNING *',
+      [name, leaderName || null, userId]
+    );
+  } catch (e: any) {
+    if (e.message?.includes('leader_name') || e.code === '42703') {
+      // Column doesn't exist yet — run migration 012_team_leader_name.sql
+      teamRes = await query(
+        'INSERT INTO public.teams (name, created_by) VALUES ($1, $2) RETURNING *',
+        [name, userId]
+      );
+    } else {
+      throw e;
+    }
+  }
   const team = teamRes.rows[0];
 
   // Insert the creator as the leader
