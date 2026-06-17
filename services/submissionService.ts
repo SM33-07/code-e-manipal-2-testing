@@ -67,8 +67,12 @@ export async function createSubmission(input: any) {
 }
 
 // ─── UPDATE ────────────────────────────
+const ALLOWED_SUBMISSION_FIELDS = ['title', 'summary', 'category', 'technologies', 'github_url', 'demo_url', 'docs_url', 'status'];
+
 export async function updateSubmission(id: string, input: any) {
-  const keys = Object.keys(input);
+  const keys = Object.keys(input).filter(
+    (k) => ALLOWED_SUBMISSION_FIELDS.includes(k) && /^[a-z_]+$/.test(k)
+  );
   if (keys.length === 0) {
     return getSubmissionById(id);
   }

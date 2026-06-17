@@ -48,7 +48,7 @@ export default function Gallery() {
             <div key={idx} className="isometric-card bg-jaipur-card">
               <div className="relative w-full h-full opacity-75">
                 <Image
-                  src={project.videoThumbnail}
+                  src={project.videoThumbnail.replace("w=800", "w=200&q=50")}
                   alt={project.title}
                   fill
                   className="object-cover filter grayscale contrast-[1.1] brightness-[0.8]"
@@ -67,7 +67,7 @@ export default function Gallery() {
         className="absolute left-1/2 -translate-x-1/2 z-0 pointer-events-none top-[6%] h-[380px] w-[640px] max-w-[90vw]"
       >
         <Image
-          src="/images/hawa_mahal.png"
+          src="/images/backgrounds/hawa_mahal_right.jpg"
           alt="Hawa Mahal Jaipur Monument Silhouette"
           fill
           className="object-contain filter sepia hue-rotate-[320deg] saturate-[0.8] contrast-[1.05]"
