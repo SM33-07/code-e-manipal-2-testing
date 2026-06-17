@@ -8,17 +8,17 @@ import { usePathname } from "next/navigation"
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false })
 
 function getBackground(pathname: string) {
-  if (pathname.startsWith("/SubmissionForm")) return "submission-generated.png"
-  if (pathname.startsWith("/submission-result")) return "results-generated.png"
-  if (pathname.startsWith("/project")) return "project-generated.png"
-  if (pathname.startsWith("/judging")) return "judging-generated.png"
-  if (pathname.startsWith("/admin/results")) return "results-generated.png"
+  if (pathname.startsWith("/SubmissionForm")) return "submission-generated.jpg"
+  if (pathname.startsWith("/submission-result")) return "results-generated.jpg"
+  if (pathname.startsWith("/project")) return "project-generated.jpg"
+  if (pathname.startsWith("/judging")) return "judging-generated.jpg"
+  if (pathname.startsWith("/admin/results")) return "results-generated.jpg"
   if (pathname.startsWith("/admin/analytics") || pathname.startsWith("/admin/report")) {
-    return "analytics-generated.png"
+    return "analytics-generated.jpg"
   }
-  if (pathname.startsWith("/admin")) return "admin-generated.png"
-  if (pathname.startsWith("/gallery")) return "gallery-generated.png"
-  return "team-generated.png"
+  if (pathname.startsWith("/admin")) return "admin-generated.jpg"
+  if (pathname.startsWith("/gallery")) return "gallery-generated.jpg"
+  return "team-generated.jpg"
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
