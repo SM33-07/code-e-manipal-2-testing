@@ -14,9 +14,16 @@ export default function FeaturedProjects() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
   }, [])
 
   // Track scroll progress of the section relative to viewport
@@ -51,6 +58,90 @@ export default function FeaturedProjects() {
         { p: p1, place: "1st", color: "#C8941C", bg: "rgba(255, 248, 230, 0.95)", border: "#E8B55A", text: "#4B1F24", team: "#A46A49", link: "#8F102A" },
         { p: p3, place: "3rd", color: "#A0522D", bg: "rgba(245, 235, 225, 0.9)", border: "#D27D2D", text: "#4B1F24", team: "#A46A49", link: "#8F102A" }
       ]
+
+  if (isMobile) {
+    return (
+      <section ref={sectionRef} className="py-12 relative overflow-hidden">
+        <MandalaWatermark className="absolute -left-16 top-1/3 pointer-events-none opacity-[0.02]" size={160} />
+        <MandalaWatermark className="absolute -right-16 bottom-1/3 pointer-events-none opacity-[0.02]" size={160} />
+
+        <div className="container mx-auto px-4 flex flex-col items-center">
+          <div className="text-center mb-8 relative z-10">
+            <span className="px-4 py-1.5 rounded-full bg-[#8F102A]/10 border border-[#8F102A]/20 text-[#8F102A] text-xs font-bold tracking-widest uppercase">
+              🏆 The Shahi Darbar
+            </span>
+            <h2 
+              className="text-3xl font-bold mt-3 text-[#4B1F24] dark:text-[#F5EFE0]"
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            >
+              Royal Court of Winners
+            </h2>
+            <div className="flex justify-center my-3">
+              <OrnamentalDivider />
+            </div>
+            <p className="text-[#7A5A4A] dark:text-[#A08070] text-sm max-w-sm mx-auto leading-relaxed">
+              Presenting the top three standout innovations evaluated by our panel of judges.
+            </p>
+          </div>
+
+          <div className="w-full flex flex-col gap-5 max-w-md relative z-10">
+            {[
+              { p: p1, place: "1st", color: "#C8941C", badgeColor: "bg-amber-500", text: isDark ? "#F0C060" : "#4B1F24" },
+              { p: p2, place: "2nd", color: "#808588", badgeColor: "bg-slate-400", text: isDark ? "#DFCDBD" : "#4B1F24" },
+              { p: p3, place: "3rd", color: "#A0522D", badgeColor: "bg-amber-700", text: isDark ? "#B89A85" : "#4B1F24" }
+            ].map(({ p, place, color, badgeColor, text }) => {
+              if (!p) return null;
+              return (
+                <div
+                  key={p.id}
+                  onClick={() => router.push(`/project/${p.id}`)}
+                  className="cursor-pointer rounded-2xl border flex flex-col overflow-hidden shadow-md transition-all active:scale-98"
+                  style={{
+                    background: isDark ? "rgba(30, 18, 8, 0.9)" : "rgba(255, 248, 230, 0.95)",
+                    borderColor: isDark ? "rgba(201, 162, 39, 0.3)" : "rgba(233, 216, 199, 0.8)",
+                  }}
+                >
+                  <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-[#DFCDBD]/40">
+                    <Image
+                      src={p.videoThumbnail}
+                      alt={p.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 400px"
+                    />
+                    <div className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider text-white shadow-md flex items-center gap-1 bg-black/45 backdrop-blur-sm">
+                      <Trophy className="w-3.5 h-3.5 text-yellow-400" />
+                      {place} Place
+                    </div>
+                  </div>
+
+                  <div className="p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 
+                        className="text-lg font-bold leading-snug line-clamp-2"
+                        style={{ color: isDark ? "#F5EFE0" : "#4B1F24", fontFamily: "'Cormorant Garamond', serif" }}
+                      >
+                        {p.title}
+                      </h3>
+                      <p className="text-xs font-semibold tracking-wide uppercase mt-1.5 text-jaipur-primary">
+                        {p.teamName}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                        {p.shortIdea}
+                      </p>
+                    </div>
+                    <span className="text-xs font-bold text-jaipur-primary hover:underline mt-4 inline-block">
+                      View Project Details &rarr;
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section ref={sectionRef} className="py-16 relative overflow-hidden">

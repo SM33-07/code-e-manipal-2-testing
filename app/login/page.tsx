@@ -83,15 +83,7 @@ export default function LoginPage() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      {/* Background */}
-      <div
-        className="absolute inset-0 transition-all duration-300"
-        style={{
-          backgroundImage: "url(/images/backgrounds/login.webp)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
+      <div className="absolute inset-0 transition-all duration-300 login-background" />
       <div className={clsx("absolute inset-0 transition-colors duration-300", isDark ? "bg-black/60" : "bg-black/25")} />
 
       {/* Shift card right on desktop, center on smaller screens */}

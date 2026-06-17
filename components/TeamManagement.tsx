@@ -510,9 +510,9 @@ export function TeamManagement() {
               {isTeamLeader && !myTeam.isLocked && myTeam.members.length < myTeam.maxSize && (
                 <div style={{ marginTop: 20 }}>
                   <p style={sectionLabelComputed}>Invite Code</p>
-                  <div style={{ display: "flex", gap: 10, position: "relative" }}>
+                  <div className="flex flex-col sm:flex-row gap-3 relative w-full">
                     <div style={{
-                      flex: 1, height: 54,
+                      height: 54,
                       background: isDark ? "rgba(42, 29, 22, 0.7)" : "rgba(241, 227, 214, 0.7)",
                       border: isDark ? "1px solid rgba(201,162,39,0.3)" : "1px solid #DFCDBD",
                       borderRadius: 14,
@@ -520,14 +520,13 @@ export function TeamManagement() {
                       paddingLeft: 18,
                       fontFamily: SERIF, fontSize: 22, color: isDark ? "#C9A227" : "#8B1C2E",
                       letterSpacing: "2px", fontWeight: 600,
-                    }}>
+                    }} className="flex-1 w-full">
                       {myTeam.inviteCode}
                     </div>
                     <button
                       type="button"
                       onClick={copyInviteCode}
                       style={{
-                        flexShrink: 0,
                         height: 54, padding: "0 22px",
                         borderRadius: 14, border: "none",
                         background: isDark ? "linear-gradient(135deg,#D4732A,#C1440E)" : "linear-gradient(135deg,#8B1F44,#6B142F)",
@@ -536,6 +535,7 @@ export function TeamManagement() {
                         display: "flex", alignItems: "center", gap: 6,
                         boxShadow: isDark ? "0 3px 10px rgba(212,115,42,0.15)" : "0 3px 10px rgba(139,28,46,0.15)",
                       }}
+                      className="w-full sm:w-auto justify-center flex-shrink-0"
                     >
                       {copiedCode ? <><Check size={15} /> Copied</> : <><Copy size={15} /> Copy</>}
                     </button>
@@ -590,14 +590,14 @@ export function TeamManagement() {
                   placeholder="Enter team name"
                   style={{ ...inputStyleComputed, flex: "unset", width: "100%" }}
                 />
-                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <div className="flex flex-col sm:flex-row gap-3 w-full">
                   <input
                     value={leaderName}
                     onChange={(e) => setLeaderName(e.target.value)}
                     placeholder="Team leader name"
-                    style={inputStyleComputed}
+                    style={{ ...inputStyleComputed, width: "100%" }}
                   />
-                  <button type="button" onClick={createTeam} style={primaryBtnComputed}>
+                  <button type="button" onClick={createTeam} style={primaryBtnComputed} className="w-full sm:w-auto justify-center">
                     <UserPlus size={15} /> Create
                   </button>
                 </div>
@@ -609,14 +609,14 @@ export function TeamManagement() {
                   Join a Team
                 </h2>
               </div>
-              <div style={{ display: "flex", gap: 10 }}>
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
                 <input
                   value={inviteCode}
                   placeholder="Enter invite code"
-                  style={{ ...inputStyleComputed, fontFamily: SERIF, letterSpacing: "2px", fontWeight: 600 }}
+                  style={{ ...inputStyleComputed, fontFamily: SERIF, letterSpacing: "2px", fontWeight: 600, width: "100%" }}
                   onChange={(e) => setInviteCode(e.target.value)}
                 />
-                <button type="button" onClick={joinTeam} style={primaryBtnComputed}>
+                <button type="button" onClick={joinTeam} style={primaryBtnComputed} className="w-full sm:w-auto justify-center">
                   <UserPlus size={15} /> Join
                 </button>
               </div>
