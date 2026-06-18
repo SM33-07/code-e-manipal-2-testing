@@ -47,6 +47,21 @@ export async function getSubmissionById(id: string) {
 
 // ─── CREATE ────────────────────────────
 export async function createSubmission(input: any) {
+  // Check if team submissions are frozen or past individual deadline extension
+  const { rows: teamRows } = await query(
+    'SELECT submission_frozen, deadline_extension FROM public.teams WHERE id = $1',
+    [input.team_id]
+  );
+  const team = teamRows[0];
+  if (team) {
+    if (team.submission_frozen) {
+      throw new Error('SUBMISSION_FROZEN');
+    }
+    if (team.deadline_extension && new Date() > new Date(team.deadline_extension)) {
+      throw new Error('SUBMISSION_DEADLINE_EXPIRED');
+    }
+  }
+
   const { rows } = await query(
     `INSERT INTO public.submissions (
       team_id, title, summary, category, technologies, github_url, demo_url, docs_url
@@ -70,11 +85,31 @@ export async function createSubmission(input: any) {
 const ALLOWED_SUBMISSION_FIELDS = ['title', 'summary', 'category', 'technologies', 'github_url', 'demo_url', 'docs_url', 'status'];
 
 export async function updateSubmission(id: string, input: any) {
+  const sub = await getSubmissionById(id);
+  if (!sub) {
+    throw new Error('SUBMISSION_NOT_FOUND');
+  }
+
+  // Check if team submissions are frozen or past individual deadline extension
+  const { rows: teamRows } = await query(
+    'SELECT submission_frozen, deadline_extension FROM public.teams WHERE id = $1',
+    [sub.team_id]
+  );
+  const team = teamRows[0];
+  if (team) {
+    if (team.submission_frozen) {
+      throw new Error('SUBMISSION_FROZEN');
+    }
+    if (team.deadline_extension && new Date() > new Date(team.deadline_extension)) {
+      throw new Error('SUBMISSION_DEADLINE_EXPIRED');
+    }
+  }
+
   const keys = Object.keys(input).filter(
     (k) => ALLOWED_SUBMISSION_FIELDS.includes(k) && /^[a-z_]+$/.test(k)
   );
   if (keys.length === 0) {
-    return getSubmissionById(id);
+    return sub;
   }
 
   const setClause = keys.map((key, index) => `"${key}" = $${index + 2}`).join(', ');

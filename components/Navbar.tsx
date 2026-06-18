@@ -27,7 +27,7 @@ const mockNotifications = [
   { id: 3, type: "info", icon: Info, title: "Welcome", text: "Welcome to Code-E-Manipal! Hack away.", time: "2h ago" },
 ]
 
-export default function Navbar() {
+export default function Navbar({ className }: { className?: string }) {
   const { role, logout, user } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
@@ -93,7 +93,7 @@ export default function Navbar() {
   const isSubmissionForm = pathname?.startsWith("/SubmissionForm")
 
   return (
-    <ResizableNavbar isSubmissionForm={isSubmissionForm}>
+    <ResizableNavbar isSubmissionForm={isSubmissionForm} className={className}>
       {/* ── Desktop Navigation ── */}
       <NavBody className="bg-background/90 border border-jaipur-gold/30 shadow-md backdrop-blur-md">
         {/* Logo */}
