@@ -80,6 +80,7 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^18.3.28",
     "@types/react-dom": "^18.3.7",
+    "autocannon": "^8.0.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^15.5.12",
     "postcss": "^8.5.6",
