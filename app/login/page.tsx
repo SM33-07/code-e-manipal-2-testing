@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Users, Scale, ShieldCheck, Images } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Users, Scale, ShieldCheck, Images, UserPlus } from "lucide-react";
 import clsx from "clsx";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/components/AuthProvider";
@@ -289,10 +289,18 @@ export default function LoginPage() {
             <WideDivider />
           </div>
 
-          {/* Demo mode */}
-          <p className="text-center mt-4 transition-colors duration-300" style={{ fontSize: 12, color: isDark ? "#A08070" : "#7A655D", fontFamily: "'Inter',sans-serif" }}>
-            Demo mode enabled
-          </p>
+          {/* Register link */}
+          <div className="mt-4">
+            <Link
+              href="/register"
+              className="flex items-center justify-center gap-2 hover:opacity-75 transition-opacity"
+            >
+              <UserPlus size={16} style={{ color: isDark ? "#F0C060" : "#7B1E3A" }} />
+              <span style={{ fontSize: 14, fontWeight: 600, color: isDark ? "#F0C060" : "#7B1E3A", fontFamily: "'Inter',sans-serif" }}>
+                Register for the Hackathon
+              </span>
+            </Link>
+          </div>
 
           {/* Gallery link */}
           <div className="mt-3">
@@ -300,8 +308,8 @@ export default function LoginPage() {
               href="/gallery"
               className="flex items-center justify-center gap-2 hover:opacity-75 transition-opacity"
             >
-              <Images size={16} style={{ color: isDark ? "#F0C060" : "#7B1E3A" }} />
-              <span style={{ fontSize: 14, fontWeight: 600, color: isDark ? "#F0C060" : "#7B1E3A", fontFamily: "'Inter',sans-serif" }}>
+              <Images size={16} style={{ color: isDark ? "#D4732A" : "#8A3150" }} />
+              <span style={{ fontSize: 13, fontWeight: 500, color: isDark ? "#A08070" : "#6E5A55", fontFamily: "'Inter',sans-serif" }}>
                 View Public Gallery
               </span>
             </Link>

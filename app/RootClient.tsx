@@ -24,10 +24,11 @@ function getBackground(pathname: string) {
 function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isLogin = pathname === "/login"
+  const isRegister = pathname === "/register"
   const isGallery = pathname === "/gallery"
   const isSubmissionForm = pathname.startsWith("/SubmissionForm")
 
-  if (isLogin) {
+  if (isLogin || isRegister) {
     return <>{children}</>
   }
 

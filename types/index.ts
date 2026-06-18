@@ -113,3 +113,20 @@ export interface RankedSubmission {
 export interface PaginationParams { limit: number; offset: number; }
 export interface ApiSuccess<T> { data: T; meta?: Record<string, unknown>; }
 export interface ApiError { error: string; code?: string; }
+
+// ── Hackathon Registration ────────────────────────────────────
+export type RegistrationStatus = 'pending' | 'approved' | 'rejected';
+
+export interface HackathonRegistration {
+  id: string;
+  name: string;
+  team_name: string;
+  phone: string;
+  email: string;
+  round: number;
+  status: RegistrationStatus;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}

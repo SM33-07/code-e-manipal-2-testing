@@ -4,11 +4,12 @@ import type { ReactNode } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard, Users, Scale, Trophy,
-  FileText, BarChart3, LogOut
+  FileText, BarChart3, LogOut, ClipboardList
 } from "lucide-react"
 
 const sideNav = [
-  { label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
+  { label: "Dashboard",     icon: LayoutDashboard, href: "/admin" },
+  { label: "Registrations", icon: ClipboardList,   href: "/admin/registrations" },
   { label: "Teams",     icon: Users,           href: "/team" },
   { label: "Judging",   icon: Scale,           href: "/judging" },
   { label: "Results",   icon: Trophy,          href: "/admin/results" },
