@@ -363,7 +363,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
                   filter: "drop-shadow(0 0 20px rgba(246,196,83,0.3))",
                 }}
               >
-                Learn IT
+                LearnIT
               </h1>
             </motion.div>
 
