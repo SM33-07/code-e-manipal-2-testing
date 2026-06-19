@@ -20,11 +20,29 @@ export function withAuth(handler: AuthHandler, requiredRole?: UserRole) {
       let profile = profileRes.rows[0] as Profile | undefined;
 
       if (!profile) {
-        // Lazily sync the user to Azure auth.users so the trigger creates the profile row
         const meta = user.user_metadata || {};
+        try {
+          // Lazily sync the user to Azure auth.users so the trigger creates the profile row
+          await query(
+            'INSERT INTO auth.users (id, email, raw_user_meta_data) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING',
+            [user.id, user.email || '', JSON.stringify(meta)]
+          );
+        } catch (e) {
+          console.warn('⚠️ auth.users sync failed, attempting direct profiles insert:', e);
+        }
+
+        // Defensive copy: insert directly into public.profiles to be absolutely sure the row exists
         await query(
-          'INSERT INTO auth.users (id, email, raw_user_meta_data) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING',
-          [user.id, user.email || '', JSON.stringify(meta)]
+          `INSERT INTO public.profiles (id, name, email, avatar_url, role) 
+           VALUES ($1, $2, $3, $4, $5) 
+           ON CONFLICT (id) DO NOTHING`,
+          [
+            user.id,
+            meta.name || user.email?.split('@')[0] || 'Unknown',
+            user.email || '',
+            meta.avatar_url || '',
+            meta.role || 'participant'
+          ]
         );
 
         // Fetch the profile once more
@@ -44,6 +62,7 @@ export function withAuth(handler: AuthHandler, requiredRole?: UserRole) {
       const resolvedParams = context?.params instanceof Promise ? await context.params : context?.params;
       return handler(req, { user, profile, params: resolvedParams });
     } catch (err) {
+      console.error('🔥 withAuth error:', err);
       return Errors.INTERNAL();
     }
   };

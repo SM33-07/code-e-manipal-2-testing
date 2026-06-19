@@ -13,9 +13,14 @@ export const pool = new Pool({
     // We set rejectUnauthorized to false to allow SSL connection without configuring a custom CA certificate locally.
     rejectUnauthorized: false,
   },
-  max: 20,                       // Max active connections in pool per Next.js server instance
-  idleTimeoutMillis: 30000,      // Close idle connections after 30s
-  connectionTimeoutMillis: 5000, // Fail connection attempt after 5s
+  max: 5,                         // Keep low for serverless (each Vercel function gets its own pool)
+  idleTimeoutMillis: 10000,       // Close idle connections after 10s (serverless functions are short-lived)
+  connectionTimeoutMillis: 10000, // Allow 10s for Azure cold-start connections
+});
+
+// Prevent uncaught pool errors from crashing the process
+pool.on('error', (err) => {
+  console.error('Unexpected PG pool error:', err.message);
 });
 
 /**
