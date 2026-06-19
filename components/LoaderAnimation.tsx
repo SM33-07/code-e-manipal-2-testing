@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
@@ -11,7 +11,27 @@ interface LoaderAnimationProps {
 export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
   const [progress, setProgress] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("INITIALIZING INNOVATION...");
+
+  // Memoize particle positions so they don't re-randomize on every render
+  const particles = useMemo(() =>
+    Array.from({ length: 25 }).map(() => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      size: Math.random() * 2.5 + 0.5,
+      duration: Math.random() * 6 + 4,
+      delay: Math.random() * 5,
+      yTravel: Math.random() * 80 + 30,
+    })), []
+  );
+
+  // Memoize bird data
+  const birds = useMemo(() => [
+    { left: "28%", top: "32%", delay: 2, scale: 0.7 },
+    { left: "32%", top: "30%", delay: 2.3, scale: 0.5 },
+    { left: "68%", top: "31%", delay: 3, scale: 0.6 },
+    { left: "72%", top: "33%", delay: 3.4, scale: 0.45 },
+    { left: "25%", top: "28%", delay: 4, scale: 0.4 },
+  ], []);
 
   // Increment progress counter
   useEffect(() => {
@@ -19,11 +39,11 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
       const exitTimer = setTimeout(() => {
         setIsExiting(true);
       }, 300);
-      
+
       const completeTimer = setTimeout(() => {
         onComplete();
-      }, 1000); // Wait for fade-out animations to complete
-      
+      }, 1000);
+
       return () => {
         clearTimeout(exitTimer);
         clearTimeout(completeTimer);
@@ -32,28 +52,13 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
 
     const timer = setTimeout(() => {
       setProgress((prev) => {
-        const increment = Math.floor(Math.random() * 8) + 5; // increment between 5% and 12%
+        const increment = Math.floor(Math.random() * 8) + 5;
         return Math.min(100, prev + increment);
       });
     }, Math.random() * 120 + 80);
 
     return () => clearTimeout(timer);
   }, [progress, onComplete]);
-
-  // Update loading status text based on progress
-  useEffect(() => {
-    if (progress < 25) {
-      setStatusMessage("INITIALIZING INNOVATION...");
-    } else if (progress < 50) {
-      setStatusMessage("LOADING SECURE DATABASE...");
-    } else if (progress < 75) {
-      setStatusMessage("CONFIGURING ENVIRONMENT...");
-    } else if (progress < 100) {
-      setStatusMessage("PREPARING THE EXPERIENCE...");
-    } else {
-      setStatusMessage("WELCOME TO CODE-E-MANIPAL");
-    }
-  }, [progress]);
 
   const handleSkip = () => {
     setProgress(100);
@@ -70,403 +75,489 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 0.96, filter: "blur(6px)" }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
-          className="fixed inset-0 z-[99999] bg-gradient-to-b from-[#06040A] via-[#090514] to-[#040207] overflow-hidden flex flex-col items-center justify-center"
+          className="fixed inset-0 z-[99999] overflow-hidden flex flex-col items-center justify-between"
+          style={{ background: "linear-gradient(180deg, #050505 0%, #070a12 50%, #050505 100%)" }}
         >
-          {/* Background Richness */}
+
+          {/* ===== BACKGROUND LAYERS ===== */}
+
+          {/* Subtle Grid Texture */}
           <div
-            className="absolute inset-0 opacity-[0.04]"
+            className="absolute inset-0 opacity-[0.03] pointer-events-none z-0"
             style={{
               backgroundImage: `
-                linear-gradient(rgba(201,162,39,0.2) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(201,162,39,0.2) 1px, transparent 1px)
+                linear-gradient(rgba(246,196,83,0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(246,196,83,0.3) 1px, transparent 1px)
               `,
-              backgroundSize: "60px 60px",
+              backgroundSize: "50px 50px",
             }}
           />
 
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {Array.from({ length: 18 }).map((_, i) => (
+          {/* Cinematic Vignette */}
+          <div className="absolute inset-0 z-[2] pointer-events-none" style={{
+            background: "radial-gradient(ellipse at center, transparent 30%, rgba(5,5,5,0.7) 70%, rgba(5,5,5,0.95) 100%)"
+          }} />
+
+          {/* MUJ Building Golden Wireframe Background */}
+          <motion.div
+            className="absolute z-[1] pointer-events-none"
+            style={{
+              top: "-25%",
+              left: "1%",
+              transform: "translateX(-50%)",
+              width: "97vw",
+              maxWidth: "1650px",
+            }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 2.5, ease: "easeOut", delay: 0.3 }}
+          >
+            <Image
+              src="/MUJ-BUILD.webp"
+              alt="MUJ Campus Building"
+              width={1600}
+              height={1600}
+              className="w-full h-auto object-contain opacity-[0.35] mix-blend-screen"
+              style={{
+                filter: "drop-shadow(0 0 12px rgba(246,196,83,0.15))",
+              }}
+              priority
+            />
+          </motion.div>
+
+          {/* Floating Particles */}
+          <div className="absolute inset-0 z-[3] overflow-hidden pointer-events-none">
+            {particles.map((p, i) => (
               <motion.div
                 key={i}
-                className="absolute w-1 h-1 rounded-full bg-[#FFE066]"
+                className="absolute rounded-full bg-[#F6C453]"
                 style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
+                  width: p.size + "px",
+                  height: p.size + "px",
+                  left: p.left + "%",
+                  top: p.top + "%",
+                  filter: "blur(0.5px)",
                 }}
                 animate={{
-                  opacity: [0, 1, 0],
-                  y: [-20, 20],
+                  y: [0, -p.yTravel],
+                  opacity: [0, 0.7, 0],
                 }}
                 transition={{
-                  duration: 4 + Math.random() * 3,
+                  duration: p.duration,
                   repeat: Infinity,
-                  delay: Math.random() * 4,
+                  ease: "easeInOut",
+                  delay: p.delay,
                 }}
               />
             ))}
           </div>
 
-          {/* Skip Intro Button */}
+          {/* Bird Silhouettes */}
+          {birds.map((bird, i) => (
+            <motion.div
+              key={`bird-${i}`}
+              className="absolute z-[3] pointer-events-none"
+              style={{ left: bird.left, top: bird.top, transform: `scale(${bird.scale})` }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 0.25, 0.15, 0] }}
+              transition={{ duration: 6, delay: bird.delay, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <svg width="24" height="10" viewBox="0 0 24 10" fill="none">
+                <path d="M 0 8 Q 6 0 12 5 Q 18 0 24 8" stroke="#F6C453" strokeWidth="1" fill="none" opacity="0.6"/>
+              </svg>
+            </motion.div>
+          ))}
+
+          {/* ===== HUD FRAME CORNERS ===== */}
+
+          {/* Top-Left Corner */}
+          <div className="absolute top-4 left-4 z-[10] pointer-events-none">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <path d="M 0 30 L 0 8 Q 0 0 8 0 L 30 0" stroke="#F6C453" strokeWidth="1.5" opacity="0.5" />
+              <path d="M 8 8 L 25 8" stroke="#F6C453" strokeWidth="1" opacity="0.4" />
+              <path d="M 8 8 L 8 25" stroke="#F6C453" strokeWidth="1" opacity="0.4" />
+              <rect x="0" y="0" width="3" height="3" fill="#F6C453" opacity="0.8" />
+            </svg>
+          </div>
+
+          {/* Top-Right Corner */}
+          <div className="absolute top-4 right-4 z-[10] pointer-events-none">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <path d="M 80 30 L 80 8 Q 80 0 72 0 L 50 0" stroke="#F6C453" strokeWidth="1.5" opacity="0.5" />
+              <path d="M 72 8 L 55 8" stroke="#F6C453" strokeWidth="1" opacity="0.4" />
+              <path d="M 72 8 L 72 25" stroke="#F6C453" strokeWidth="1" opacity="0.4" />
+              <rect x="77" y="0" width="3" height="3" fill="#F6C453" opacity="0.8" />
+            </svg>
+          </div>
+
+          {/* Bottom-Left Corner */}
+          <div className="absolute bottom-4 left-4 z-[10] pointer-events-none">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <path d="M 0 50 L 0 72 Q 0 80 8 80 L 30 80" stroke="#F6C453" strokeWidth="1.5" opacity="0.5" />
+              <rect x="0" y="77" width="3" height="3" fill="#F6C453" opacity="0.8" />
+            </svg>
+          </div>
+
+          {/* Bottom-Right Corner */}
+          <div className="absolute bottom-4 right-4 z-[10] pointer-events-none">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <path d="M 80 50 L 80 72 Q 80 80 72 80 L 50 80" stroke="#F6C453" strokeWidth="1.5" opacity="0.5" />
+              <rect x="77" y="77" width="3" height="3" fill="#F6C453" opacity="0.8" />
+            </svg>
+          </div>
+
+          {/* Dotted Border - Top */}
+          <motion.div
+            className="absolute top-3 left-20 right-20 h-[1px] z-[10] pointer-events-none"
+            style={{
+              backgroundImage: "radial-gradient(circle, #F6C453 1px, transparent 1px)",
+              backgroundSize: "10px 1px",
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.25 }}
+            transition={{ delay: 1, duration: 1 }}
+          />
+
+          {/* Dotted Border - Right */}
+          <motion.div
+            className="absolute top-20 bottom-20 right-3 w-[1px] z-[10] pointer-events-none"
+            style={{
+              backgroundImage: "radial-gradient(circle, #F6C453 1px, transparent 1px)",
+              backgroundSize: "1px 10px",
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.25 }}
+            transition={{ delay: 1.2, duration: 1 }}
+          />
+
+          {/* ===== SKIP BUTTON ===== */}
           <button
             onClick={handleSkip}
-            className="absolute top-6 right-6 z-[99] rounded-full border border-[#C9A227]/30 bg-black/40 px-5 py-2 font-mono text-[10px] sm:text-xs text-[#C9A227] tracking-wider transition-all duration-300 hover:bg-[#C9A227] hover:text-black hover:shadow-[0_0_15px_rgba(201,162,39,0.4)] focus:outline-none cursor-pointer"
+            className="absolute top-6 right-10 z-[20] rounded-full border border-[#F6C453]/30 bg-black/40 px-5 py-2 font-mono text-[10px] sm:text-xs text-[#F6C453] tracking-wider transition-all duration-300 hover:bg-[#F6C453] hover:text-black hover:shadow-[0_0_15px_rgba(246,196,83,0.4)] focus:outline-none cursor-pointer backdrop-blur-sm"
           >
             SKIP INTRO
           </button>
 
-          {/* Centerpiece Vector Visualizer */}
-          <div className="relative flex flex-col items-center justify-center z-20">
-            <svg viewBox="0 0 350 350" className="w-[280px] h-[280px] sm:w-[350px] sm:h-[350px]">
-              <defs>
-                <filter id="loader-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-                <linearGradient id="logo-silver" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FFFFFF" />
-                  <stop offset="50%" stopColor="#E0E0E0" />
-                  <stop offset="100%" stopColor="#9C9C9C" />
-                </linearGradient>
-                <linearGradient id="loader-gold" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#C9A227" />
-                  <stop offset="50%" stopColor="#F0C060" />
-                  <stop offset="100%" stopColor="#FFE066" />
-                </linearGradient>
-                <radialGradient id="goldGlow">
-                  <stop offset="0%" stopColor="#FFE066" stopOpacity="0.55" />
-                  <stop offset="60%" stopColor="#C9A227" stopOpacity="0.2" />
-                  <stop offset="100%" stopColor="#C9A227" stopOpacity="0" />
-                </radialGradient>
-              </defs>
+          {/* ===== MAIN CONTENT ===== */}
+          <div className="flex-1 flex flex-col items-center justify-center z-[15] w-full px-4 max-w-4xl mx-auto">
 
-              {/* Glowing Outer gold ring */}
-              <circle cx="175" cy="175" r="90" fill="none" stroke="url(#loader-gold)" strokeWidth="2" filter="url(#loader-glow)" opacity="0.8" />
+            {/* ── LOGO SECTION ── */}
+            <motion.div
+              className="relative mb-6 flex justify-center items-center"
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
+            >
+              {/* Pulsating Glow Aura */}
+              <motion.div
+                className="absolute w-28 h-28 md:w-36 md:h-36 rounded-full"
+                style={{
+                  background: "radial-gradient(circle, rgba(246,196,83,0.15) 0%, transparent 70%)",
+                }}
+                animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.7, 0.4] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              />
 
-              {/* Decorative inner rings */}
-              <circle cx="175" cy="175" r="82" fill="none" stroke="rgba(201,162,39,0.25)" strokeWidth="0.8" />
-              <circle cx="175" cy="175" r="75" fill="none" stroke="rgba(201,162,39,0.15)" strokeWidth="0.5" strokeDasharray="5 3" />
-
-              {/* MANDALA SECTION (LEFT HALF) */}
-              <g transform="translate(175, 175)">
-                {Array.from({ length: 17 }).map((_, i) => {
-                  const angle = -90 + (i * 180) / 16;
+              {/* Animated Circuit Lines extending from Logo */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                {[
+                  { angle: -30, len: 100 },
+                  { angle: 30, len: 90 },
+                  { angle: -60, len: 70 },
+                  { angle: 60, len: 75 },
+                  { angle: 150, len: 55 },
+                  { angle: 210, len: 55 },
+                ].map((line, i) => (
+                  <motion.div
+                    key={`circuit-${i}`}
+                    className="absolute h-[1px] origin-left"
+                    style={{
+                      transform: `rotate(${line.angle}deg)`,
+                      background: "linear-gradient(90deg, rgba(246,196,83,0.6), rgba(246,196,83,0))",
+                    }}
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{
+                      width: [0, line.len, line.len],
+                      opacity: [0, 0.7, 0],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      delay: i * 0.4 + 0.5,
+                      ease: "easeInOut",
+                    }}
+                  />
+                ))}
+                {/* Node dots at circuit endpoints */}
+                {[
+                  { angle: -30, dist: 100 },
+                  { angle: 30, dist: 90 },
+                ].map((node, i) => {
+                  const rad = (node.angle * Math.PI) / 180;
                   return (
-                    <g key={i} transform={`rotate(${angle})`}>
-                      {/* Outer petal outline */}
-                      <motion.path 
-                        d="M -90 0 C -100 -12, -112 -12, -120 0 C -112 12, -100 12, -90 0" 
-                        fill="none" 
-                        stroke="rgba(201,162,39,0.3)" 
-                        strokeWidth="0.8" 
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        animate={{ pathLength: 1, opacity: 1 }}
-                        transition={{ duration: 0.8, delay: i * 0.04 }}
-                      />
-                      {/* Inner petal outline */}
-                      <motion.path 
-                        d="M -90 0 C -96 -6, -104 -6, -108 0 C -104 6, -96 6, -90 0" 
-                        fill="none" 
-                        stroke="rgba(201,162,39,0.45)" 
-                        strokeWidth="0.6" 
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        animate={{ pathLength: 1, opacity: 1 }}
-                        transition={{ duration: 0.6, delay: i * 0.04 + 0.1 }}
-                      />
-                      {/* Petal tip node */}
-                      <motion.circle 
-                        cx="-120" cy="0" r="1.5" 
-                        fill="#FFE066" 
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 0.3, delay: i * 0.04 + 0.3 }}
-                      />
-                    </g>
+                    <motion.div
+                      key={`node-${i}`}
+                      className="absolute w-1.5 h-1.5 rounded-full bg-[#F6C453] shadow-[0_0_6px_#F6C453]"
+                      style={{
+                        left: `calc(50% + ${Math.cos(rad) * node.dist}px - 3px)`,
+                        top: `calc(50% + ${Math.sin(rad) * node.dist}px - 3px)`,
+                      }}
+                      animate={{ opacity: [0, 1, 0] }}
+                      transition={{ duration: 3, repeat: Infinity, delay: i * 0.4 + 1.5 }}
+                    />
                   );
                 })}
-              </g>
+              </div>
 
-              {/* CIRCUIT SECTION (RIGHT HALF) */}
-              <g filter="url(#loader-glow)">
-                {/* Track 1 (upper right) */}
-                <motion.path 
-                  d="M 238.6 111.4 L 260 90 L 300 90" 
-                  fill="none" 
-                  stroke="url(#loader-gold)" 
-                  strokeWidth="1.2" 
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.2, ease: "easeInOut", delay: 0.1 }}
-                />
-                <motion.path 
-                  d="M 260 90 L 275 75 L 300 75" 
-                  fill="none" 
-                  stroke="url(#loader-gold)" 
-                  strokeWidth="0.8" 
-                  opacity="0.7" 
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.0, ease: "easeInOut", delay: 0.5 }}
-                />
-                <motion.circle 
-                  cx="300" cy="90" r="2.5" 
-                  fill="#FFE066" 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300, delay: 1.2 }}
-                />
-                <motion.circle 
-                  cx="300" cy="75" r="2" 
-                  fill="#FFE066" 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300, delay: 1.4 }}
-                />
-
-                {/* Track 2 (right-upper-right) */}
-                <motion.path 
-                  d="M 259.6 144.2 L 280 144.2 L 300 125 L 320 125" 
-                  fill="none" 
-                  stroke="url(#loader-gold)" 
-                  strokeWidth="1.2" 
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.2, ease: "easeInOut", delay: 0.2 }}
-                />
-                <motion.circle 
-                  cx="320" cy="125" r="2.5" 
-                  fill="#FFE066" 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300, delay: 1.3 }}
-                />
-
-                {/* Track 3 (straight right) */}
-                <motion.path 
-                  d="M 265 175 L 325 175" 
-                  fill="none" 
-                  stroke="url(#loader-gold)" 
-                  strokeWidth="1.8" 
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.0, ease: "easeInOut", delay: 0.3 }}
-                />
-                <motion.circle 
-                  cx="325" cy="175" r="3.5" 
-                  fill="#FFE066" 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300, delay: 1.1 }}
-                />
-
-                {/* Track 4 (right-lower-right) */}
-                <motion.path 
-                  d="M 259.6 205.8 L 280 205.8 L 300 225 L 320 225" 
-                  fill="none" 
-                  stroke="url(#loader-gold)" 
-                  strokeWidth="1.2" 
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.2, ease: "easeInOut", delay: 0.2 }}
-                />
-                <motion.circle 
-                  cx="320" cy="225" r="2.5" 
-                  fill="#FFE066" 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300, delay: 1.3 }}
-                />
-
-                {/* Track 5 (lower right) */}
-                <motion.path 
-                  d="M 238.6 238.6 L 260 260 L 300 260" 
-                  fill="none" 
-                  stroke="url(#loader-gold)" 
-                  strokeWidth="1.2" 
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.2, ease: "easeInOut", delay: 0.1 }}
-                />
-                <motion.path 
-                  d="M 260 260 L 275 275 L 300 275" 
-                  fill="none" 
-                  stroke="url(#loader-gold)" 
-                  strokeWidth="0.8" 
-                  opacity="0.7" 
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.0, ease: "easeInOut", delay: 0.5 }}
-                />
-                <motion.circle 
-                  cx="300" cy="260" r="2.5" 
-                  fill="#FFE066" 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300, delay: 1.2 }}
-                />
-                <motion.circle 
-                  cx="300" cy="275" r="2" 
-                  fill="#FFE066" 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300, delay: 1.4 }}
-                />
-              </g>
-
-              {/* CENTER LOGO */}
-              <radialGradient id="goldGlow">
-                <stop offset="0%" stopColor="#FFE066" stopOpacity="0.55" />
-                <stop offset="60%" stopColor="#C9A227" stopOpacity="0.2" />
-                <stop offset="100%" stopColor="#C9A227" stopOpacity="0" />
-              </radialGradient>
-
-              <motion.circle
-                cx="175"
-                cy="175"
-                r="55"
-                fill="url(#goldGlow)"
-                animate={{
-                  scale: [1, 1.08, 1],
-                  opacity: [0.3, 0.5, 0.3],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                }}
-              />
-
-              <foreignObject
-                x="120"
-                y="120"
-                width="110"
-                height="110"
-              >
+              {/* Logo Container - Circular with glow border */}
+              <div className="relative z-10 w-20 h-20 md:w-28 md:h-28 rounded-full border border-[#F6C453]/30 shadow-[0_0_25px_rgba(246,196,83,0.12)] bg-[#050505]/80 backdrop-blur-md flex items-center justify-center p-2">
+                {/* Rotating dashed inner ring */}
                 <motion.div
-                  animate={{
-                    scale: [1, 1.03, 1],
-                  }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                  }}
-                  className="relative w-full h-full flex items-center justify-center"
-                >
-                  <Image
-                    src="/logo.png"
-                    alt="Code-E-Manipal"
-                    width={90}
-                    height={90}
-                    className="drop-shadow-[0_0_20px_rgba(255,224,102,0.55)] object-contain"
-                  />
+                  className="absolute inset-1 rounded-full border border-dashed border-[#F6C453]/25"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                />
+                {/* Outer decorative dots ring */}
+                <div className="absolute inset-0">
+                  {Array.from({ length: 24 }).map((_, i) => {
+                    const angle = (i * 360) / 24;
+                    const rad = (angle * Math.PI) / 180;
+                    const r = 50;
+                    return (
+                      <div
+                        key={`dot-${i}`}
+                        className="absolute w-[2px] h-[2px] rounded-full bg-[#F6C453]/40"
+                        style={{
+                          left: `calc(50% + ${Math.cos(rad) * r}% - 1px)`,
+                          top: `calc(50% + ${Math.sin(rad) * r}% - 1px)`,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+                {/* Logo Image */}
+                <Image
+                  src="/logo.png"
+                  alt="Learn IT Logo"
+                  width={90}
+                  height={90}
+                  className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(246,196,83,0.7)]"
+                  priority
+                />
+              </div>
+            </motion.div>
 
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 12,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                    className="absolute inset-0"
-                  >
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#FFE066] shadow-[0_0_12px_#FFE066]" />
-                  </motion.div>
-                </motion.div>
-              </foreignObject>
-            </svg>
+            {/* ── TITLE SECTION ── */}
+            <motion.div
+              className="text-center mb-3 relative"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+            >
+              <h1
+                className="text-5xl md:text-7xl font-serif tracking-widest text-transparent bg-clip-text"
+                style={{
+                  backgroundImage: "linear-gradient(180deg, #FFF8E1 0%, #F6C453 60%, #C9A227 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  filter: "drop-shadow(0 0 20px rgba(246,196,83,0.3))",
+                }}
+              >
+                Learn IT
+              </h1>
+            </motion.div>
+
+            <motion.div
+              className="text-center mb-1"
+              initial={{ y: 15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
+            >
+              <h2
+                className="text-xs md:text-sm tracking-[0.35em] font-light uppercase"
+                style={{ color: "#F6C453", opacity: 0.8 }}
+              >
+                Manipal University Jaipur
+              </h2>
+            </motion.div>
+
+            {/* Three diamond decorations */}
+            <motion.div
+              className="flex items-center gap-2 mb-10 mt-2"
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
+            >
+              <div className="w-1.5 h-1.5 rotate-45 bg-[#F6C453]/50" />
+              <div className="w-2 h-2 rotate-45 bg-[#F6C453]" />
+              <div className="w-1.5 h-1.5 rotate-45 bg-[#F6C453]/50" />
+            </motion.div>
+
+            {/* ── LOADING CARD ── */}
+            <motion.div
+              className="w-full max-w-lg relative z-[15]"
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1, delay: 0.9, ease: "easeOut" }}
+            >
+              {/* Outer decorative border (double border effect) */}
+              <div className="relative p-[2px] rounded-lg" style={{
+                background: "linear-gradient(135deg, rgba(246,196,83,0.4), rgba(246,196,83,0.1), rgba(246,196,83,0.4))",
+              }}>
+                <div className="p-[3px] rounded-lg bg-[#0A0A0A]/90">
+                  <div className="relative p-[1px] rounded-md" style={{
+                    background: "linear-gradient(135deg, rgba(246,196,83,0.5), rgba(246,196,83,0.15), rgba(246,196,83,0.5))",
+                  }}>
+                    {/* Glassmorphism Inner Panel */}
+                    <div className="relative overflow-hidden rounded-md bg-[#0A0A0A]/80 backdrop-blur-xl px-6 py-5 md:px-8 md:py-6">
+
+                      {/* Top glowing edge */}
+                      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#F6C453]/60 to-transparent" />
+
+                      {/* Card content */}
+                      <div className="flex justify-between items-end mb-4">
+                        <div>
+                          <h3 className="text-lg md:text-xl font-semibold tracking-wide" style={{ color: "#FFF5E1" }}>
+                            CODE-ए-MANIPAL
+                          </h3>
+                          <p className="text-xs md:text-sm mt-1 font-light tracking-wider" style={{ color: "rgba(246,196,83,0.55)" }}>
+                            Great things are loading. Please wait.
+                          </p>
+                        </div>
+                        <div className="text-2xl md:text-3xl font-light tabular-nums tracking-tighter" style={{ color: "#F6C453" }}>
+                          {Math.min(Math.round(progress), 100)}
+                          <span className="text-sm ml-0.5" style={{ color: "rgba(246,196,83,0.5)" }}>%</span>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="h-2 w-full rounded-full overflow-hidden relative" style={{ background: "#111111", border: "1px solid rgba(246,196,83,0.12)" }}>
+                        <motion.div
+                          className="h-full relative"
+                          style={{
+                            width: `${Math.min(progress, 100)}%`,
+                            background: "linear-gradient(90deg, #C9A227, #F6C453, #FFE066)",
+                          }}
+                          layout
+                          transition={{ duration: 0.15, ease: "easeOut" }}
+                        >
+                          {/* Inner bright core */}
+                          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.35) 0%, transparent 60%)" }} />
+                          {/* Leading glow orb */}
+                          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white/80 shadow-[0_0_10px_rgba(246,196,83,1),0_0_20px_rgba(246,196,83,0.6)]" style={{ filter: "blur(1px)" }} />
+                        </motion.div>
+                      </div>
+
+                      {/* Micro HUD Elements */}
+                      <div className="flex justify-between items-center mt-3">
+                        <div className="flex gap-1">
+                          <motion.div className="w-1 h-1 bg-[#F6C453]" animate={{ opacity: [0.2, 1, 0.2] }} transition={{ duration: 1, repeat: Infinity, delay: 0 }} />
+                          <motion.div className="w-1 h-1 bg-[#F6C453]" animate={{ opacity: [0.2, 1, 0.2] }} transition={{ duration: 1, repeat: Infinity, delay: 0.2 }} />
+                          <motion.div className="w-1 h-1 bg-[#F6C453]" animate={{ opacity: [0.2, 1, 0.2] }} transition={{ duration: 1, repeat: Infinity, delay: 0.4 }} />
+                        </div>
+                        <span className="font-mono text-[9px] tracking-widest uppercase" style={{ color: "rgba(246,196,83,0.35)" }}>
+                          SYS.INIT.2026
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Corner accents on the loading card - like the reference image's futuristic beveled corners */}
+              {/* Top-left */}
+              <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-[#F6C453]/60 rounded-tl-sm" />
+              {/* Top-right */}
+              <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-[#F6C453]/60 rounded-tr-sm" />
+              {/* Bottom-left */}
+              <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-[#F6C453]/60 rounded-bl-sm" />
+              {/* Bottom-right */}
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-[#F6C453]/60 rounded-br-sm" />
+
+              {/* Circuit lines extending from card sides */}
+              <motion.div
+                className="absolute -left-10 top-1/2 h-[1px] w-8"
+                style={{ background: "linear-gradient(90deg, rgba(246,196,83,0), rgba(246,196,83,0.5))" }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0.6, 0] }}
+                transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+              />
+              <motion.div
+                className="absolute -right-10 top-1/2 h-[1px] w-8"
+                style={{ background: "linear-gradient(270deg, rgba(246,196,83,0), rgba(246,196,83,0.5))" }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0.6, 0] }}
+                transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}
+              />
+            </motion.div>
+
           </div>
 
-          {/* Scanner Sweep */}
+          {/* ===== FOOTER SECTION ===== */}
           <motion.div
-            className="absolute w-[420px] h-[2px] bg-gradient-to-r from-transparent via-[#FFE066] to-transparent blur-sm"
-            animate={{
-              y: [-120, 120],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-
-          {/* BRAND TITLE SECTION */}
-          <motion.h1 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-center font-serif text-3xl sm:text-4xl font-bold tracking-[0.2em] text-[#F5EFE0] uppercase mt-8"
-            style={{
-              textShadow: "0 2px 10px rgba(245,239,224,0.12)",
-            }}
+            className="z-[15] pb-6 pt-4 flex flex-col items-center justify-center gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.5, delay: 1.5 }}
           >
-            Code-E-Manipal
-          </motion.h1>
-
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex items-center justify-center gap-4 mt-2"
-          >
-            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#B88A72]" />
-            <span 
-              className="font-mono text-sm font-semibold text-[#B88A72]"
-              style={{ letterSpacing: "0.2em" }}
+            {/* Small footer logo */}
+            <motion.div
+              className="relative w-10 h-10 rounded-full border border-[#F6C453]/20 bg-[#050505]/60 backdrop-blur-md flex items-center justify-center shadow-[0_0_12px_rgba(246,196,83,0.08)]"
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 3, repeat: Infinity }}
             >
-              ♦ 2.0 ♦
-            </span>
-            <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#B88A72]" />
+              {/* Rotating ring */}
+              <motion.div
+                className="absolute inset-0 rounded-full border border-dashed border-[#F6C453]/20"
+                animate={{ rotate: -360 }}
+                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+              />
+              <Image
+                src="/logo.png"
+                alt="Learn IT"
+                width={28}
+                height={28}
+                className="object-contain drop-shadow-[0_0_8px_rgba(246,196,83,0.5)]"
+              />
+
+              {/* Footer circuit lines */}
+              <motion.div
+                className="absolute -right-8 top-1/2 h-[1px] w-6"
+                style={{ background: "linear-gradient(90deg, rgba(246,196,83,0.4), transparent)" }}
+                animate={{ opacity: [0, 0.5, 0] }}
+                transition={{ duration: 2.5, repeat: Infinity }}
+              />
+              <motion.div
+                className="absolute -left-8 top-1/2 h-[1px] w-6"
+                style={{ background: "linear-gradient(270deg, rgba(246,196,83,0.4), transparent)" }}
+                animate={{ opacity: [0, 0.5, 0] }}
+                transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
+              />
+            </motion.div>
+
+            {/* Footer tagline */}
+            <div className="flex items-center gap-3">
+              <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-[#F6C453]/40" />
+              <p
+                className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-light italic"
+                style={{ color: "rgba(246,196,83,0.65)" }}
+              >
+                Empowering Minds. Building the Future.
+              </p>
+              <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-[#F6C453]/40" />
+            </div>
           </motion.div>
 
-          {/* STATUS MESSAGE */}
-          <motion.p 
-            key={statusMessage}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.3 }}
-            className="mt-6 font-mono text-[10px] sm:text-xs tracking-[0.25em] text-[#A08070] text-center uppercase min-h-[16px] px-4"
-          >
-            {statusMessage}
-          </motion.p>
-
-          {/* PROGRESS SLIDER */}
-          <div className="w-64 sm:w-80 flex flex-col items-center mt-8 z-20">
-            {/* Progress line */}
-            <div className="w-full h-[2px] bg-white/10 relative rounded-full">
-              {/* Glowing progress fill */}
-              <div 
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#C9A227] to-[#FFE066] shadow-[0_0_8px_#C9A227] transition-all duration-150 ease-out" 
-                style={{ width: `${progress}%` }}
-              />
-              {/* Glowing sliding orb */}
-              <div 
-                className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-[#FFE066] border border-[#C9A227] shadow-[0_0_12px_#C9A227] transition-all duration-150 ease-out"
-                style={{ left: `calc(${progress}% - 7px)` }}
-              />
-            </div>
-
-            {/* Monospace progress status and percentage */}
-            <span className="mt-4 font-mono text-sm tracking-widest text-[#C9A227] font-bold">
-              {progress}%
-            </span>
-          </div>
-
-          {/* Premium Footer Line */}
-          <div className="absolute bottom-14 left-0 right-0 flex justify-center">
-            <motion.div
-              animate={{
-                opacity: [0.2, 0.6, 0.2],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-              }}
-              className="h-px w-[450px] bg-gradient-to-r from-transparent via-[#C9A227] to-transparent"
-            />
-          </div>
+          {/* Background shimmer sweep */}
+          <motion.div
+            className="absolute w-full h-[1px] z-[4] pointer-events-none"
+            style={{
+              background: "linear-gradient(90deg, transparent, rgba(246,196,83,0.15), transparent)",
+              top: "50%",
+            }}
+            animate={{ y: [-200, 200], opacity: [0, 0.6, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          />
 
         </motion.div>
       )}
