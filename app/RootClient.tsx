@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from "@/components/AuthProvider"
 import { Suspense, useState, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { usePathname } from "next/navigation"
+import LoaderAnimation from "@/components/LoaderAnimation"
 
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false })
 
@@ -153,9 +154,29 @@ function Shell({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootClient({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const [showLoader, setShowLoader] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Trigger loader on every route transition
+  useEffect(() => {
+    setShowLoader(true);
+  }, [pathname]);
+
+  const handleLoaderComplete = () => {
+    setShowLoader(false);
+  };
+
   return (
     <AuthProvider>
       <Shell>{children}</Shell>
+      {mounted && showLoader && (
+        <LoaderAnimation onComplete={handleLoaderComplete} />
+      )}
     </AuthProvider>
   )
 }

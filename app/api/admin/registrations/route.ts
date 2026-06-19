@@ -4,6 +4,8 @@ import { query } from '@/lib/db';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { successResponse, Errors } from '@/lib/utils/response';
 import { logger } from '@/lib/utils/logger';
+import crypto from 'crypto';
+import { decrypt } from '@/lib/utils/crypto';
 
 /**
  * GET /api/admin/registrations
@@ -104,11 +106,24 @@ export const PATCH = withAuth(async (req, { user: adminUser }) => {
       }
 
       if (action === 'approve') {
+        let passwordToUse = crypto.randomUUID().replace(/-/g, '').slice(0, 24) + 'A1!';
+        let hasCustomPassword = false;
+
+        if (reg.encrypted_password) {
+          try {
+            passwordToUse = decrypt(reg.encrypted_password);
+            hasCustomPassword = true;
+          } catch (e) {
+            logger.warn('Failed to decrypt password, falling back to random password', { error: String(e) });
+          }
+        }
+
         // Create Supabase Auth user
         const supabase = createSupabaseAdminClient();
 
         const { data: authData, error: authError } = await supabase.auth.admin.createUser({
           email: reg.email,
+          password: passwordToUse,
           email_confirm: true,
           user_metadata: {
             name: reg.name,
@@ -144,7 +159,7 @@ export const PATCH = withAuth(async (req, { user: adminUser }) => {
           );
         }
 
-        // Send invite email (user clicks link → sets password)
+        // Send invite email (user clicks link → logs in / sets password)
         try {
           await supabase.auth.admin.inviteUserByEmail(reg.email);
         } catch (e) {

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import clsx from "clsx";
 import {
-  User, Users, Phone, Mail, ArrowRight, CheckCircle2,
+  User, Users, Phone, Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle2,
   Clock, Loader2, AlertCircle,
 } from "lucide-react";
 
@@ -39,6 +39,8 @@ export default function RegisterPage() {
   const [teamName, setTeamName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [shake, setShake] = useState(false);
@@ -62,6 +64,8 @@ export default function RegisterPage() {
     if (!/^\+?[\d\s\-()]{10,}$/.test(phone.trim())) { triggerError("Please enter a valid phone number (min 10 digits)"); return; }
     if (!email.trim()) { triggerError("Please enter your email"); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { triggerError("Please enter a valid email address"); return; }
+    if (!password) { triggerError("Please enter a password"); return; }
+    if (password.length < 6) { triggerError("Password must be at least 6 characters"); return; }
 
     setLoading(true);
     setError("");
@@ -74,6 +78,7 @@ export default function RegisterPage() {
           team_name: teamName.trim(),
           phone: phone.trim(),
           email: email.trim(),
+          password: password,
         }),
       });
       const data = await res.json();
@@ -177,7 +182,7 @@ export default function RegisterPage() {
               }}
             >
               {success.autoApproved
-                ? "Your account has been created! Check your email for a link to set your password, then log in to get started."
+                ? "Your account has been created! You can now log in using your email and password."
                 : "Your application is under review. You'll be notified via email once an admin reviews your registration."}
             </p>
 
@@ -350,6 +355,31 @@ export default function RegisterPage() {
                 className={clsx("w-full outline-none transition-colors duration-300", isDark ? "placeholder-[#A08070]/60" : "placeholder-[#9A7B73]/60")}
                 style={inputStyle(isDark)}
               />
+            </div>
+
+            {/* Password */}
+            <label style={{ fontFamily: "'Inter',sans-serif", fontSize: 12, fontWeight: 500, color: isDark ? "#F5EFE0" : "#5C4944", marginTop: 14, marginBottom: 6 }}>
+              Password
+            </label>
+            <div className="relative">
+              <Lock className="absolute transition-colors duration-300" style={{ left: 14, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: isDark ? "#A08070" : "#9A7B73" }} />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                className={clsx("w-full outline-none transition-colors duration-300", isDark ? "placeholder-[#A08070]/60" : "placeholder-[#9A7B73]/60")}
+                style={{ ...inputStyle(isDark), paddingRight: 40 }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(v => !v)}
+                className={clsx("absolute transition-colors", isDark ? "text-[#A08070] hover:text-[#C9A227]" : "text-[#9A7B73] hover:text-[#4B1F24]")}
+                style={{ right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer" }}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
 
             {/* Error */}
