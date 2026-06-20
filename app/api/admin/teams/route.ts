@@ -12,7 +12,8 @@ export const GET = withAuth(async (req) => {
   try {
     const { rows } = await query(
       `SELECT t.*, 
-              (SELECT COUNT(*)::int FROM public.team_members tm WHERE tm.team_id = t.id) AS member_count
+              (SELECT COUNT(*)::int FROM public.team_members tm WHERE tm.team_id = t.id) AS member_count,
+              (SELECT s.submitted_at FROM public.submissions s WHERE s.team_id = t.id AND s.deleted_at IS NULL ORDER BY s.submitted_at DESC LIMIT 1) AS submitted_at
        FROM public.teams t 
        ORDER BY t.created_at DESC`
     );

@@ -18,6 +18,7 @@ import {
   Sparkles,
   Github,
   Globe,
+  Lock,
 } from "lucide-react";
 
 
@@ -450,6 +451,93 @@ export default function Home() {
   const [heroVisible, setHeroVisible] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
+  // Timer & Team states
+  const [timerConfig, setTimerConfig] = useState<{
+    hackathon_start_time?: string;
+    hackathon_duration_hours?: string;
+    hackathon_is_started?: string;
+  } | null>(null);
+  const [team, setTeam] = useState<any>(null);
+  const [timeRemainingHours, setTimeRemainingHours] = useState<number>(48);
+  const [countdownBadge, setCountdownBadge] = useState<string>("Ongoing");
+  const [countdownSubtitle, setCountdownSubtitle] = useState<string>("until deadline");
+  const [isLocked, setIsLocked] = useState<boolean>(false);
+
+  // Fetch timer config and team details on mount
+  useEffect(() => {
+    const fetchTimerAndTeam = async () => {
+      try {
+        const res = await fetch("/api/event-config");
+        if (res.ok) {
+          const json = await res.json();
+          setTimerConfig(json.data || null);
+        }
+      } catch (err) {
+        console.error("Failed to load event config:", err);
+      }
+
+      try {
+        const res = await fetch("/api/teams");
+        if (res.ok) {
+          const json = await res.json();
+          setTeam(json.data || null);
+        }
+      } catch (err) {
+        console.error("Failed to load team details:", err);
+      }
+    };
+
+    fetchTimerAndTeam();
+    const interval = setInterval(fetchTimerAndTeam, 30000); // Poll every 30s
+    return () => clearInterval(interval);
+  }, []);
+
+  // Update countdown ticking
+  useEffect(() => {
+    const updateCountdown = () => {
+      if (!timerConfig) return;
+
+      const isStarted = timerConfig.hackathon_is_started === "true";
+      if (!isStarted) {
+        const durationHours = parseFloat(timerConfig.hackathon_duration_hours || "48");
+        setTimeRemainingHours(durationHours);
+        setCountdownBadge("Not Started");
+        setCountdownSubtitle("yet to begin");
+        setIsLocked(true);
+        return;
+      }
+
+      const start = new Date(timerConfig.hackathon_start_time || "").getTime();
+      const durationHours = parseFloat(timerConfig.hackathon_duration_hours || "48");
+      const globalEnd = start + durationHours * 60 * 60 * 1000;
+
+      let effectiveEnd = globalEnd;
+      const hasExtension = team && team.deadline_extension;
+      if (hasExtension) {
+        effectiveEnd = new Date(team.deadline_extension).getTime();
+      }
+
+      const remainingMs = effectiveEnd - Date.now();
+
+      if (remainingMs <= 0) {
+        setTimeRemainingHours(0);
+        setCountdownBadge("Closed");
+        setCountdownSubtitle(hasExtension ? "extension expired" : "deadline passed");
+        setIsLocked(true);
+      } else {
+        const hoursLeft = Math.ceil(remainingMs / (1000 * 60 * 60));
+        setTimeRemainingHours(hoursLeft);
+        setCountdownBadge(hasExtension ? "Extended" : "Ongoing");
+        setCountdownSubtitle(hasExtension ? "extended deadline" : "until deadline");
+        setIsLocked(false);
+      }
+    };
+
+    updateCountdown();
+    const ticker = setInterval(updateCountdown, 1000);
+    return () => clearInterval(ticker);
+  }, [timerConfig, team]);
+
   // Entrance animations on mount
   useEffect(() => {
     setMounted(true);
@@ -482,14 +570,24 @@ export default function Home() {
 
       const mapped = (data.data || []).map((item: any) => ({
         id: item.id,
+        submittedAt: item.created_at || item.submitted_at,
         projectName: item.title,
+        tagline: item.tagline,
+        problemSolved: item.problem_solved,
         solutionSummary: item.summary,
-        category: item.category,
-        teamName: "Team",
         techStack: item.technologies || [],
+        architectureOverview: item.architecture_overview,
+        technicalChallenges: item.technical_challenges,
         githubUrl: item.github_url,
-        demoUrl: item.demo_url,
+        videoUrl: item.demo_video_url,
         docsUrl: item.docs_url,
+        whatWorkedWell: item.what_worked_well,
+        challengesFaced: item.challenges_faced,
+        lessonsLearned: item.lessons_learned,
+        futureRoadmap: item.future_roadmap,
+        teamName: item.teams?.name || "Team",
+        teamMembers: item.teams?.team_members?.map((m: any) => m.profiles?.name).filter(Boolean) || [],
+        category: item.category,
       }));
 
       setSubmissions(mapped);
@@ -523,6 +621,14 @@ export default function Home() {
         demo_url: newSubmission.demoUrl,
         docs_url: newSubmission.docsUrl,
         demo_video_url: newSubmission.videoUrl,
+        tagline: newSubmission.tagline,
+        problem_solved: newSubmission.problemSolved,
+        architecture_overview: newSubmission.architectureOverview,
+        technical_challenges: newSubmission.technicalChallenges,
+        what_worked_well: newSubmission.whatWorkedWell,
+        challenges_faced: newSubmission.challengesFaced,
+        lessons_learned: newSubmission.lessonsLearned,
+        future_roadmap: newSubmission.futureRoadmap,
       };
 
       const res = await fetch("/api/submissions", {
@@ -713,12 +819,12 @@ export default function Home() {
               delay={550}
             />
             <StatCard
-              value={48}
+              value={timeRemainingHours}
               label="Time Remaining"
               suffix="h"
-              subtitle="until deadline"
-              badge="Ongoing"
-              accentColor="#D4732A"
+              subtitle={countdownSubtitle}
+              badge={countdownBadge}
+              accentColor={countdownBadge === "Closed" ? "#8F102A" : countdownBadge === "Extended" ? "#C9A227" : "#D4732A"}
               delay={700}
             />
           </div>
@@ -747,7 +853,7 @@ export default function Home() {
               isDark={isDark}
             >
               <Trophy style={{ width: "14px", height: "14px" }} />
-              Browse Submissions
+              Review Your Submission
             </TabButton>
           </div>
         </section>
@@ -851,8 +957,49 @@ export default function Home() {
                   </p>
                 </div>
 
+                {isLocked && (
+                  <div
+                    style={{
+                      margin: "28px 32px 0",
+                      padding: "20px 24px",
+                      borderRadius: "12px",
+                      background: isDark ? "rgba(143,16,42,0.15)" : "rgba(143,16,42,0.06)",
+                      border: "1px solid rgba(143,16,42,0.3)",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "14px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "50%",
+                        background: "rgba(143,16,42,0.15)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#8F102A",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Lock size={18} />
+                    </div>
+                    <div style={{ textAlign: "left" }}>
+                      <h4 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: isDark ? "#F0C060" : "#8F102A" }}>
+                        Submissions Locked
+                      </h4>
+                      <p style={{ margin: "4px 0 0", fontSize: "0.85rem", color: "var(--muted-foreground)", lineHeight: 1.5 }}>
+                        {timerConfig?.hackathon_is_started !== "true"
+                          ? "The hackathon event has not been started yet by the administrators. Submissions will open once the countdown begins."
+                          : "Submissions for Code-e-Manipal 2.0 are now closed as the deadline has passed. The portal is frozen for all teams, except those with active approved extensions."}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div style={{ padding: "28px 32px 32px" }}>
-                  <SubmissionForm onSubmit={handleSubmission} />
+                  <SubmissionForm onSubmit={handleSubmission} disabled={isLocked} />
                 </div>
               </div>
 
@@ -923,27 +1070,30 @@ export default function Home() {
               style={{
                 animation:
                   "float-up 0.5s cubic-bezier(0.22,1,0.36,1) forwards",
-                marginLeft: "80px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                width: "100%",
+                paddingLeft: "32px", // Balances the parent's padding-right of 32px
               }}
             >
-              {/* Browse header */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  marginBottom: "28px",
-                  flexWrap: "wrap",
-                  gap: "16px",
-                }}
-              >
-                <div>
+              <div style={{ maxWidth: "720px", width: "100%", display: "flex", flexDirection: "column", gap: "24px" }}>
+                {/* Browse header */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    marginBottom: "12px",
+                    gap: "6px",
+                  }}
+                >
                   <div
                     style={{
                       display: "flex",
                       alignItems: "center",
                       gap: "10px",
-                      marginBottom: "5px",
                     }}
                   >
                     <Trophy
@@ -961,7 +1111,7 @@ export default function Home() {
                         margin: 0,
                       }}
                     >
-                      All Submissions
+                      Review Your Submission
                     </h2>
                   </div>
                   <p
@@ -971,299 +1121,298 @@ export default function Home() {
                       margin: 0,
                     }}
                   >
-                    {filteredSubmissions.length} project
-                    {filteredSubmissions.length !== 1
-                      ? "s"
-                      : ""}{" "}
-                    found
-                    {activeCategory !== "All"
-                      ? ` in ${activeCategory}`
-                      : ""}
+                    {filteredSubmissions.length === 0
+                      ? "You have not submitted a project yet."
+                      : "Your team's submitted project."}
                   </p>
                 </div>
 
-                {/* Search */}
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    alignItems: "center",
-                  }}
-                >
-                  <div style={{ position: "relative" }}>
-                    <Search
-                      style={{
-                        position: "absolute",
-                        left: "11px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        width: "14px",
-                        height: "14px",
-                        color: isDark ? "#F0C060" : "#B89A85",
-                        pointerEvents: "none",
-                      }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Search projects..."
-                      value={searchQuery}
-                      onChange={(e) =>
-                        setSearchQuery(e.target.value)
-                      }
-                      style={{
-                        padding: "9px 14px 9px 34px",
-                        borderRadius: "10px",
-                        background: isDark ? "rgba(30,18,8,0.75)" : "rgba(255,255,255,0.72)",
-                        border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #E6C7A8",
-                        color: isDark ? "#F5EFE0" : "#6A4635",
-                        fontSize: "1.00rem",
-                        outline: "none",
-                        width: "220px",
-                        transition: "border-color 0.2s ease, box-shadow 0.2s ease",
-                      }}
-                      onFocus={(e) =>
-                      ((
-                        e.target as HTMLInputElement
-                      ).style.borderColor = isDark ? "#D4732A" : "#C9822B")
-                      }
-                      onBlur={(e) =>
-                      ((
-                        e.target as HTMLInputElement
-                      ).style.borderColor = isDark ? "rgba(201,162,39,0.25)" : "#E6C7A8")
-                      }
-                    />
-                  </div>
-                  <button
-                    onClick={() => setShowFilters((v) => !v)}
+                {/* Search - only show if there are multiple submissions */}
+                {submissions.length > 1 && (
+                  <div
                     style={{
-                      padding: "9px 14px",
-                      borderRadius: "10px",
-                      background: showFilters
-                        ? isDark
-                          ? "#D4732A"
-                          : "#8F102A"
-                        : isDark
-                          ? "rgba(30,18,8,0.72)"
-                          : "#FFF8F1",
-                      border: showFilters
-                        ? "none"
-                        : isDark
-                          ? "1px solid rgba(201,162,39,0.25)"
-                          : "1px solid #EBC9AA",
-                      color: showFilters
-                        ? isDark
-                          ? "#0F0A05"
-                          : "#FFF7F1"
-                        : isDark
-                          ? "#F0C060"
-                          : "#9A5A2B",
-                      cursor: "pointer",
                       display: "flex",
+                      gap: "10px",
                       alignItems: "center",
-                      gap: "5px",
-                      fontSize: "1.0rem",
-                      transition: "all 0.2s ease",
+                      justifyContent: "center",
+                      marginBottom: "12px",
                     }}
                   >
-                    <SlidersHorizontal
-                      style={{ width: "13px", height: "13px" }}
-                    />
-                    Filter
-                    <ChevronDown
-                      style={{
-                        width: "12px",
-                        height: "12px",
-                        transform: showFilters
-                          ? "rotate(180deg)"
-                          : "rotate(0deg)",
-                        transition: "transform 0.2s ease",
-                      }}
-                    />
-                  </button>
-                </div>
-              </div>
-
-              {/* Category filter pills */}
-              {showFilters && (
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "8px",
-                    marginBottom: "24px",
-                    padding: "16px",
-                    borderRadius: "12px",
-                    background: isDark ? "rgba(30,18,8,0.92)" : "rgba(255,248,239,0.88)",
-                    border: isDark ? "1px solid rgba(201,162,39,0.3)" : "1px solid #EBCFB5",
-                    animation:
-                      "float-up 0.3s cubic-bezier(0.22,1,0.36,1) forwards",
-                  }}
-                >
-                  {CATEGORY_FILTERS.map((cat) => (
+                    <div style={{ position: "relative" }}>
+                      <Search
+                        style={{
+                          position: "absolute",
+                          left: "11px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          width: "14px",
+                          height: "14px",
+                          color: isDark ? "#F0C060" : "#B89A85",
+                          pointerEvents: "none",
+                        }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Search projects..."
+                        value={searchQuery}
+                        onChange={(e) =>
+                          setSearchQuery(e.target.value)
+                        }
+                        style={{
+                          padding: "9px 14px 9px 34px",
+                          borderRadius: "10px",
+                          background: isDark ? "rgba(30,18,8,0.75)" : "rgba(255,255,255,0.72)",
+                          border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #E6C7A8",
+                          color: isDark ? "#F5EFE0" : "#6A4635",
+                          fontSize: "1.00rem",
+                          outline: "none",
+                          width: "220px",
+                          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+                        }}
+                        onFocus={(e) =>
+                        ((
+                          e.target as HTMLInputElement
+                        ).style.borderColor = isDark ? "#D4732A" : "#C9822B")
+                        }
+                        onBlur={(e) =>
+                        ((
+                          e.target as HTMLInputElement
+                        ).style.borderColor = isDark ? "rgba(201,162,39,0.25)" : "#E6C7A8")
+                        }
+                      />
+                    </div>
                     <button
-                      key={cat}
-                      onClick={() => setActiveCategory(cat)}
+                      onClick={() => setShowFilters((v) => !v)}
                       style={{
-                        padding: "5px 14px",
-                        borderRadius: "999px",
-                        fontSize: "1.00rem",
-                        fontWeight:
-                          activeCategory === cat ? 600 : 400,
-                        background:
-                          activeCategory === cat
-                            ? isDark
-                              ? "#D4732A"
-                              : "#8F102A"
-                            : isDark
-                              ? "rgba(30,18,8,0.6)"
-                              : "#FFF6ED",
-                        border:
-                          activeCategory === cat
-                            ? "none"
-                            : isDark
-                              ? "1px solid rgba(201,162,39,0.2)"
-                              : "1px solid #E9C39B",
-                        color:
-                          activeCategory === cat
-                            ? isDark
-                              ? "#0F0A05"
-                              : "#FFF7F1"
-                            : isDark
-                              ? "#B89A85"
-                              : "#A15C2E",
+                        padding: "9px 14px",
+                        borderRadius: "10px",
+                        background: showFilters
+                          ? isDark
+                            ? "#D4732A"
+                            : "#8F102A"
+                          : isDark
+                            ? "rgba(30,18,8,0.72)"
+                            : "#FFF8F1",
+                        border: showFilters
+                          ? "none"
+                          : isDark
+                            ? "1px solid rgba(201,162,39,0.25)"
+                            : "1px solid #EBC9AA",
+                        color: showFilters
+                          ? isDark
+                            ? "#0F0A05"
+                            : "#FFF7F1"
+                          : isDark
+                            ? "#F0C060"
+                            : "#9A5A2B",
                         cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "5px",
+                        fontSize: "1.0rem",
                         transition: "all 0.2s ease",
                       }}
                     >
-                      {cat}
+                      <SlidersHorizontal
+                        style={{ width: "13px", height: "13px" }}
+                      />
+                      Filter
+                      <ChevronDown
+                        style={{
+                          width: "12px",
+                          height: "12px",
+                          transform: showFilters
+                            ? "rotate(180deg)"
+                            : "rotate(0deg)",
+                          transition: "transform 0.2s ease",
+                        }}
+                      />
                     </button>
-                  ))}
-                </div>
-              )}
+                  </div>
+                )}
 
-              {/* Cards grid */}
-              {loading ? (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: "80px 0",
-                    gap: "16px",
-                  }}
-                >
+                {/* Category filter pills - only show if there are multiple submissions */}
+                {showFilters && submissions.length > 1 && (
                   <div
                     style={{
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "50%",
-                      border: isDark ? "2px solid rgba(201,162,39,0.25)" : "2px solid #EBCFB5",
-                      borderTopColor: isDark ? "#D4732A" : "#D59B3D",
-                      animation: "spin 1s linear infinite",
-                    }}
-                  />
-                  <p
-                    style={{
-                      color: isDark ? "#B89A85" : "#7A5A4A",
-                      fontSize: "0.9rem",
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "8px",
+                      justifyContent: "center",
+                      marginBottom: "24px",
+                      padding: "16px",
+                      borderRadius: "12px",
+                      background: isDark ? "rgba(30,18,8,0.92)" : "rgba(255,248,239,0.88)",
+                      border: isDark ? "1px solid rgba(201,162,39,0.3)" : "1px solid #EBCFB5",
+                      animation:
+                        "float-up 0.3s cubic-bezier(0.22,1,0.36,1) forwards",
                     }}
                   >
-                    Loading submissions...
-                  </p>
-                  <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-                </div>
-              ) : filteredSubmissions.length === 0 ? (
-                <div
-                  style={{
-                    textAlign: "center",
-                    padding: "80px 0",
-                    animation: "float-up 0.5s ease forwards",
-                  }}
-                >
+                    {CATEGORY_FILTERS.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setActiveCategory(cat)}
+                        style={{
+                          padding: "5px 14px",
+                          borderRadius: "999px",
+                          fontSize: "1.00rem",
+                          fontWeight:
+                            activeCategory === cat ? 600 : 400,
+                          background:
+                            activeCategory === cat
+                              ? isDark
+                                ? "#D4732A"
+                                : "#8F102A"
+                              : isDark
+                                ? "rgba(30,18,8,0.6)"
+                                : "#FFF6ED",
+                          border:
+                            activeCategory === cat
+                              ? "none"
+                              : isDark
+                                ? "1px solid rgba(201,162,39,0.2)"
+                                : "1px solid #E9C39B",
+                          color:
+                            activeCategory === cat
+                              ? isDark
+                                ? "#0F0A05"
+                                : "#FFF7F1"
+                              : isDark
+                                ? "#B89A85"
+                                : "#A15C2E",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                        }}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Cards grid */}
+                {loading ? (
                   <div
                     style={{
-                      width: "72px",
-                      height: "72px",
-                      borderRadius: "20px",
-                      background: isDark ? "rgba(212,115,42,0.12)" : "rgba(143,16,42,0.1)",
-                      border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #EBCFB5",
                       display: "flex",
+                      flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
-                      margin: "0 auto 20px",
+                      padding: "80px 0",
+                      gap: "16px",
                     }}
                   >
-                    <Code2
+                    <div
                       style={{
-                        width: "30px",
-                        height: "30px",
-                        color: isDark ? "#D4732A" : "#8F102A",
+                        width: "48px",
+                        height: "48px",
+                        borderRadius: "50%",
+                        border: isDark ? "2px solid rgba(201,162,39,0.25)" : "2px solid #EBCFB5",
+                        borderTopColor: isDark ? "#D4732A" : "#D59B3D",
+                        animation: "spin 1s linear infinite",
                       }}
                     />
-                  </div>
-                  <h3
-                    style={{
-                      color: isDark ? "#F0C060" : "#8F102A",
-                      fontSize: "1.1rem",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    {searchQuery
-                      ? "No results found"
-                      : "No submissions yet"}
-                  </h3>
-                  <p
-                    style={{
-                      color: "#B89A85",
-                      fontSize: "0.88rem",
-                    }}
-                  >
-                    {searchQuery
-                      ? "Try a different search term or category"
-                      : "Be the first to submit your project!"}
-                  </p>
-                  {!searchQuery && (
-                    <button
-                      onClick={() => setActiveTab("submit")}
+                    <p
                       style={{
-                        marginTop: "20px",
-                        padding: "10px 22px",
-                        borderRadius: "10px",
-                        background:
-                          "linear-gradient(90deg, #8F102A 0%, #A61B36 50%, #7A0E22 100%)",
-                        border: "none",
-                        color: "#FFF6EE",
-                        fontSize: "0.88rem",
-                        fontWeight: 500,
-                        cursor: "pointer",
-                        boxShadow:
-                          "0 4px 16px rgba(143,16,42,0.3)",
+                        color: isDark ? "#B89A85" : "#7A5A4A",
+                        fontSize: "0.9rem",
                       }}
                     >
-                      Submit First Project →
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fill, minmax(320px, 1fr))",
-                    gap: "18px",
-                  }}
-                >
-                  {filteredSubmissions.map((submission, i) => (
-                    <SubmissionCard
-                      key={submission.id}
-                      submission={submission}
-                      index={i}
-                      
-                    />
-                  ))}
-                </div>
-              )}
+                      Loading submissions...
+                    </p>
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                  </div>
+                ) : filteredSubmissions.length === 0 ? (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      padding: "80px 0",
+                      animation: "float-up 0.5s ease forwards",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "72px",
+                        height: "72px",
+                        borderRadius: "20px",
+                        background: isDark ? "rgba(212,115,42,0.12)" : "rgba(143,16,42,0.1)",
+                        border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #EBCFB5",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        margin: "0 auto 20px",
+                      }}
+                    >
+                      <Code2
+                        style={{
+                          width: "30px",
+                          height: "30px",
+                          color: isDark ? "#D4732A" : "#8F102A",
+                        }}
+                      />
+                    </div>
+                    <h3
+                      style={{
+                        color: isDark ? "#F0C060" : "#8F102A",
+                        fontSize: "1.1rem",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      {searchQuery
+                        ? "No results found"
+                        : "No submissions yet"}
+                    </h3>
+                    <p
+                      style={{
+                        color: "#B89A85",
+                        fontSize: "0.88rem",
+                      }}
+                    >
+                      {searchQuery
+                        ? "Try a different search term or category"
+                        : "Be the first to submit your project!"}
+                    </p>
+                    {!searchQuery && (
+                      <button
+                        onClick={() => setActiveTab("submit")}
+                        style={{
+                          marginTop: "20px",
+                          padding: "10px 22px",
+                          borderRadius: "10px",
+                          background:
+                            "linear-gradient(90deg, #8F102A 0%, #A61B36 50%, #7A0E22 100%)",
+                          border: "none",
+                          color: "#FFF6EE",
+                          fontSize: "0.88rem",
+                          fontWeight: 500,
+                          cursor: "pointer",
+                          boxShadow:
+                            "0 4px 16px rgba(143,16,42,0.3)",
+                        }}
+                      >
+                        Submit First Project →
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      width: "100%",
+                      gap: "20px",
+                    }}
+                  >
+                    {filteredSubmissions.map((submission, i) => (
+                      <SubmissionCard
+                        key={submission.id}
+                        submission={submission}
+                        index={i}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </main>
@@ -1289,27 +1438,15 @@ export default function Home() {
               marginBottom: "6px",
             }}
           >
-            <div
+            <img
+              src="/logo.png"
+              alt="logo"
               style={{
                 width: "22px",
                 height: "22px",
-                borderRadius: "6px",
-                background: isDark
-                  ? "linear-gradient(135deg, #D4732A, #C9A227)"
-                  : "linear-gradient(135deg, #8F102A, #A61B36)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                objectFit: "contain",
               }}
-            >
-              <Code2
-                style={{
-                  width: "11px",
-                  height: "11px",
-                  color: isDark ? "#0F0A05" : "#FFF6EE",
-                }}
-              />
-            </div>
+            />
             <span
               style={{
                 fontSize: "1.40rem",

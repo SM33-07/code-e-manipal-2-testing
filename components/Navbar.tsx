@@ -38,6 +38,93 @@ export default function Navbar({ className }: { className?: string }) {
   const [notifsOpen, setNotifsOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
 
+  // Countdown timer config & live string states
+  const [timerConfig, setTimerConfig] = useState<{
+    hackathon_start_time?: string;
+    hackathon_duration_hours?: string;
+    hackathon_is_started?: string;
+  } | null>(null);
+  const [timeLeftStr, setTimeLeftStr] = useState("Not Started");
+  const [team, setTeam] = useState<{ deadline_extension?: string | null } | null>(null);
+
+  useEffect(() => {
+    const fetchTimer = async () => {
+      try {
+        const res = await fetch("/api/event-config");
+        if (res.ok) {
+          const data = await res.json();
+          setTimerConfig(data.data || null);
+        }
+      } catch (e) {
+        console.error("Failed to fetch timer in navbar:", e);
+      }
+    };
+
+    fetchTimer();
+    const interval = setInterval(fetchTimer, 30000); // Poll every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setTeam(null);
+      return;
+    }
+
+    const fetchTeam = async () => {
+      try {
+        const res = await fetch("/api/teams");
+        if (res.ok) {
+          const json = await res.json();
+          setTeam(json.data || null);
+        }
+      } catch (e) {
+        console.error("Failed to fetch team in navbar:", e);
+      }
+    };
+
+    fetchTeam();
+    const interval = setInterval(fetchTeam, 30000); // Poll every 30 seconds
+    return () => clearInterval(interval);
+  }, [user]);
+
+  useEffect(() => {
+    if (!timerConfig || timerConfig.hackathon_is_started !== "true" || !timerConfig.hackathon_start_time) {
+      setTimeLeftStr("Not Started");
+      return;
+    }
+
+    const updateCountdown = () => {
+      const start = new Date(timerConfig.hackathon_start_time!).getTime();
+      const durationHours = parseFloat(timerConfig.hackathon_duration_hours || "48");
+      const globalEnd = start + durationHours * 60 * 60 * 1000;
+      
+      let end = globalEnd;
+      if (team && team.deadline_extension) {
+        end = new Date(team.deadline_extension).getTime();
+      }
+      
+      const remaining = end - Date.now();
+
+      if (remaining <= 0) {
+        setTimeLeftStr("Closed");
+      } else {
+        const secs = Math.floor((remaining / 1000) % 60);
+        const mins = Math.floor((remaining / (1000 * 60)) % 60);
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        
+        const pad = (num: number) => String(num).padStart(2, "0");
+        setTimeLeftStr(`${hours}:${pad(mins)}:${pad(secs)}`);
+      }
+    };
+
+    updateCountdown();
+    const ticker = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(ticker);
+  }, [timerConfig, team]);
+
   // Notifications state management
   const [notifications, setNotifications] = useState(
     mockNotifications.map((n) => ({ ...n, read: false }))
@@ -118,6 +205,14 @@ export default function Navbar({ className }: { className?: string }) {
             <span className="hidden xl:inline-block text-xs px-3 py-1 rounded-full bg-jaipur-secondary border border-jaipur-secondary-light text-foreground font-medium capitalize">
               {role}
             </span>
+          )}
+
+          {/* Hackathon Timer */}
+          {timerConfig && (
+            <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-jaipur-secondary/50 border border-jaipur-gold/20 text-xs font-mono font-bold text-[#F0C060]">
+              <span className={timeLeftStr !== "Not Started" && timeLeftStr !== "Closed" ? "animate-pulse" : ""}>⏳</span>
+              <span>{timeLeftStr}</span>
+            </div>
           )}
 
           {/* Theme Toggle */}
@@ -241,6 +336,12 @@ export default function Navbar({ className }: { className?: string }) {
             />
           </Link>
           <div className="flex items-center gap-3">
+            {timerConfig && (
+              <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-jaipur-secondary/50 border border-jaipur-gold/20 text-[10px] font-mono font-bold text-[#F0C060]">
+                <span className={timeLeftStr !== "Not Started" && timeLeftStr !== "Closed" ? "animate-pulse" : ""}>⏳</span>
+                <span>{timeLeftStr}</span>
+              </div>
+            )}
             <ThemeToggle />
             <MobileNavToggle
               isOpen={mobileNavOpen}

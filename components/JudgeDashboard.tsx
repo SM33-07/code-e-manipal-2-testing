@@ -50,6 +50,9 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
     try {
       // Fetch assignments
       const res = await fetch("/api/judging/assignments");
+      if (!res.ok) {
+        throw new Error(`Failed to fetch assignments: ${res.status} ${res.statusText}`);
+      }
       const json = await res.json();
       const data = Array.isArray(json.data) ? json.data : [];
 
@@ -71,6 +74,9 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
 
       // Fetch existing reviews / scores
       const reviewsRes = await fetch("/api/judging/reviews");
+      if (!reviewsRes.ok) {
+        throw new Error(`Failed to fetch reviews: ${reviewsRes.status} ${reviewsRes.statusText}`);
+      }
       const reviewsJson = await reviewsRes.json();
       const reviewsData = Array.isArray(reviewsJson.data) ? reviewsJson.data : [];
       setAllScores(reviewsData);
