@@ -7,6 +7,7 @@ import {
   Github, Video, BookOpen, Tag, Users, Calendar,
   ChevronDown, ChevronUp, Lock, Cpu, Lightbulb,
   AlertTriangle, GraduationCap, Map, ExternalLink,
+  CheckCircle2, Layers,
 } from "lucide-react";
 
 interface SubmissionCardProps {
@@ -213,9 +214,64 @@ export function SubmissionCard({ submission, index = 0 }: SubmissionCardProps) {
     setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
   };
 
-  const formattedDate = new Date(submission.submittedAt).toLocaleDateString("en-US", {
-    month: "short", day: "numeric", year: "numeric",
+  const dateObj = submission.submittedAt ? new Date(submission.submittedAt) : null;
+  const formattedDate = dateObj && !isNaN(dateObj.getTime())
+    ? dateObj.toLocaleDateString("en-US", {
+        month: "short", day: "numeric", year: "numeric",
+      })
+    : "Date Unavailable";
+
+  const sectionHeadingStyle = (color: string) => ({
+    fontSize: "0.74rem",
+    fontWeight: 700,
+    color: color,
+    textTransform: "uppercase" as const,
+    letterSpacing: "0.06em",
+    borderBottom: `1px solid ${isDark ? "rgba(201,162,39,0.15)" : "rgba(213,155,61,0.25)"}`,
+    paddingBottom: "4px",
+    marginBottom: "8px",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
   });
+
+  const renderMarkdownLite = (text: string) => {
+    if (!text) return <p style={{ fontSize: "0.8rem", color: p.summary, fontStyle: "italic", margin: "4px 0 0" }}>Not specified.</p>;
+    const paragraphs = text.split("\n\n");
+
+    return paragraphs.map((pGroup, i) => {
+      const trimmed = pGroup.trim();
+      if (!trimmed) return null;
+
+      const lines = trimmed.split("\n");
+      const isList = lines.every((l) => l.trim().startsWith("-"));
+
+      if (isList) {
+        return (
+          <ul key={i} style={{ listStyleType: "disc", paddingLeft: "16px", margin: "6px 0", fontSize: "0.8rem", color: p.summary }}>
+            {lines.map((line, j) => (
+              <li
+                key={j}
+                dangerouslySetInnerHTML={{
+                  __html: line.replace(/^-\s*/, "").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
+                }}
+              />
+            ))}
+          </ul>
+        );
+      }
+
+      return (
+        <p
+          key={i}
+          style={{ fontSize: "0.8rem", color: p.summary, lineHeight: 1.5, margin: "6px 0" }}
+          dangerouslySetInnerHTML={{
+            __html: trimmed.replace(/\n/g, "<br/>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
+          }}
+        />
+      );
+    });
+  };
 
   const hasGithub = !!submission.githubUrl;
   const hasVideo  = !!submission.videoUrl;
@@ -428,29 +484,42 @@ export function SubmissionCard({ submission, index = 0 }: SubmissionCardProps) {
         {/* ── Expanded Details ── */}
         {expanded && (
           <div style={{
-            padding: "18px 20px 20px",
-            borderTop: `1px solid ${isDark ? "rgba(59,130,246,0.1)" : "rgba(213,155,61,0.15)"}`,
-            display: "flex", flexDirection: "column", gap: "16px",
+            padding: "20px",
+            borderTop: `1px solid ${p.divider}`,
+            display: "flex", flexDirection: "column", gap: "20px",
             animation: "expand-in 0.3s cubic-bezier(0.22,1,0.36,1) forwards",
+            textAlign: "left",
           }}>
-            {/* Technical */}
-            {(submission.architectureOverview || submission.technicalChallenges) && (
-              <div>
-                <div style={{
-                  fontSize: "0.68rem", fontWeight: 700, color: p.sectionTitle,
-                  textTransform: "uppercase", letterSpacing: "0.06em",
-                  marginBottom: "10px", display: "flex", alignItems: "center", gap: "5px",
-                }}>
-                  <Cpu style={{ width: "10px", height: "10px" }} /> Technical Details
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  <DetailRow p={p} icon={<ExternalLink style={{ width: "12px", height: "12px" }} />} label="Architecture Overview" value={submission.architectureOverview} />
-                  <DetailRow p={p} icon={<Lightbulb style={{ width: "12px", height: "12px" }} />} label="Technical Challenges" value={submission.technicalChallenges} />
-                </div>
+            {/* Header / Intro */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: `1px solid ${p.divider}`, paddingBottom: "10px" }}>
+              <div style={{ width: "24px", height: "24px", borderRadius: "6px", background: "rgba(213,155,61,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <BookOpen style={{ width: "12px", height: "12px", color: p.expandActive }} />
+              </div>
+              <h4 style={{ fontSize: "0.85rem", fontWeight: 700, color: p.title, margin: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                Kaggle Solution Write-Up
+              </h4>
+            </div>
+
+            {/* 1. Problem Statement */}
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <h5 style={sectionHeadingStyle(p.sectionTitle)}>
+                <AlertTriangle style={{ width: "11px", height: "11px" }} /> 1. Problem Statement & Context
+              </h5>
+              {renderMarkdownLite(submission.problemSolved || submission.solutionSummary)}
+            </div>
+
+            {/* 2. Architecture Overview */}
+            {(submission.architectureOverview || (submission.techStack && submission.techStack.length > 0)) && (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <h5 style={sectionHeadingStyle(p.sectionTitle)}>
+                  <Cpu style={{ width: "11px", height: "11px" }} /> 2. Architecture & Design
+                </h5>
+                {submission.architectureOverview && renderMarkdownLite(submission.architectureOverview)}
+                
                 {(submission.techStack || []).length > 0 && (
                   <div style={{ marginTop: "10px" }}>
                     <div style={{ fontSize: "0.68rem", fontWeight: 600, color: p.detailLabel, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                      Full Stack
+                      Full Stack Components
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
                       {submission.techStack.map((tech) => (
@@ -466,40 +535,69 @@ export function SubmissionCard({ submission, index = 0 }: SubmissionCardProps) {
               </div>
             )}
 
-            {/* Reflection */}
-            {(submission.whatWorkedWell || submission.challengesFaced || submission.lessonsLearned || submission.futureRoadmap) && (
-              <div style={{ borderTop: `1px solid ${p.divider}`, paddingTop: "14px" }}>
-                <div style={{
-                  fontSize: "0.68rem", fontWeight: 700, color: p.sectionTitle,
-                  textTransform: "uppercase", letterSpacing: "0.06em",
-                  marginBottom: "10px", display: "flex", alignItems: "center", gap: "5px",
-                }}>
-                  <GraduationCap style={{ width: "10px", height: "10px" }} /> Reflection
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                  <DetailRow p={p} icon={<Lightbulb style={{ width: "12px", height: "12px" }} />} label="What Worked Well" value={submission.whatWorkedWell} />
-                  <DetailRow p={p} icon={<AlertTriangle style={{ width: "12px", height: "12px" }} />} label="Challenges Faced" value={submission.challengesFaced} />
-                  <DetailRow p={p} icon={<GraduationCap style={{ width: "12px", height: "12px" }} />} label="Lessons Learned" value={submission.lessonsLearned} />
-                  <DetailRow p={p} icon={<Map style={{ width: "12px", height: "12px" }} />} label="Future Roadmap" value={submission.futureRoadmap} />
-                </div>
+            {/* 3. Technical Challenges */}
+            {submission.technicalChallenges && (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <h5 style={sectionHeadingStyle(p.sectionTitle)}>
+                  <Layers style={{ width: "11px", height: "11px" }} /> 3. Technical Challenges
+                </h5>
+                {renderMarkdownLite(submission.technicalChallenges)}
               </div>
             )}
 
-            {/* Team Members */}
+            {/* 4. Outcomes & Validation */}
+            {(submission.challengesFaced || submission.whatWorkedWell) && (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
+                {submission.challengesFaced && (
+                  <div style={{ flex: 1 }}>
+                    <h5 style={sectionHeadingStyle(p.sectionTitle)}>
+                      <AlertTriangle style={{ width: "11px", height: "11px" }} /> 4a. Challenges Faced
+                    </h5>
+                    {renderMarkdownLite(submission.challengesFaced)}
+                  </div>
+                )}
+                {submission.whatWorkedWell && (
+                  <div style={{ flex: 1 }}>
+                    <h5 style={sectionHeadingStyle(p.sectionTitle)}>
+                      <CheckCircle2 style={{ width: "11px", height: "11px" }} /> 4b. What Worked Well
+                    </h5>
+                    {renderMarkdownLite(submission.whatWorkedWell)}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 5. Learnings & Reflections */}
+            {submission.lessonsLearned && (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <h5 style={sectionHeadingStyle(p.sectionTitle)}>
+                  <GraduationCap style={{ width: "11px", height: "11px" }} /> 5. Lessons Learned
+                </h5>
+                {renderMarkdownLite(submission.lessonsLearned)}
+              </div>
+            )}
+
+            {/* 6. Future Roadmap */}
+            {submission.futureRoadmap && (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <h5 style={sectionHeadingStyle(p.sectionTitle)}>
+                  <Map style={{ width: "11px", height: "11px" }} /> 6. Future Roadmap
+                </h5>
+                {renderMarkdownLite(submission.futureRoadmap)}
+              </div>
+            )}
+
+            {/* Team Roster */}
             {(submission.teamMembers || []).length > 0 && (
               <div style={{ borderTop: `1px solid ${p.divider}`, paddingTop: "14px" }}>
-                <div style={{
-                  fontSize: "0.68rem", fontWeight: 700, color: p.sectionTitle,
-                  textTransform: "uppercase", letterSpacing: "0.06em",
-                  marginBottom: "8px", display: "flex", alignItems: "center", gap: "5px",
-                }}>
-                  <Lock style={{ width: "10px", height: "10px" }} /> Team Roster (Locked)
-                </div>
+                <h5 style={{ fontSize: "0.74rem", fontWeight: 700, color: p.sectionTitle, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px", display: "flex", alignItems: "center", gap: "5px" }}>
+                  <Lock style={{ width: "11px", height: "11px" }} /> Team Roster (Locked)
+                </h5>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                   {submission.teamMembers.map((m, i) => (
                     <span key={i} style={{
                       display: "flex", alignItems: "center", gap: "5px",
-                      padding: "3px 10px", borderRadius: "999px", fontSize: "0.75rem",
+                      padding: "3px 10px", borderRadius: "999px", fontSize: "0.72rem",
                       background: p.memberPillBg, border: `1px solid ${p.memberPillBdr}`,
                       color: p.memberPillTxt,
                     }}>

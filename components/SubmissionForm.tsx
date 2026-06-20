@@ -35,6 +35,7 @@ export interface Submission {
 
 interface SubmissionFormProps {
   onSubmit: (submission: Omit<Submission, "id" | "submittedAt">) => Promise<void>;
+  disabled?: boolean;
 }
 
 // ─── Tech Stack Options ───────────────────────────────────────────────────────
@@ -284,7 +285,7 @@ function Section({ children, visible, delay = 0 }: { children: React.ReactNode; 
 }
 
 // ─── Main Form ────────────────────────────────────────────────────────────────
-export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
+export function SubmissionForm({ onSubmit, disabled = false }: SubmissionFormProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
@@ -398,6 +399,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <fieldset disabled={disabled} style={{ border: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
 
       {/* ── Section 1: Project Overview ── */}
       <Section visible={true} delay={0}>
@@ -808,25 +810,31 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
       >
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || disabled}
           onMouseEnter={() => setBtnHovered(true)}
           onMouseLeave={() => setBtnHovered(false)}
           style={{
             width: "100%", padding: "16px 32px", borderRadius: "16px", height: "52px", border: "none",
-            background: submitted
+            background: disabled
+              ? (isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)")
+              : submitted
               ? "linear-gradient(135deg,#059669,#10b981)"
               : isSubmitting
               ? (isDark ? "linear-gradient(135deg,#A5521A,#D4732A)" : "linear-gradient(135deg,#6B0D1F,#8F102A)")
               : btnHovered
               ? (isDark ? "linear-gradient(135deg,#D4732A,#E28945,#F0C060)" : "linear-gradient(135deg,#8F102A,#A61B36,#C0243F)")
               : (isDark ? "linear-gradient(135deg,#D4732A,#C9A227)" : "linear-gradient(135deg,#8F102A,#A61B36)"),
-            color: isDark ? "#0F0A05" : "#FFF6EE",
+            color: disabled
+              ? (isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.35)")
+              : isDark ? "#0F0A05" : "#FFF6EE",
             fontSize: "1rem", fontWeight: 700,
-            cursor: isSubmitting ? "not-allowed" : "pointer",
+            cursor: (isSubmitting || disabled) ? "not-allowed" : "pointer",
             display: "flex", alignItems: "center", justifyContent: "center", gap: "9px",
             transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
-            transform: btnHovered && !isSubmitting ? "translateY(-3px)" : "translateY(0)",
-            boxShadow: submitted
+            transform: btnHovered && !isSubmitting && !disabled ? "translateY(-3px)" : "translateY(0)",
+            boxShadow: disabled
+              ? "none"
+              : submitted
               ? "0 6px 24px rgba(16,185,129,0.4)"
               : btnHovered
               ? (isDark ? "0 12px 40px rgba(212,115,42,0.4), 0 0 0 1px rgba(201,162,39,0.25)" : "0 12px 40px rgba(143,16,42,0.5), 0 0 0 1px rgba(213,155,61,0.2)")
@@ -835,7 +843,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
             position: "relative", overflow: "hidden",
           }}
         >
-          {btnHovered && !isSubmitting && (
+          {btnHovered && !isSubmitting && !disabled && (
             <span style={{
               position: "absolute", top: 0, left: "-100%", width: "60%", height: "100%",
               background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent)",
@@ -855,6 +863,7 @@ export function SubmissionForm({ onSubmit }: SubmissionFormProps) {
           All 5 sections will be saved · Submissions are visible to all participants
         </p>
       </div>
+    </fieldset>
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }

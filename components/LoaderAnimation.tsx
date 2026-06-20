@@ -33,16 +33,16 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
     { left: "25%", top: "28%", delay: 4, scale: 0.4 },
   ], []);
 
-  // Increment progress counter
+  // Increment progress counter smoothly
   useEffect(() => {
     if (progress >= 100) {
       const exitTimer = setTimeout(() => {
         setIsExiting(true);
-      }, 300);
+      }, 200);
 
       const completeTimer = setTimeout(() => {
         onComplete();
-      }, 1000);
+      }, 800);
 
       return () => {
         clearTimeout(exitTimer);
@@ -52,10 +52,10 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
 
     const timer = setTimeout(() => {
       setProgress((prev) => {
-        const increment = Math.floor(Math.random() * 8) + 5;
+        const increment = Math.random() * 1.8 + 0.8;
         return Math.min(100, prev + increment);
       });
-    }, Math.random() * 120 + 80);
+    }, Math.random() * 15 + 15);
 
     return () => clearTimeout(timer);
   }, [progress, onComplete]);

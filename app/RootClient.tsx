@@ -188,7 +188,9 @@ export default function RootClient({ children }: { children: React.ReactNode }) 
 
   return (
     <AuthProvider>
-      <Shell>{children}</Shell>
+      {(!showLoaderForPath || !showLoader) && (
+        <Shell>{children}</Shell>
+      )}
       {mounted && showLoader && showLoaderForPath && (
         <LoaderAnimation onComplete={handleLoaderComplete} />
       )}

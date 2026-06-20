@@ -13,6 +13,7 @@ interface Team {
   submission_frozen: boolean;
   deadline_extension: string | null;
   member_count: number;
+  submitted_at?: string | null;
 }
 
 interface Announcement {
@@ -39,10 +40,116 @@ export default function EventControlPage() {
   const [submittingBroadcast, setSubmittingBroadcast] = useState(false);
   const [togglingGlobal, setTogglingGlobal] = useState(false);
 
+  // Hackathon Timer state
+  const [startTime, setStartTime] = useState("");
+  const [durationHours, setDurationHours] = useState(48);
+  const [isStarted, setIsStarted] = useState(false);
+  const [updatingTimer, setUpdatingTimer] = useState(false);
+  const [timeRemainingStr, setTimeRemainingStr] = useState("Not Started");
+
   useEffect(() => {
     fetchTeams();
     fetchAnnouncements();
+    fetchEventConfig();
   }, []);
+
+  const fetchEventConfig = async () => {
+    try {
+      const res = await fetch("/api/event-config");
+      if (res.ok) {
+        const json = await res.json();
+        const data = json.data || {};
+        setStartTime(data.hackathon_start_time || "");
+        setDurationHours(parseFloat(data.hackathon_duration_hours || "48"));
+        setIsStarted(data.hackathon_is_started === "true");
+      }
+    } catch (err) {
+      console.error("Failed to load event config:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (!isStarted || !startTime) {
+      setTimeRemainingStr("Not Started");
+      return;
+    }
+
+    const calculateRemaining = () => {
+      const start = new Date(startTime).getTime();
+      const durationMs = durationHours * 60 * 60 * 1000;
+      const end = start + durationMs;
+      const remainingMs = end - Date.now();
+
+      if (remainingMs <= 0) {
+        setTimeRemainingStr("Submissions Closed");
+      } else {
+        const secs = Math.floor((remainingMs / 1000) % 60);
+        const mins = Math.floor((remainingMs / (1000 * 60)) % 60);
+        const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+        setTimeRemainingStr(`${hours}h ${mins}m ${secs}s left`);
+      }
+    };
+
+    calculateRemaining();
+    const interval = setInterval(calculateRemaining, 1000);
+
+    return () => clearInterval(interval);
+  }, [isStarted, startTime, durationHours]);
+
+  const handleSaveTimer = async (startNow = false) => {
+    setUpdatingTimer(true);
+    try {
+      const targetStartTime = startNow ? new Date().toISOString() : startTime;
+      const res = await fetch("/api/event-config", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          hackathon_start_time: targetStartTime,
+          hackathon_duration_hours: durationHours,
+          hackathon_is_started: "true",
+        }),
+      });
+
+      if (res.ok) {
+        toast.success("Hackathon Timer Started!");
+        fetchEventConfig();
+        fetchAnnouncements();
+      } else {
+        toast.error("Failed to update hackathon timer settings.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error updating timer.");
+    } finally {
+      setUpdatingTimer(false);
+    }
+  };
+
+  const handleStopTimer = async () => {
+    if (!confirm("Are you sure you want to reset the timer? This will unfreeze portals that were auto-locked by this timer.")) return;
+    setUpdatingTimer(true);
+    try {
+      const res = await fetch("/api/event-config", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          hackathon_is_started: "false",
+        }),
+      });
+
+      if (res.ok) {
+        toast.success("Hackathon Timer Stopped / Reset.");
+        fetchEventConfig();
+      } else {
+        toast.error("Failed to reset timer.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error stopping timer.");
+    } finally {
+      setUpdatingTimer(false);
+    }
+  };
 
   const fetchTeams = async () => {
     setLoadingTeams(true);
@@ -261,6 +368,97 @@ export default function EventControlPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Announcement Broadcaster */}
         <div className="space-y-8 lg:col-span-1">
+          {/* Timer Settings Card */}
+          <div className="bg-[#1E1208] border border-[#C9A227]/20 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-3 opacity-10">
+              <Clock size={80} className="text-[#D4732A]" />
+            </div>
+            
+            <h3 className="text-lg font-bold text-foreground flex items-center gap-2 mb-4">
+              <Clock size={18} className="text-[#D4732A]" />
+              Hackathon Event Timer
+            </h3>
+
+            <div className="space-y-4">
+              <div className="flex justify-between items-center bg-black/20 p-3 rounded-xl border border-[#C9A227]/10">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-[#A08070]">Status</span>
+                  <p className="text-sm font-bold text-foreground">
+                    {isStarted ? (
+                      <span className="text-emerald-400">● Live Running</span>
+                    ) : (
+                      <span className="text-[#A08070]">● Not Started</span>
+                    )}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] uppercase font-bold text-[#A08070]">Time Left</span>
+                  <p className="text-sm font-mono font-bold text-[#F0C060]">{timeRemainingStr}</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#A08070] mb-2">
+                  Hackathon Start Time
+                </label>
+                <input
+                  type="datetime-local"
+                  value={startTime ? new Date(new Date(startTime).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+                  onChange={(e) => setStartTime(e.target.value ? new Date(e.target.value).toISOString() : "")}
+                  disabled={isStarted}
+                  className="w-full bg-black/35 border border-[#C9A227]/20 rounded-xl p-3 text-xs text-foreground focus:ring-1 focus:ring-[#D4732A] focus:outline-none disabled:opacity-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#A08070] mb-2">
+                  Duration (Hours)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={168}
+                  value={durationHours}
+                  onChange={(e) => setDurationHours(Math.max(1, parseInt(e.target.value) || 0))}
+                  disabled={isStarted}
+                  className="w-full bg-black/35 border border-[#C9A227]/20 rounded-xl p-3 text-xs text-foreground focus:ring-1 focus:ring-[#D4732A] focus:outline-none disabled:opacity-50"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                {!isStarted ? (
+                  <button
+                    onClick={() => handleSaveTimer(true)}
+                    disabled={updatingTimer}
+                    className="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500 transition duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-md"
+                  >
+                    {updatingTimer ? <Loader2 className="animate-spin size-4" /> : <Clock size={14} />}
+                    Start Now
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleStopTimer}
+                    disabled={updatingTimer}
+                    className="flex-1 py-3 rounded-xl bg-red-950 text-red-200 border border-red-800 hover:bg-red-900 transition duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-md"
+                  >
+                    {updatingTimer ? <Loader2 className="animate-spin size-4" /> : <Lock size={14} />}
+                    Stop / Reset Timer
+                  </button>
+                )}
+                
+                {!isStarted && (
+                  <button
+                    onClick={() => handleSaveTimer(false)}
+                    disabled={updatingTimer || !startTime}
+                    className="flex-1 py-3 rounded-xl bg-[#D4732A] text-[#1E1208] font-bold text-xs hover:bg-[#D4732A]/90 transition duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Set Schedule
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Broadcaster Form */}
           <div className="bg-[#1E1208] border border-[#C9A227]/20 rounded-2xl p-6 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 p-3 opacity-10">
@@ -417,6 +615,7 @@ export default function EventControlPage() {
                     <tr className="border-b border-[#C9A227]/20 text-[#A08070] font-bold uppercase tracking-wider text-[10px]">
                       <th className="pb-3 pl-2">Team Details</th>
                       <th className="pb-3">Submission Status</th>
+                      <th className="pb-3">Submitted At</th>
                       <th className="pb-3">Deadline Extension (Grace)</th>
                       <th className="pb-3 text-right pr-2">Lock Controls</th>
                     </tr>
@@ -442,29 +641,41 @@ export default function EventControlPage() {
                           </span>
                         </td>
                         
-                        {/* Extensions control */}
+                        {/* Submitted At */}
                         <td className="py-4">
-                          <div className="flex flex-col gap-1.5">
-                            <span className="text-[10px] font-semibold text-[#C9A227]">
-                              {formatDateTime(team.deadline_extension)}
-                            </span>
-                            <div className="flex gap-1">
-                              <input
-                                type="datetime-local"
-                                value={team.deadline_extension ? new Date(new Date(team.deadline_extension).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
-                                onChange={(e) => handleTeamExtension(team.id, e.target.value ? new Date(e.target.value).toISOString() : null)}
-                                className="bg-black/30 border border-[#C9A227]/20 rounded px-1.5 py-0.5 text-[10px] focus:ring-1 focus:ring-[#D4732A] focus:outline-none text-foreground"
-                              />
-                              {team.deadline_extension && (
-                                <button
-                                  onClick={() => handleTeamExtension(team.id, null)}
-                                  className="text-[#A08070] hover:text-red-400 font-bold px-1.5 border border-[#C9A227]/20 rounded hover:border-red-400 cursor-pointer"
-                                >
-                                  Clear
-                                </button>
+                          {team.submitted_at ? (
+                            <div className="flex flex-col gap-0.5">
+                              <span className="font-semibold text-[#D4732A]">
+                                {formatDateTime(team.submitted_at)}
+                              </span>
+                              {isStarted && startTime && (
+                                <span className="text-[10px] text-[#A08070]">
+                                  {(() => {
+                                    const subMs = new Date(team.submitted_at).getTime();
+                                    const startMs = new Date(startTime).getTime();
+                                    const diffMs = subMs - startMs;
+                                    if (diffMs < 0) return "Before start";
+                                    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+                                    const diffMins = Math.floor((diffMs / (1000 * 60)) % 60);
+                                    return `+${diffHrs}h ${diffMins}m elapsed`;
+                                  })()}
+                                </span>
                               )}
                             </div>
-                          </div>
+                          ) : (
+                            <span className="text-[#A08070]/60 italic font-medium">Not submitted</span>
+                          )}
+                        </td>
+
+                        {/* Extensions control */}
+                        <td className="py-4">
+                          <ExtensionPicker
+                            teamId={team.id}
+                            deadlineExtension={team.deadline_extension}
+                            startTime={startTime}
+                            durationHours={durationHours}
+                            onSave={handleTeamExtension}
+                          />
                         </td>
                         
                         {/* Lock / Unlock button */}
@@ -488,6 +699,128 @@ export default function EventControlPage() {
             )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+interface ExtensionPickerProps {
+  teamId: string;
+  deadlineExtension: string | null;
+  startTime: string;
+  durationHours: number;
+  onSave: (teamId: string, extIso: string | null) => void;
+}
+
+function ExtensionPicker({
+  teamId,
+  deadlineExtension,
+  startTime,
+  durationHours,
+  onSave,
+}: ExtensionPickerProps) {
+  const getDurations = (teamDeadlineExtension: string | null) => {
+    if (!teamDeadlineExtension || !startTime) return { hours: 0, minutes: 0 };
+    const start = new Date(startTime).getTime();
+    const durationMs = durationHours * 60 * 60 * 1000;
+    const baseDeadlineMs = start + durationMs;
+    const extMs = new Date(teamDeadlineExtension).getTime() - baseDeadlineMs;
+    if (extMs <= 0) return { hours: 0, minutes: 0 };
+    const totalMins = Math.round(extMs / (1000 * 60));
+    return {
+      hours: Math.floor(totalMins / 60),
+      minutes: totalMins % 60,
+    };
+  };
+
+  const initialVal = getDurations(deadlineExtension);
+  const [hours, setHours] = useState<string>(initialVal.hours > 0 ? String(initialVal.hours) : "");
+  const [minutes, setMinutes] = useState<string>(initialVal.minutes > 0 ? String(initialVal.minutes) : "");
+
+  useEffect(() => {
+    const val = getDurations(deadlineExtension);
+    setHours(val.hours > 0 ? String(val.hours) : "");
+    setMinutes(val.minutes > 0 ? String(val.minutes) : "");
+  }, [deadlineExtension, startTime, durationHours]);
+
+  const handleUpdate = (hStr: string, mStr: string) => {
+    const h = parseInt(hStr) || 0;
+    const m = parseInt(mStr) || 0;
+
+    if (h === 0 && m === 0) {
+      onSave(teamId, null);
+      return;
+    }
+
+    const base = startTime ? new Date(startTime).getTime() : Date.now();
+    const baseDeadline = base + durationHours * 3600000;
+    const newExt = new Date(baseDeadline + h * 3600000 + m * 60000).toISOString();
+    onSave(teamId, newExt);
+  };
+
+  if (!startTime) {
+    return (
+      <span className="text-[10px] font-semibold text-[#A08070]/60 italic">
+        Timer not started
+      </span>
+    );
+  }
+
+  const hasExtension = deadlineExtension && startTime && (parseInt(hours) > 0 || parseInt(minutes) > 0);
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-[10px] font-semibold text-[#C9A227]">
+        {hasExtension
+          ? `${parseInt(hours) || 0}h ${parseInt(minutes) || 0}m extension`
+          : "No extension"}
+      </span>
+      <div className="flex gap-1 items-center">
+        <div className="flex gap-1 items-center bg-black/30 border border-[#C9A227]/20 rounded px-1.5 py-0.5">
+          <input
+            type="number"
+            min="0"
+            placeholder="0"
+            value={hours}
+            onChange={(e) => setHours(e.target.value)}
+            onBlur={() => handleUpdate(hours, minutes)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.currentTarget.blur();
+              }
+            }}
+            className="w-7 bg-transparent border-none text-[10px] focus:outline-none text-foreground text-center p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+          <span className="text-[9px] text-[#A08070] font-bold">h</span>
+          <input
+            type="number"
+            min="0"
+            max="59"
+            placeholder="0"
+            value={minutes}
+            onChange={(e) => setMinutes(e.target.value)}
+            onBlur={() => handleUpdate(hours, minutes)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.currentTarget.blur();
+              }
+            }}
+            className="w-7 bg-transparent border-none text-[10px] focus:outline-none text-foreground text-center p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+          <span className="text-[9px] text-[#A08070] font-bold">m</span>
+        </div>
+        {deadlineExtension && (
+          <button
+            onClick={() => {
+              setHours("");
+              setMinutes("");
+              onSave(teamId, null);
+            }}
+            className="text-[#A08070] hover:text-red-400 font-bold px-1.5 py-0.5 border border-[#C9A227]/20 rounded hover:border-red-400 cursor-pointer text-[9px]"
+          >
+            Clear
+          </button>
+        )}
       </div>
     </div>
   );
