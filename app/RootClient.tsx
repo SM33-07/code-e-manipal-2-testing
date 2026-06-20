@@ -153,19 +153,34 @@ function Shell({ children }: { children: React.ReactNode }) {
   )
 }
 
+function shouldShowLoader(pathname: string): boolean {
+  if (pathname === "/") return true;
+  if (pathname.startsWith("/team")) return true;
+  if (pathname.startsWith("/SubmissionForm")) return true;
+  if (pathname.startsWith("/judging")) return true;
+  if (pathname.startsWith("/gallery")) return true;
+  if (pathname === "/admin" || pathname === "/admin/") return true;
+  return false;
+}
+
 export default function RootClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [showLoader, setShowLoader] = useState(true);
+  const showLoaderForPath = shouldShowLoader(pathname);
+  const [showLoader, setShowLoader] = useState(showLoaderForPath);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Trigger loader on every route transition
+  // Trigger loader on every route transition for designated main pages
   useEffect(() => {
-    setShowLoader(true);
-  }, [pathname]);
+    if (showLoaderForPath) {
+      setShowLoader(true);
+    } else {
+      setShowLoader(false);
+    }
+  }, [pathname, showLoaderForPath]);
 
   const handleLoaderComplete = () => {
     setShowLoader(false);
@@ -174,7 +189,7 @@ export default function RootClient({ children }: { children: React.ReactNode }) 
   return (
     <AuthProvider>
       <Shell>{children}</Shell>
-      {mounted && showLoader && (
+      {mounted && showLoader && showLoaderForPath && (
         <LoaderAnimation onComplete={handleLoaderComplete} />
       )}
     </AuthProvider>

@@ -3,7 +3,7 @@
 import type { ReactNode } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import {
-  LayoutDashboard, Users, Scale, Trophy,
+  LayoutDashboard, Trophy,
   FileText, BarChart3, LogOut, ClipboardList, Radio
 } from "lucide-react"
 
@@ -11,8 +11,6 @@ const sideNav = [
   { label: "Dashboard",     icon: LayoutDashboard, href: "/admin" },
   { label: "Registrations", icon: ClipboardList,   href: "/admin/registrations" },
   { label: "Event Control", icon: Radio,           href: "/admin/event-control" },
-  { label: "Teams",     icon: Users,           href: "/team" },
-  { label: "Judging",   icon: Scale,           href: "/judging" },
   { label: "Results",   icon: Trophy,          href: "/admin/results" },
   { label: "Report",    icon: FileText,        href: "/admin/report" },
   { label: "Analytics", icon: BarChart3,       href: "/admin/analytics" },
