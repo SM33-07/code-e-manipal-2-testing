@@ -100,12 +100,9 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
 
           {/* MUJ Building Golden Wireframe Background */}
           <motion.div
-            className="absolute z-[1] pointer-events-none"
+            className="absolute z-[1] pointer-events-none w-[180vw] sm:w-[97vw] left-[-40vw] sm:left-[1%] -top-[10%] sm:-top-[25%]"
             style={{
-              top: "-25%",
-              left: "1%",
               transform: "translateX(-50%)",
-              width: "97vw",
               maxWidth: "1650px",
             }}
             initial={{ opacity: 0, scale: 0.95 }}
@@ -171,8 +168,8 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
           {/* ===== HUD FRAME CORNERS ===== */}
 
           {/* Top-Left Corner */}
-          <div className="absolute top-4 left-4 z-[10] pointer-events-none">
-            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-[10] pointer-events-none w-10 h-10 sm:w-20 sm:h-20">
+            <svg className="w-full h-full sm:w-auto sm:h-auto" width="80" height="80" viewBox="0 0 80 80" fill="none">
               <path d="M 0 30 L 0 8 Q 0 0 8 0 L 30 0" stroke="#F6C453" strokeWidth="1.5" opacity="0.5" />
               <path d="M 8 8 L 25 8" stroke="#F6C453" strokeWidth="1" opacity="0.4" />
               <path d="M 8 8 L 8 25" stroke="#F6C453" strokeWidth="1" opacity="0.4" />
@@ -181,8 +178,8 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
           </div>
 
           {/* Top-Right Corner */}
-          <div className="absolute top-4 right-4 z-[10] pointer-events-none">
-            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-[10] pointer-events-none w-10 h-10 sm:w-20 sm:h-20">
+            <svg className="w-full h-full sm:w-auto sm:h-auto" width="80" height="80" viewBox="0 0 80 80" fill="none">
               <path d="M 80 30 L 80 8 Q 80 0 72 0 L 50 0" stroke="#F6C453" strokeWidth="1.5" opacity="0.5" />
               <path d="M 72 8 L 55 8" stroke="#F6C453" strokeWidth="1" opacity="0.4" />
               <path d="M 72 8 L 72 25" stroke="#F6C453" strokeWidth="1" opacity="0.4" />
@@ -191,16 +188,16 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
           </div>
 
           {/* Bottom-Left Corner */}
-          <div className="absolute bottom-4 left-4 z-[10] pointer-events-none">
-            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-[10] pointer-events-none w-10 h-10 sm:w-20 sm:h-20">
+            <svg className="w-full h-full sm:w-auto sm:h-auto" width="80" height="80" viewBox="0 0 80 80" fill="none">
               <path d="M 0 50 L 0 72 Q 0 80 8 80 L 30 80" stroke="#F6C453" strokeWidth="1.5" opacity="0.5" />
               <rect x="0" y="77" width="3" height="3" fill="#F6C453" opacity="0.8" />
             </svg>
           </div>
 
           {/* Bottom-Right Corner */}
-          <div className="absolute bottom-4 right-4 z-[10] pointer-events-none">
-            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-[10] pointer-events-none w-10 h-10 sm:w-20 sm:h-20">
+            <svg className="w-full h-full sm:w-auto sm:h-auto" width="80" height="80" viewBox="0 0 80 80" fill="none">
               <path d="M 80 50 L 80 72 Q 80 80 72 80 L 50 80" stroke="#F6C453" strokeWidth="1.5" opacity="0.5" />
               <rect x="77" y="77" width="3" height="3" fill="#F6C453" opacity="0.8" />
             </svg>
@@ -208,7 +205,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
 
           {/* Dotted Border - Top */}
           <motion.div
-            className="absolute top-3 left-20 right-20 h-[1px] z-[10] pointer-events-none"
+            className="absolute top-3 left-14 right-14 sm:left-20 sm:right-20 h-[1px] z-[10] pointer-events-none"
             style={{
               backgroundImage: "radial-gradient(circle, #F6C453 1px, transparent 1px)",
               backgroundSize: "10px 1px",
@@ -220,7 +217,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
 
           {/* Dotted Border - Right */}
           <motion.div
-            className="absolute top-20 bottom-20 right-3 w-[1px] z-[10] pointer-events-none"
+            className="absolute top-14 bottom-14 sm:top-20 sm:bottom-20 right-3 w-[1px] z-[10] pointer-events-none"
             style={{
               backgroundImage: "radial-gradient(circle, #F6C453 1px, transparent 1px)",
               backgroundSize: "1px 10px",
@@ -233,7 +230,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
           {/* ===== SKIP BUTTON ===== */}
           <button
             onClick={handleSkip}
-            className="absolute top-6 right-10 z-[20] rounded-full border border-[#F6C453]/30 bg-black/40 px-5 py-2 font-mono text-[10px] sm:text-xs text-[#F6C453] tracking-wider transition-all duration-300 hover:bg-[#F6C453] hover:text-black hover:shadow-[0_0_15px_rgba(246,196,83,0.4)] focus:outline-none cursor-pointer backdrop-blur-sm"
+            className="absolute top-4 right-6 sm:top-6 sm:right-10 z-[20] rounded-full border border-[#F6C453]/30 bg-black/40 px-5 py-2 font-mono text-[10px] sm:text-xs text-[#F6C453] tracking-wider transition-all duration-300 hover:bg-[#F6C453] hover:text-black hover:shadow-[0_0_15px_rgba(246,196,83,0.4)] focus:outline-none cursor-pointer backdrop-blur-sm"
           >
             SKIP INTRO
           </button>
@@ -243,7 +240,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
 
             {/* ── LOGO SECTION ── */}
             <motion.div
-              className="relative mb-6 flex justify-center items-center"
+              className="relative mb-4 sm:mb-6 flex justify-center items-center"
               initial={{ scale: 0.7, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 1.2, ease: "easeOut" }}
@@ -349,13 +346,13 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
 
             {/* ── TITLE SECTION ── */}
             <motion.div
-              className="text-center mb-3 relative"
+              className="text-center mb-2 sm:mb-3 relative"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
             >
               <h1
-                className="text-5xl md:text-7xl font-serif tracking-widest text-transparent bg-clip-text"
+                className="text-3xl min-[400px]:text-4xl sm:text-5xl md:text-7xl font-serif tracking-widest text-transparent bg-clip-text"
                 style={{
                   backgroundImage: "linear-gradient(180deg, #FFF8E1 0%, #F6C453 60%, #C9A227 100%)",
                   WebkitBackgroundClip: "text",
@@ -374,7 +371,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
               transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
             >
               <h2
-                className="text-xs md:text-sm tracking-[0.35em] font-light uppercase"
+                className="text-[9px] min-[400px]:text-xs md:text-sm tracking-[0.2em] min-[400px]:tracking-[0.35em] font-light uppercase"
                 style={{ color: "#F6C453", opacity: 0.8 }}
               >
                 Manipal University Jaipur
@@ -383,7 +380,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
 
             {/* Three diamond decorations */}
             <motion.div
-              className="flex items-center gap-2 mb-10 mt-2"
+              className="flex items-center gap-2 mb-6 sm:mb-10 mt-2"
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.8, duration: 0.6 }}
@@ -476,14 +473,14 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
 
               {/* Circuit lines extending from card sides */}
               <motion.div
-                className="absolute -left-10 top-1/2 h-[1px] w-8"
+                className="hidden sm:block absolute -left-10 top-1/2 h-[1px] w-8"
                 style={{ background: "linear-gradient(90deg, rgba(246,196,83,0), rgba(246,196,83,0.5))" }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: [0, 0.6, 0] }}
                 transition={{ duration: 3, repeat: Infinity, delay: 1 }}
               />
               <motion.div
-                className="absolute -right-10 top-1/2 h-[1px] w-8"
+                className="hidden sm:block absolute -right-10 top-1/2 h-[1px] w-8"
                 style={{ background: "linear-gradient(270deg, rgba(246,196,83,0), rgba(246,196,83,0.5))" }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: [0, 0.6, 0] }}
@@ -495,7 +492,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
 
           {/* ===== FOOTER SECTION ===== */}
           <motion.div
-            className="z-[15] pb-6 pt-4 flex flex-col items-center justify-center gap-4"
+            className="z-[15] pb-4 sm:pb-6 pt-2 sm:pt-4 flex flex-col items-center justify-center gap-3 sm:gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.5, delay: 1.5 }}
@@ -537,14 +534,14 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
 
             {/* Footer tagline */}
             <div className="flex items-center gap-3">
-              <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-[#F6C453]/40" />
+              <div className="hidden min-[400px]:block h-[1px] w-8 bg-gradient-to-r from-transparent to-[#F6C453]/40" />
               <p
-                className="text-[10px] md:text-xs uppercase tracking-[0.2em] font-light italic"
+                className="text-[8px] min-[400px]:text-[10px] md:text-xs uppercase tracking-[0.15em] min-[400px]:tracking-[0.2em] font-light italic text-center px-2"
                 style={{ color: "rgba(246,196,83,0.65)" }}
               >
                 Empowering Minds. Building the Future.
               </p>
-              <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-[#F6C453]/40" />
+              <div className="hidden min-[400px]:block h-[1px] w-8 bg-gradient-to-l from-transparent to-[#F6C453]/40" />
             </div>
           </motion.div>
 

@@ -17,11 +17,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body suppressHydrationWarning className="min-h-screen bg-background text-foreground relative overflow-x-hidden transition-colors duration-300">
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="dark"
           enableSystem={false}
           storageKey="code-e-manipal-theme"
         >
