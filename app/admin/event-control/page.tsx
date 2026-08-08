@@ -47,6 +47,12 @@ export default function EventControlPage() {
   const [updatingTimer, setUpdatingTimer] = useState(false);
   const [timeRemainingStr, setTimeRemainingStr] = useState("Not Started");
 
+  // Results Publishing state
+  const [resultsPublished, setResultsPublished] = useState<"false" | "publishing" | "true">("false");
+  const [resultsPublishTime, setResultsPublishTime] = useState("");
+  const [showPublishModal, setShowPublishModal] = useState(false);
+  const [publishingResults, setPublishingResults] = useState(false);
+
   useEffect(() => {
     fetchTeams();
     fetchAnnouncements();
@@ -62,6 +68,8 @@ export default function EventControlPage() {
         setStartTime(data.hackathon_start_time || "");
         setDurationHours(parseFloat(data.hackathon_duration_hours || "48"));
         setIsStarted(data.hackathon_is_started === "true");
+        setResultsPublished(data.results_published || "false");
+        setResultsPublishTime(data.results_publish_time || "");
       }
     } catch (err) {
       console.error("Failed to load event config:", err);
@@ -314,6 +322,58 @@ export default function EventControlPage() {
     }
   };
 
+  const handleStartPublish = async () => {
+    setPublishingResults(true);
+    try {
+      const publishTime = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+      const res = await fetch("/api/event-config", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          results_published: "publishing",
+          results_publish_time: publishTime,
+        }),
+      });
+      if (res.ok) {
+        toast.success("Leaderboard publishing initiated (5-minute countdown started).");
+        setShowPublishModal(false);
+        fetchEventConfig();
+      } else {
+        toast.error("Failed to start publishing countdown.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error starting publishing.");
+    } finally {
+      setPublishingResults(false);
+    }
+  };
+
+  const handleCancelPublish = async () => {
+    setPublishingResults(true);
+    try {
+      const res = await fetch("/api/event-config", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          results_published: "false",
+          results_publish_time: "",
+        }),
+      });
+      if (res.ok) {
+        toast.success("Results publishing reset / unpublished.");
+        fetchEventConfig();
+      } else {
+        toast.error("Failed to reset results status.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error resetting publishing state.");
+    } finally {
+      setPublishingResults(false);
+    }
+  };
+
   const filteredTeams = teams.filter((t) =>
     t.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -455,6 +515,86 @@ export default function EventControlPage() {
                     Set Schedule
                   </button>
                 )}
+              </div>
+            </div>
+          </div>
+
+          {/* LEADERBOARD & RESULTS PUBLISHING CARD */}
+          <div className="bg-[#1E1208] border border-[#C9A227]/20 rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-[#D4732A]/10 border border-[#D4732A]/30 rounded-xl text-[#D4732A]">
+                  <Sparkles size={20} />
+                </div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-[#F0C060] bg-[#C9A227]/10 px-2.5 py-1 rounded-full border border-[#C9A227]/20">
+                  Results Control
+                </span>
+              </div>
+
+              <h3 className="text-xl font-bold font-serif text-foreground mb-1">
+                Leaderboard & Results
+              </h3>
+              <p className="text-xs text-[#A08070] mb-4">
+                Publish competition rankings to participants with a 5-minute announcement buffer.
+              </p>
+
+              <div className="space-y-4">
+                <div className="flex justify-between items-center bg-black/20 p-3 rounded-xl border border-[#C9A227]/10">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-[#A08070]">Publish Status</span>
+                    <p className="text-sm font-bold text-foreground">
+                      {resultsPublished === "true" ? (
+                        <span className="text-emerald-400">● Published Live</span>
+                      ) : resultsPublished === "publishing" ? (
+                        <span className="text-[#F0C060] animate-pulse">● Publishing (5m Buffer)</span>
+                      ) : (
+                        <span className="text-[#A08070]">● Unpublished (Hidden)</span>
+                      )}
+                    </p>
+                  </div>
+                  {resultsPublished === "publishing" && resultsPublishTime && (
+                    <div className="text-right">
+                      <span className="text-[10px] uppercase font-bold text-[#A08070]">Goes Live</span>
+                      <p className="text-xs font-mono text-[#F0C060]">
+                        {new Date(resultsPublishTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-2">
+                  {resultsPublished === "false" && (
+                    <button
+                      onClick={() => setShowPublishModal(true)}
+                      disabled={publishingResults}
+                      className="w-full py-3 rounded-xl bg-gradient-to-r from-[#D4732A] to-[#C1440E] text-white font-bold text-xs hover:from-[#E8924A] hover:to-[#D4732A] transition duration-200 cursor-pointer flex items-center justify-center gap-2 shadow-md"
+                    >
+                      <Sparkles size={16} /> Publish Results (5-Min Buffer)
+                    </button>
+                  )}
+
+                  {resultsPublished === "publishing" && (
+                    <div className="space-y-2">
+                      <button
+                        onClick={handleCancelPublish}
+                        disabled={publishingResults}
+                        className="w-full py-3 rounded-xl bg-red-950 text-red-200 border border-red-800 hover:bg-red-900 font-bold text-xs transition duration-200 cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        {publishingResults ? <Loader2 className="animate-spin size-4" /> : <Lock size={14} />} Cancel Publishing
+                      </button>
+                    </div>
+                  )}
+
+                  {resultsPublished === "true" && (
+                    <button
+                      onClick={handleCancelPublish}
+                      disabled={publishingResults}
+                      className="w-full py-3 rounded-xl bg-neutral-900 border border-[#C9A227]/30 text-[#A08070] hover:text-foreground font-bold text-xs transition duration-200 cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      {publishingResults ? <Loader2 className="animate-spin size-4" /> : <Unlock size={14} />} Unpublish Leaderboard
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -698,8 +838,48 @@ export default function EventControlPage() {
               </div>
             )}
           </div>
+      {/* PUBLISH RESULTS CONFIRMATION MODAL */}
+      {showPublishModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-[#1E1208] border border-[#C9A227]/30 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+            <div className="flex items-center justify-between pb-4 border-b border-[#C9A227]/20 mb-4">
+              <h3 className="text-xl font-bold font-serif text-foreground">
+                Publish Results Confirmation
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowPublishModal(false)}
+                className="text-muted-foreground hover:text-foreground text-xl font-bold cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <p className="text-sm text-[#A08070] leading-relaxed mb-6">
+              The leaderboard will be published in 5 minutes.
+            </p>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-[#C9A227]/20">
+              <button
+                type="button"
+                onClick={() => setShowPublishModal(false)}
+                disabled={publishingResults}
+                className="h-10 px-4 rounded-xl border border-[#C9A227]/30 text-xs font-bold text-[#A08070] hover:bg-[#C9A227]/10 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleStartPublish}
+                disabled={publishingResults}
+                className="h-10 px-5 rounded-xl bg-gradient-to-r from-[#D4732A] to-[#C1440E] text-white text-xs font-bold flex items-center justify-center gap-2 hover:from-[#E8924A] hover:to-[#D4732A] transition-all cursor-pointer"
+              >
+                {publishingResults ? "Initiating..." : "Confirm & Publish"}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
