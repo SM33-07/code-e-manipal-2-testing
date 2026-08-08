@@ -291,9 +291,9 @@ export default function AdminPage() {
                 onChange={e => setSelSub(e.target.value)} 
                 className="w-full h-11 bg-background border border-jaipur-secondary-light rounded-lg pl-4 pr-10 text-sm text-foreground focus:outline-none focus:border-jaipur-gold appearance-none cursor-pointer"
               >
-                <option value="">Select Submission</option>
+                <option value="" className="bg-[#FCF6EF] text-[#6A4635] dark:bg-[#1E1208] dark:text-[#F5EFE0]">Select Submission</option>
                 {submissions.map(s => (
-                  <option key={s.id} value={s.id}>{s.title}</option>
+                  <option key={s.id} value={s.id} className="bg-[#FCF6EF] text-[#6A4635] dark:bg-[#1E1208] dark:text-[#F5EFE0]">{s.title}</option>
                 ))}
               </select>
               <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-jaipur-primary pointer-events-none" />
@@ -304,9 +304,9 @@ export default function AdminPage() {
                 onChange={e => setSelJudge(e.target.value)} 
                 className="w-full h-11 bg-background border border-jaipur-secondary-light rounded-lg pl-4 pr-10 text-sm text-foreground focus:outline-none focus:border-jaipur-gold appearance-none cursor-pointer"
               >
-                <option value="">Select Judge</option>
+                <option value="" className="bg-[#FCF6EF] text-[#6A4635] dark:bg-[#1E1208] dark:text-[#F5EFE0]">Select Judge</option>
                 {judges.map(j => (
-                  <option key={j.id} value={j.id}>{j.name || j.email}</option>
+                  <option key={j.id} value={j.id} className="bg-[#FCF6EF] text-[#6A4635] dark:bg-[#1E1208] dark:text-[#F5EFE0]">{j.name || j.email}</option>
                 ))}
               </select>
               <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-jaipur-primary pointer-events-none" />
