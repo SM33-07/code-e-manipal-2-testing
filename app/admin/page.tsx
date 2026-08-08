@@ -243,7 +243,7 @@ export default function AdminPage() {
         {stats.map(({ label, value, Icon }) => (
           <div 
             key={label} 
-            className="bg-jaipur-card border border-jaipur-secondary-light rounded-xl p-5 flex items-center gap-4 shadow-sm hover:shadow-[0_4px_16px_rgba(201,162,39,0.1)] transition-shadow"
+            className="bg-jaipur-card border border-jaipur-secondary-light rounded-xl p-5 flex items-center gap-4 shadow-sm hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(201,162,39,0.18)] transition-all duration-300"
           >
             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center shrink-0 border border-jaipur-secondary-light">
               <Icon size={24} className="text-jaipur-gold" />
@@ -261,7 +261,7 @@ export default function AdminPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* JUDGE ASSIGNMENT PANEL */}
-        <div className="lg:col-span-2 bg-jaipur-card border border-jaipur-secondary-light rounded-2xl p-6 md:p-8 relative overflow-hidden flex flex-col min-h-[500px]">
+        <div className="lg:col-span-2 bg-jaipur-card border border-jaipur-secondary-light rounded-2xl p-6 md:p-8 relative overflow-hidden flex flex-col min-h-[500px] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300">
           
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 shrink-0">
             <div className="flex items-center gap-4">

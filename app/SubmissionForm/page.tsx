@@ -85,9 +85,13 @@ function StatCard({
     return () => clearTimeout(timer);
   }, [delay]);
 
+  const [hovered, setHovered] = useState(false);
+
   return (
     <div
       ref={ref}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         position: "relative",
         padding: "24px 28px 22px",
@@ -95,11 +99,10 @@ function StatCard({
         background: "var(--card)",
         border: "1px solid var(--jaipur-secondary-light)",
         borderLeft: `4px solid ${accentColor}`,
-        backdropFilter: "blur(12px)",
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(20px)",
-        transition: `opacity 0.6s ease ${delay}ms, transform 0.6s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
-        boxShadow: "0 4px 20px rgba(143,16,42,0.08)",
+        transform: visible ? (hovered ? "translateY(-4px)" : "translateY(0)") : "translateY(20px)",
+        transition: `opacity 0.6s ease ${delay}ms, transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease`,
+        boxShadow: hovered ? "0 12px 30px rgba(143,16,42,0.16)" : "0 4px 20px rgba(143,16,42,0.08)",
         minWidth: "210px",
         textAlign: "left",
       }}
@@ -925,9 +928,8 @@ export default function Home() {
               <div
                 style={{
                   borderRadius: "20px",
-                  background: isDark ? "rgba(30,18,8,0.85)" : "rgba(255,248,239,0.68)",
+                  background: isDark ? "#1E1208" : "#FCF6EF",
                   border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #EBCFB5",
-                  backdropFilter: "blur(16px)",
                   overflow: "hidden",
                   boxShadow: isDark
                     ? "0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(201,162,39,0.15)"
@@ -1473,11 +1475,10 @@ export default function Home() {
                   <div
                     style={{
                       borderRadius: "20px",
-                      background: isDark ? "rgba(30,18,8,0.85)" : "rgba(255,248,239,0.85)",
+                      background: isDark ? "#1E1208" : "#FCF6EF",
                       border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #EBCFB5",
                       padding: "48px 32px",
                       textAlign: "center",
-                      backdropFilter: "blur(16px)",
                     }}
                   >
                     <div
@@ -1523,10 +1524,9 @@ export default function Home() {
                   <div
                     style={{
                       borderRadius: "20px",
-                      background: isDark ? "rgba(30,18,8,0.85)" : "rgba(255,248,239,0.85)",
+                      background: isDark ? "#1E1208" : "#FCF6EF",
                       border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #EBCFB5",
                       padding: "32px",
-                      backdropFilter: "blur(16px)",
                     }}
                   >
                     <div className="flex items-center justify-between pb-4 border-b border-[#C9A227]/20 mb-6">
