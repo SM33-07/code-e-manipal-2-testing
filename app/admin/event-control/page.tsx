@@ -838,6 +838,9 @@ export default function EventControlPage() {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
       {/* PUBLISH RESULTS CONFIRMATION MODAL */}
       {showPublishModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
