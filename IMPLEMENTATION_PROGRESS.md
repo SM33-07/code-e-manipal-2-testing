@@ -85,4 +85,4 @@ Validation performed:
 
 Browser inspection remains unavailable because the local automation runtime could not initialize; no browser validation is claimed.
 
-Commit: pending legacy surface consolidation checkpoint
+Commit: `7f3c750` — `feat: finalize frontend experience and visual system`
