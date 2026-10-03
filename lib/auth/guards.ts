@@ -54,8 +54,9 @@ export type GuardedHandler = (
 export function withGuardedAuth(handler: GuardedHandler, requiredRole?: UserRole) {
   return async (
     req: NextRequest,
-    context?: { params?: Record<string, string> | Promise<Record<string, string>> }
+    ...args: any[]
   ): Promise<NextResponse> => {
+    const context = args[0] as { params?: Record<string, string> | Promise<Record<string, string>> } | undefined;
     try {
       // 1. CSRF validation for state-changing requests
       const csrfError = validateCsrf(req);
