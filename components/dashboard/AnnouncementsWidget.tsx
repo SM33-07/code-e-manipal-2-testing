@@ -18,7 +18,7 @@ interface AnnouncementsWidgetProps {
 export function AnnouncementsWidget({ announcement }: AnnouncementsWidgetProps) {
   if (!announcement) {
     return (
-      <div className="bg-card/70 backdrop-blur-xl border border-border/60 rounded-2xl p-6 shadow-sm flex items-center gap-4">
+      <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm flex items-center gap-4">
         <div className="size-11 rounded-xl bg-muted/30 border border-border/30 flex items-center justify-center text-muted-foreground shrink-0">
           <Bell className="w-5 h-5" />
         </div>
@@ -38,7 +38,7 @@ export function AnnouncementsWidget({ announcement }: AnnouncementsWidgetProps) 
 
   return (
     <div
-      className={`relative overflow-hidden bg-card/80 backdrop-blur-xl border rounded-2xl p-6 shadow-sm transition-all ${
+      className={`relative overflow-hidden bg-card border rounded-2xl p-6 shadow-sm transition-all ${
         isUrgent
           ? 'border-rose-500/40 bg-rose-500/5'
           : 'border-border/70 hover:border-primary/40'

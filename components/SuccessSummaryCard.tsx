@@ -61,7 +61,7 @@ export function SuccessSummaryCard({ topThree, onClose, onGoToLeaderboard }: Pro
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-start justify-center p-4 pt-28 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/70 z-[200] flex items-start justify-center p-4 pt-28 overflow-y-auto">
       <Card className={`max-w-md w-full border rounded-2xl transform scale-100 transition-all relative ${cardBg}`}>
         <CardHeader className="text-center pb-2">
           <div className="mx-auto w-14 h-14 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mb-4">

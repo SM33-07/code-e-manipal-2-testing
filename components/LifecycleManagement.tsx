@@ -26,7 +26,7 @@ export function LifecycleManagement() {
   }
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
+    <div className="bg-card border border-border rounded-2xl p-6">
 
       <h2 className="text-xl text-white mb-4">
         Lifecycle Management

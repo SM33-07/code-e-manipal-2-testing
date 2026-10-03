@@ -850,7 +850,7 @@ export default function EventControlPage() {
 
       {/* PUBLISH RESULTS CONFIRMATION MODAL */}
       {showPublishModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-[#FCF6EF] dark:bg-[#1E1208] border border-[#EBCFB5] dark:border-[#C9A227]/30 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
             <div className="flex items-center justify-between pb-4 border-b border-[#C9A227]/20 mb-4">
               <h3 className="text-xl font-bold font-serif text-foreground">

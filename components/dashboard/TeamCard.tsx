@@ -35,7 +35,7 @@ export function TeamCard({ team }: TeamCardProps) {
 
   if (!team) {
     return (
-      <div className="bg-card/80 backdrop-blur-xl border border-dashed border-border/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full min-h-[300px] transition-all hover:border-primary/50">
+      <div className="bg-card border border-dashed border-border/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full min-h-[300px] transition-all hover:border-primary/50">
         <div>
           <div className="size-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-4">
             <Users className="w-6 h-6" />
@@ -71,7 +71,7 @@ export function TeamCard({ team }: TeamCardProps) {
   const maxMembers = 4;
 
   return (
-    <div className="bg-card/80 backdrop-blur-xl border border-border/70 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full min-h-[300px] transition-all hover:shadow-md">
+    <div className="bg-card border border-border/70 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full min-h-[300px] transition-all hover:shadow-md">
       <div>
         {/* Header */}
         <div className="flex items-start justify-between gap-3 mb-4">

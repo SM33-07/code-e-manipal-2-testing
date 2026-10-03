@@ -509,7 +509,7 @@ export default function AdminUsersPage() {
 
       {/* Password Reset Result Modal */}
       {resetPasswordResult && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
           <div className="bg-[#121114] border border-amber-500/30 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
               <span>🔐 Temporary Password Generated</span>
@@ -555,7 +555,7 @@ export default function AdminUsersPage() {
 
       {/* Bulk Generator Modal */}
       {showBulkModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
           <div className="bg-[#121114] border border-white/20 rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -648,7 +648,7 @@ export default function AdminUsersPage() {
 
       {/* Audit Log Viewer Modal */}
       {showAuditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
           <div className="bg-[#121114] border border-white/20 rounded-xl max-w-3xl w-full p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">

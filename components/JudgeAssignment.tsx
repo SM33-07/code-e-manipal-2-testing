@@ -120,7 +120,7 @@ export function JudgeAssignment() {
 
   if (loading) {
     return (
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl">
+      <div className="bg-card border border-border rounded-2xl p-6">
         <p className="text-white/50 text-sm">Loading assignments...</p>
       </div>
     );
@@ -133,7 +133,7 @@ export function JudgeAssignment() {
 
   return (
     <motion.div
-      className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl"
+      className="bg-card border border-border rounded-2xl p-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}

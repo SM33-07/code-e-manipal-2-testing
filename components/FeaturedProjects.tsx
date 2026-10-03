@@ -109,7 +109,7 @@ export default function FeaturedProjects() {
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, 400px"
                     />
-                    <div className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider text-white shadow-md flex items-center gap-1 bg-black/45 backdrop-blur-sm">
+                    <div className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider text-white shadow-md flex items-center gap-1 bg-black/80">
                       <Trophy className="w-3.5 h-3.5 text-yellow-400" />
                       {place} Place
                     </div>

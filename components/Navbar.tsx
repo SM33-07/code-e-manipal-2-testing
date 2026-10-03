@@ -186,6 +186,7 @@ export default function Navbar({ className }: { className?: string }) {
   // Generate dynamic links based on user role
   const navItems = []
   if (role === "admin" || role === "participant") {
+    navItems.push({ name: "Dashboard", link: "/dashboard" })
     navItems.push({ name: "Team", link: "/team" })
     navItems.push({ name: "Submit", link: "/SubmissionForm" })
   }
@@ -202,7 +203,7 @@ export default function Navbar({ className }: { className?: string }) {
   return (
     <ResizableNavbar isSubmissionForm={isSubmissionForm} className={className}>
       {/* ── Desktop Navigation ── */}
-      <NavBody className="bg-background/90 border border-jaipur-gold/30 shadow-md backdrop-blur-md">
+      <NavBody className="bg-background border border-jaipur-gold/30 shadow-md">
         {/* Logo */}
         <Link href="/" className="flex items-center no-underline h-12 flex-shrink-0 z-20">
           <Image
@@ -350,7 +351,7 @@ export default function Navbar({ className }: { className?: string }) {
       </NavBody>
 
       {/* ── Mobile Navigation ── */}
-      <MobileNav className="bg-background/95 border-b border-jaipur-gold/20 shadow-sm">
+      <MobileNav className="bg-background border-b border-jaipur-gold/20 shadow-sm">
         <MobileNavHeader>
           <Link href="/" className="flex items-center no-underline h-10">
             <Image
@@ -424,7 +425,7 @@ export default function Navbar({ className }: { className?: string }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSheetOpen(false)}
-              className="fixed inset-0 bg-black/50 z-[90] backdrop-blur-sm"
+              className="fixed inset-0 bg-black/60 z-[90]"
             />
 
             {/* Slide-out Panel */}

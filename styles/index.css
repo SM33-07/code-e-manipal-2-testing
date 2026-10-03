@@ -1,31 +1,31 @@
 :root {
-  --foreground: #4B1F24;
-  --background: #FCF6EF;
-  --muted: #6E5A55;
-  --jaipur-primary: #8B1F44;
-  --jaipur-primary-light: #6B142F;
-  --jaipur-secondary: rgba(255, 250, 245, 0.92); /* Input background */
-  --jaipur-secondary-light: rgba(233, 216, 199, 0.8); /* Borders */
-  --jaipur-gold: #A46A49;
-  --jaipur-gold-light: #8A3150;
-  --jaipur-card: rgba(252, 246, 239, 0.97); /* Card background */
-  --jaipur-pink: #DFCDBD;
-  --jaipur-terracotta: #8A3150;
+  --foreground: #24211D;
+  --background: #F4EBDD;
+  --muted: #70685E;
+  --jaipur-primary: #B95745;
+  --jaipur-primary-light: #9F4235;
+  --jaipur-secondary: #E5D0B2;
+  --jaipur-secondary-light: #D7B993;
+  --jaipur-gold: #B08A45;
+  --jaipur-gold-light: #8E6B30;
+  --jaipur-card: #FFF9F0;
+  --jaipur-pink: #C97878;
+  --jaipur-terracotta: #B95745;
 }
 
 .dark {
-  --foreground: #F5EFE0;
-  --background: #0F0A05;
-  --muted: #A08070;
-  --jaipur-primary: #D4732A;
-  --jaipur-primary-light: #E8924A;
-  --jaipur-secondary: #2A1D16;
-  --jaipur-secondary-light: #3D2E22;
-  --jaipur-gold: #C9A227;
-  --jaipur-gold-light: #F0C060;
-  --jaipur-card: #1E1208;
-  --jaipur-pink: #C2687A;
-  --jaipur-terracotta: #C1440E;
+  --foreground: #E9DDC8;
+  --background: #091221;
+  --muted: #A9B4C2;
+  --jaipur-primary: #B88A45;
+  --jaipur-primary-light: #D2AC68;
+  --jaipur-secondary: #10223A;
+  --jaipur-secondary-light: #234568;
+  --jaipur-gold: #B88A45;
+  --jaipur-gold-light: #D2AC68;
+  --jaipur-card: #0C1728;
+  --jaipur-pink: #A85346;
+  --jaipur-terracotta: #A85346;
 }
 
 
@@ -50,25 +50,29 @@ body {
   transform: scale(1.01);
 }
 
+.route-dashboard { background-image: url("/images/heritage/light/dashboard.webp"); }
+.route-team { background-image: url("/images/heritage/light/albert-hall.webp"); }
+.route-submit { background-image: url("/images/heritage/light/submit-jantar-mantar.webp"); }
+.route-gallery { background-image: url("/images/heritage/light/gallery.webp"); }
+.route-judging { background-image: url("/images/heritage/light/workflow-symmetric.webp"); }
+.route-admin { background-image: url("/images/heritage/light/admin-dashboard.webp"); }
+.route-results { background-image: url("/images/heritage/light/public-results-pink-city.webp"); }
+
+.dark .route-dashboard { background-image: url("/images/heritage/dark/dashboard.webp"); }
+.dark .route-team { background-image: url("/images/heritage/dark/team-architectural-detail.webp"); }
+.dark .route-submit { background-image: url("/images/heritage/dark/workflow-teal.webp"); }
+.dark .route-gallery { background-image: url("/images/heritage/dark/architectural-atmosphere.webp"); }
+.dark .route-judging { background-image: url("/images/heritage/dark/judge-teal-lanterns.webp"); }
+.dark .route-admin { background-image: url("/images/heritage/dark/admin-dashboard.webp"); }
+.dark .route-results { background-image: url("/images/heritage/dark/results-jal-mahal.webp"); }
+
 .route-background-veil {
   z-index: 1;
-  background:
-    linear-gradient(
-      180deg,
-      rgb(252 246 239 / 0.52),
-      rgb(252 246 239 / 0.7)
-    );
-  backdrop-filter: saturate(0.9);
+  background: linear-gradient(180deg, rgb(244 235 221 / 0.84), rgb(244 235 221 / 0.94));
 }
 
 .dark .route-background-veil {
-  background:
-    linear-gradient(
-      180deg,
-      rgb(15 10 5 / 0.56),
-      rgb(15 10 5 / 0.72)
-    );
-  backdrop-filter: saturate(0.8);
+  background: linear-gradient(180deg, rgb(9 18 33 / 0.84), rgb(9 18 33 / 0.94));
 }
 
 
@@ -82,35 +86,27 @@ body {
   color: var(--foreground);
 }
 
-/* Glass card improvement */
+/* Legacy component name, now rendered as a solid operational surface. */
 
 .glass-card {
   background: var(--jaipur-card);
   border: 1px solid var(--jaipur-secondary-light);
-  backdrop-filter: blur(14px);
-  border-radius: 18px;
-  box-shadow:
-    0 10px 40px rgba(60, 20, 20, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  transition: all 0.3s ease;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgb(36 33 29 / 0.08);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .dark .glass-card {
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.24);
 }
 
 .glass-card:hover {
-  box-shadow:
-    0 20px 60px rgba(60, 20, 20, 0.12),
-    0 0 40px rgba(139, 31, 68, 0.05);
+  border-color: var(--jaipur-gold);
+  box-shadow: 0 12px 24px rgb(36 33 29 / 0.12);
 }
 
 .dark .glass-card:hover {
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.4),
-    0 0 40px rgba(212, 115, 42, 0.1);
+  box-shadow: 0 12px 24px rgb(0 0 0 / 0.3);
 }
 
 /* Kaggle-style readable writeups */
@@ -202,7 +198,13 @@ body {
 }
 
 .login-background {
-  background-image: url("/images/backgrounds/login.webp");
+  background-image: url("/images/heritage/light/login.webp");
   background-size: cover;
   background-position: center;
+}
+
+.dark .login-background { background-image: url("/images/heritage/dark/login.webp"); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
 }

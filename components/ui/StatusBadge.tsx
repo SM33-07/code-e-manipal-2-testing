@@ -106,7 +106,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium border backdrop-blur-sm tracking-wide ${config.bg} ${config.text} ${className}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium border tracking-wide ${config.bg} ${config.text} ${className}`}
     >
       <span className="relative flex h-2 w-2">
         {shouldPulse && (

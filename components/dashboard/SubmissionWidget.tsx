@@ -35,7 +35,7 @@ interface SubmissionWidgetProps {
 export function SubmissionWidget({ hasTeam, submission }: SubmissionWidgetProps) {
   if (!hasTeam) {
     return (
-      <div className="bg-card/80 backdrop-blur-xl border border-dashed border-border/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full min-h-[300px] transition-all hover:border-primary/50 opacity-90">
+      <div className="bg-card border border-dashed border-border/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full min-h-[300px] transition-all hover:border-primary/50 opacity-90">
         <div>
           <div className="size-12 rounded-xl bg-muted/30 border border-border/40 flex items-center justify-center text-muted-foreground mb-4">
             <Lock className="w-6 h-6" />
@@ -62,7 +62,7 @@ export function SubmissionWidget({ hasTeam, submission }: SubmissionWidgetProps)
 
   if (!submission) {
     return (
-      <div className="bg-card/80 backdrop-blur-xl border border-border/70 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full min-h-[300px] transition-all hover:shadow-md">
+      <div className="bg-card border border-border/70 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full min-h-[300px] transition-all hover:shadow-md">
         <div>
           <div className="flex items-start justify-between gap-3 mb-4">
             <div>
@@ -111,7 +111,7 @@ export function SubmissionWidget({ hasTeam, submission }: SubmissionWidgetProps)
   const isFinalized = submission.isLocked || isSubmitted;
 
   return (
-    <div className="bg-card/80 backdrop-blur-xl border border-border/70 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full min-h-[300px] transition-all hover:shadow-md">
+    <div className="bg-card border border-border/70 rounded-2xl p-6 shadow-sm flex flex-col justify-between h-full min-h-[300px] transition-all hover:shadow-md">
       <div>
         {/* Header */}
         <div className="flex items-start justify-between gap-3 mb-3">

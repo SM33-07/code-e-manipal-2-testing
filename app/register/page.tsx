@@ -129,7 +129,6 @@ export default function RegisterPage() {
               border: isDark ? "1px solid rgba(201,162,39,0.3)" : "1px solid rgba(233,216,199,0.8)",
               borderRadius: 24,
               boxShadow: isDark ? "0 16px 48px rgba(0,0,0,0.5)" : "0 16px 48px rgba(60,20,20,0.16)",
-              backdropFilter: "blur(12px)",
             }}
           >
             {/* Success icon */}
@@ -246,7 +245,6 @@ export default function RegisterPage() {
             border: isDark ? "1px solid rgba(201,162,39,0.3)" : "1px solid rgba(233,216,199,0.8)",
             borderRadius: 24,
             boxShadow: isDark ? "0 16px 48px rgba(0,0,0,0.5)" : "0 16px 48px rgba(60,20,20,0.16)",
-            backdropFilter: "blur(12px)",
           }}
         >
 

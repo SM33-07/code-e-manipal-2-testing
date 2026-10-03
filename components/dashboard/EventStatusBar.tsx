@@ -83,7 +83,7 @@ export function EventStatusBar({
   const currentIdx = PHASES_ORDER.findIndex((p) => p.phase === phase);
 
   return (
-    <div className="w-full bg-card/80 backdrop-blur-xl border border-border/70 rounded-2xl p-5 shadow-sm transition-all duration-300">
+    <div className="w-full bg-card border border-border/70 rounded-2xl p-5 shadow-sm transition-all duration-300">
       {/* Top Bar: Active Status & Countdown */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/40">
         <div className="flex items-center gap-3">

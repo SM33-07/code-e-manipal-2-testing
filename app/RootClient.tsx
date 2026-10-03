@@ -8,18 +8,15 @@ import LoaderAnimation from "@/components/LoaderAnimation"
 
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false })
 
-function getBackground(pathname: string) {
-  if (pathname.startsWith("/SubmissionForm")) return "submission-generated.jpg"
-  if (pathname.startsWith("/submission-result")) return "results-generated.jpg"
-  if (pathname.startsWith("/project")) return "project-generated.jpg"
-  if (pathname.startsWith("/judging")) return "judging-generated.jpg"
-  if (pathname.startsWith("/admin/results")) return "results-generated.jpg"
-  if (pathname.startsWith("/admin/analytics") || pathname.startsWith("/admin/report")) {
-    return "analytics-generated.jpg"
-  }
-  if (pathname.startsWith("/admin")) return "admin-generated.jpg"
-  if (pathname.startsWith("/gallery")) return "gallery-generated.jpg"
-  return "team-generated.jpg"
+function getBackgroundClass(pathname: string) {
+  if (pathname.startsWith("/SubmissionForm")) return "route-submit"
+  if (pathname.startsWith("/submission-result")) return "route-results"
+  if (pathname.startsWith("/project") || pathname.startsWith("/gallery")) return "route-gallery"
+  if (pathname.startsWith("/judging")) return "route-judging"
+  if (pathname.startsWith("/admin/results")) return "route-results"
+  if (pathname.startsWith("/admin")) return "route-admin"
+  if (pathname.startsWith("/dashboard")) return "route-dashboard"
+  return "route-team"
 }
 
 interface Announcement {
@@ -85,7 +82,7 @@ function AnnouncementBanner({ onActiveChange }: { onActiveChange: (active: boole
   if (publishingAlert) {
     return (
       <div 
-        className="fixed top-0 left-0 right-0 z-[9999] h-10 px-4 flex items-center justify-center gap-2 border-b backdrop-blur-md shadow-sm transition-all duration-300 bg-amber-600 dark:bg-amber-950/95 text-white border-amber-500 animate-pulse"
+        className="fixed top-0 left-0 right-0 z-[9999] h-10 px-4 flex items-center justify-center gap-2 border-b shadow-sm transition-all duration-300 bg-amber-600 dark:bg-amber-950 text-white border-amber-500 animate-pulse"
       >
         <span className="text-sm">🏆</span>
         <p className="text-xs font-bold tracking-wide text-center uppercase truncate max-w-[90%]">
@@ -120,7 +117,7 @@ function AnnouncementBanner({ onActiveChange }: { onActiveChange: (active: boole
 
   return (
     <div 
-      className={`fixed top-0 left-0 right-0 z-[9999] h-10 px-4 flex items-center justify-center gap-2 border-b backdrop-blur-md shadow-sm transition-all duration-300 ${style.bg}`}
+      className={`fixed top-0 left-0 right-0 z-[9999] h-10 px-4 flex items-center justify-center gap-2 border-b shadow-sm transition-all duration-300 ${style.bg}`}
     >
       <span className="text-sm">{style.icon}</span>
       <p className="text-xs font-semibold tracking-wide text-center uppercase truncate max-w-[90%]">
@@ -143,15 +140,12 @@ function Shell({ children }: { children: React.ReactNode }) {
     return <>{children}</>
   }
 
-  const backgroundImage = getBackground(pathname)
+  const backgroundClass = getBackgroundClass(pathname)
 
   return (
     <>
       <div
-        className="route-background"
-        style={{
-          backgroundImage: `url("/images/backgrounds/${backgroundImage}")`,
-        }}
+        className={`route-background ${backgroundClass}`}
         aria-hidden="true"
       />
       <div className="route-background-veil" aria-hidden="true" />

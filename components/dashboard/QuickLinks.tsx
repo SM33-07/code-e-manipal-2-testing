@@ -49,7 +49,7 @@ const RESOURCES: QuickLinkItem[] = [
 
 export function QuickLinks() {
   return (
-    <div className="bg-card/80 backdrop-blur-xl border border-border/70 rounded-2xl p-6 shadow-sm">
+    <div className="bg-card border border-border/70 rounded-2xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base font-bold text-foreground flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-primary" />

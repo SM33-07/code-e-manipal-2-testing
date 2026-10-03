@@ -26,7 +26,7 @@ export function ThemeToggle() {
   ] as const;
 
   return (
-    <div className="relative flex items-center p-1 gap-1 rounded-full border border-jaipur-gold/30 bg-jaipur-card/80 text-jaipur-primary backdrop-blur-md shadow-sm h-11">
+    <div className="relative flex items-center p-1 gap-1 rounded-full border border-jaipur-gold/30 bg-jaipur-card text-jaipur-primary shadow-sm h-11">
       {options.map((option) => {
         const Icon = option.icon;
         const isActive = theme === option.value;

@@ -88,10 +88,7 @@ export const NavBody = ({ children, className, visible, isSubmissionForm }: NavB
   return (
     <motion.div
       animate={{
-        backdropFilter: visible ? "blur(10px)" : "none",
-        boxShadow: visible
-          ? "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset"
-          : "none",
+        boxShadow: visible ? "0 8px 20px rgba(0, 0, 0, 0.14)" : "none",
         width: visible ? "75%" : "100%",
         y: visible ? 12 : 0,
       }}
@@ -104,8 +101,8 @@ export const NavBody = ({ children, className, visible, isSubmissionForm }: NavB
         minWidth: visible ? "980px" : "100%",
       }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between rounded-full bg-transparent px-6 py-3 lg:flex transition-all duration-300",
-        visible && "bg-[#FCF6EF]/90 dark:bg-[#0F0A05]/90 border border-jaipur-gold/20",
+        "relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between rounded-xl bg-background px-6 py-3 lg:flex transition-all duration-300 border-b border-border",
+        visible && "border border-jaipur-gold/30",
         className,
       )}
     >
@@ -158,10 +155,7 @@ export const MobileNav = ({ children, className, visible, isSubmissionForm }: Mo
   return (
     <motion.div
       animate={{
-        backdropFilter: visible ? "blur(10px)" : "none",
-        boxShadow: visible
-          ? "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset"
-          : "none",
+        boxShadow: visible ? "0 8px 20px rgba(0, 0, 0, 0.14)" : "none",
         width: visible ? "90%" : "100%",
         paddingRight: visible ? "16px" : "12px",
         paddingLeft: visible ? "16px" : "12px",
@@ -174,8 +168,8 @@ export const MobileNav = ({ children, className, visible, isSubmissionForm }: Mo
         damping: 35,
       }}
       className={cn(
-        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-3 lg:hidden transition-all duration-300",
-        visible && "bg-[#FCF6EF]/95 dark:bg-[#0F0A05]/95 border border-jaipur-gold/20",
+        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-background px-0 py-3 lg:hidden transition-all duration-300 border-b border-border",
+        visible && "border border-jaipur-gold/30",
         className,
       )}
     >
@@ -214,7 +208,7 @@ export const MobileNavMenu = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           className={cn(
-            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-2xl bg-[#FCF6EF] px-6 py-8 shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05)] dark:bg-[#1E1208] border border-jaipur-gold/20",
+            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-xl bg-card px-6 py-8 shadow-lg border border-border",
             className,
           )}
         >

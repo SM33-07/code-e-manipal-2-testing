@@ -2,7 +2,7 @@ import React from 'react';
 
 export function EventStatusBarSkeleton() {
   return (
-    <div className="w-full bg-card/60 backdrop-blur-md border border-border/50 rounded-2xl p-5 shadow-sm animate-pulse mb-8">
+    <div className="w-full bg-card border border-border/50 rounded-2xl p-5 shadow-sm animate-pulse mb-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-28 h-8 bg-muted/60 rounded-full" />
@@ -27,7 +27,7 @@ export function EventStatusBarSkeleton() {
 
 export function TeamCardSkeleton() {
   return (
-    <div className="bg-card/70 backdrop-blur-md border border-border/50 rounded-2xl p-6 shadow-sm animate-pulse flex flex-col justify-between h-full min-h-[280px]">
+    <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-sm animate-pulse flex flex-col justify-between h-full min-h-[280px]">
       <div>
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
@@ -56,7 +56,7 @@ export function TeamCardSkeleton() {
 
 export function SubmissionWidgetSkeleton() {
   return (
-    <div className="bg-card/70 backdrop-blur-md border border-border/50 rounded-2xl p-6 shadow-sm animate-pulse flex flex-col justify-between h-full min-h-[280px]">
+    <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-sm animate-pulse flex flex-col justify-between h-full min-h-[280px]">
       <div>
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
@@ -85,7 +85,7 @@ export function SubmissionWidgetSkeleton() {
 
 export function AnnouncementsWidgetSkeleton() {
   return (
-    <div className="bg-card/60 backdrop-blur-md border border-border/50 rounded-2xl p-6 shadow-sm animate-pulse">
+    <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-sm animate-pulse">
       <div className="flex items-center justify-between mb-4">
         <div className="w-36 h-6 bg-muted/70 rounded-md" />
         <div className="w-16 h-5 bg-muted/40 rounded" />
@@ -108,7 +108,7 @@ export function AnnouncementsWidgetSkeleton() {
 
 export function QuickLinksSkeleton() {
   return (
-    <div className="bg-card/60 backdrop-blur-md border border-border/50 rounded-2xl p-6 shadow-sm animate-pulse">
+    <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-sm animate-pulse">
       <div className="w-32 h-6 bg-muted/70 rounded-md mb-4" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {[1, 2, 3, 4].map((i) => (

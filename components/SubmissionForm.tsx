@@ -270,7 +270,6 @@ function Section({ children, visible, delay = 0 }: { children: React.ReactNode; 
         borderRadius: "16px",
         background: isDark ? "rgba(30,18,8,0.82)" : "rgba(255,248,239,0.82)",
         border: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid rgba(173,114,55,0.15)",
-        backdropFilter: "blur(10px)",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(16px)",
         transition: `opacity 0.5s ease ${delay}ms, transform 0.5s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,

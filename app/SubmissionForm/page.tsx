@@ -388,7 +388,6 @@ function UserMenu() {
             minWidth: "160px",
             zIndex: 1000,
             boxShadow: "0 6px 24px rgba(173,114,55,0.12)",
-            backdropFilter: "blur(10px)",
           }}
         >
           <div
@@ -1589,7 +1588,6 @@ export default function Home() {
             zIndex: 7,
             borderTop: isDark ? "1px solid rgba(201,162,39,0.25)" : "1px solid #EBCFB5",
             background: isDark ? "rgba(30,18,8,0.6)" : "rgba(255,248,239,0.6)",
-            backdropFilter: "blur(10px)",
             padding: "24px",
             textAlign: "center",
           }}
