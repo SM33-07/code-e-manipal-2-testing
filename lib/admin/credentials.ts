@@ -4,8 +4,8 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 import { UserRole } from '@/types';
 import { logger } from '@/lib/utils/logger';
 
-// Unambiguous alphanumeric alphabet (excludes 0, O, 1, I, l)
-const EVENT_CHARSET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+// Unambiguous alphanumeric alphabet strictly matching [2-9A-HJKMNP-Z] (excludes 0, 1, I, L, O)
+const EVENT_CHARSET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
 const ADMIN_CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+';
 
 /**
@@ -102,61 +102,78 @@ export async function createBulkCredentials(
   const supabase = createSupabaseAdminClient();
 
   const generatedList: GeneratedCredential[] = [];
-
-  for (let i = 1; i <= count; i++) {
-    const randomSuffix = crypto.randomBytes(3).toString('hex').toUpperCase();
-    const identifier = `${prefix}-${randomSuffix}`;
-    const email = `${identifier.toLowerCase()}@${domain}`;
-    const name = `${params.role === 'judge' ? 'Judge' : 'Team Member'} ${identifier}`;
-    const password = generateEventPassword(6);
-
-    // 1. Create Supabase Auth user (hashes password with bcrypt)
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: {
-        name,
-        role: params.role,
-        identifier,
-      },
-    });
-
-    if (authError || !authData.user) {
-      logger.error('Failed to create auth user in bulk generator', {
-        email,
-        error: authError?.message,
-      });
-      continue;
+  const BATCH_SIZE = 10;
+  const chunkIndices: number[][] = [];
+  for (let i = 1; i <= count; i += BATCH_SIZE) {
+    const chunk: number[] = [];
+    for (let j = i; j < i + BATCH_SIZE && j <= count; j++) {
+      chunk.push(j);
     }
+    chunkIndices.push(chunk);
+  }
 
-    const userId = authData.user.id;
+  for (const chunk of chunkIndices) {
+    const chunkResults = await Promise.all(
+      chunk.map(async (i) => {
+        const randomSuffix = crypto.randomBytes(4).toString('hex').toUpperCase();
+        const identifier = `${prefix}-${String(i).padStart(3, '0')}-${randomSuffix}`;
+        const email = `${identifier.toLowerCase()}@${domain}`;
+        const name = `${params.role === 'judge' ? 'Judge' : 'Team Member'} ${identifier}`;
+        const password = generateEventPassword(6);
 
-    // 2. Sync to Azure auth.users table for schema consistency
-    try {
-      await query(
-        'INSERT INTO auth.users (id, email, raw_user_meta_data) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING',
-        [userId, email, JSON.stringify({ name, role: params.role, identifier })]
-      );
-    } catch {
-      // ignore
-    }
+        // 1. Create Supabase Auth user (hashes password with bcrypt)
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: {
+            name,
+            role: params.role,
+            identifier,
+          },
+        });
 
-    // 3. Upsert public.profiles row
-    await query(
-      `INSERT INTO public.profiles (id, name, email, avatar_url, role, identifier)
-       VALUES ($1, $2, $3, '', $4, $5)
-       ON CONFLICT (id) DO UPDATE SET role = EXCLUDED.role, name = EXCLUDED.name, identifier = EXCLUDED.identifier`,
-      [userId, name, email, params.role, identifier]
+        if (authError || !authData.user) {
+          logger.error('Failed to create auth user in bulk generator', {
+            email,
+            error: authError?.message,
+          });
+          return null;
+        }
+
+        const userId = authData.user.id;
+
+        // 2. Sync to Azure auth.users table for schema consistency
+        try {
+          await query(
+            'INSERT INTO auth.users (id, email, raw_user_meta_data) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING',
+            [userId, email, JSON.stringify({ name, role: params.role, identifier })]
+          );
+        } catch {
+          // ignore
+        }
+
+        // 3. Upsert public.profiles row
+        await query(
+          `INSERT INTO public.profiles (id, name, email, avatar_url, role, identifier)
+           VALUES ($1, $2, $3, '', $4, $5)
+           ON CONFLICT (id) DO UPDATE SET role = EXCLUDED.role, name = EXCLUDED.name, identifier = EXCLUDED.identifier`,
+          [userId, name, email, params.role, identifier]
+        );
+
+        return {
+          id: userId,
+          name,
+          email,
+          role: params.role,
+          password, // returned once to caller for badge printing
+        };
+      })
     );
 
-    generatedList.push({
-      id: userId,
-      name,
-      email,
-      role: params.role,
-      password, // returned once to caller for badge printing
-    });
+    for (const r of chunkResults) {
+      if (r) generatedList.push(r);
+    }
   }
 
   // 4. Record bulk generation in audit_logs (NO passwords logged)
