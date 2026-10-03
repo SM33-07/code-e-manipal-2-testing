@@ -31,13 +31,14 @@ export interface PublicEventConfig {
   end_time: string | null;
   publish_at: string | null;
   countdown_target: string | null;
+  announcements: Array<{
+    id: string;
+    title: string;
+    content: string;
+    priority: string;
+    created_at: string;
+  }>;
   active_round: string;
-  // Legacy compatibility fields (public timer values)
-  hackathon_is_started: string;
-  hackathon_start_time: string | null;
-  hackathon_duration_hours: string;
-  results_published: string;
-  results_publish_time: string | null;
 }
 
 /**
@@ -154,11 +155,16 @@ export async function getEventConfigState(): Promise<EventConfigState> {
 /**
  * Returns the strictly allowlisted public representation of the event configuration.
  *
- * Excludes:
- * - internal database IDs (id)
- * - internal release IDs (active_release_id)
- * - buffer duration
- * - internal notes or infrastructure data
+ * Conforms 100% to IMPLEMENTATION_BASELINE_v4_FINAL.md:
+ * Exactly 8 allowed fields:
+ * - event_phase
+ * - results_release
+ * - start_time
+ * - end_time
+ * - publish_at
+ * - countdown_target
+ * - announcements
+ * - active_round
  */
 export async function getPublicEventConfig(): Promise<PublicEventConfig> {
   const fullConfig = await getEventConfigState();
@@ -173,6 +179,26 @@ export async function getPublicEventConfig(): Promise<PublicEventConfig> {
     countdownTarget = fullConfig.publish_at;
   }
 
+  // Fetch active announcements
+  let announcements: PublicEventConfig['announcements'] = [];
+  try {
+    const { rows } = await query(
+      `SELECT id, title, content, priority, created_at
+       FROM public.announcements
+       WHERE is_active = true
+       ORDER BY created_at DESC`
+    );
+    announcements = rows.map((r: any) => ({
+      id: r.id,
+      title: r.title || '',
+      content: r.content,
+      priority: r.priority || 'NORMAL',
+      created_at: r.created_at ? new Date(r.created_at).toISOString() : '',
+    }));
+  } catch {
+    announcements = [];
+  }
+
   return {
     event_phase: fullConfig.event_phase,
     results_release: fullConfig.results_release,
@@ -180,12 +206,7 @@ export async function getPublicEventConfig(): Promise<PublicEventConfig> {
     end_time: fullConfig.end_time,
     publish_at: fullConfig.publish_at,
     countdown_target: countdownTarget,
+    announcements,
     active_round: '1',
-    // Legacy compatibility fields
-    hackathon_is_started: fullConfig.hackathon_is_started,
-    hackathon_start_time: fullConfig.hackathon_start_time,
-    hackathon_duration_hours: fullConfig.hackathon_duration_hours,
-    results_published: fullConfig.results_published,
-    results_publish_time: fullConfig.results_publish_time,
   };
 }
