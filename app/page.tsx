@@ -18,7 +18,7 @@ export default function HomePage() {
     }
     if (role === "admin") { router.replace("/admin"); return; }
     if (role === "judge") { router.replace("/judging"); return; }
-    if (role === "participant") { router.replace("/team"); return; }
+    if (role === "participant") { router.replace("/dashboard"); return; }
     router.replace("/login");
   }, [isAuthenticated, role, loading, router]);
 
