@@ -149,6 +149,16 @@ export const POST = withAuth(async (req, { user: adminUser }) => {
       return Errors.BAD_REQUEST('Admins cannot remove their own admin role');
     }
 
+    // Update Supabase Auth user metadata
+    try {
+      const supabase = createSupabaseAdminClient();
+      await supabase.auth.admin.updateUserById(user_id, {
+        user_metadata: { role },
+      });
+    } catch (e) {
+      logger.warn('Failed to update Supabase Auth user_metadata via Admin API', { error: String(e) });
+    }
+
     const updated = await setUserRole(user_id, role as UserRole);
 
     logger.info('POST /api/admin/users (role update)', {

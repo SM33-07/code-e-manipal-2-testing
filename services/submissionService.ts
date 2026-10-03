@@ -1,4 +1,5 @@
 import { query } from "@/lib/db";
+import { getEventConfigState } from "@/lib/event/eventConfigHelper";
 
 // ─── LIST ─────────────────────────────
 export async function listSubmissions(
@@ -93,11 +94,7 @@ async function checkSubmissionDeadline(teamId: string) {
     throw new Error('SUBMISSION_FROZEN');
   }
 
-  const configRes = await query('SELECT key, value FROM public.event_config');
-  const config = configRes.rows.reduce((acc: any, row: any) => {
-    acc[row.key] = row.value;
-    return acc;
-  }, {});
+  const config = await getEventConfigState();
 
   if (config.hackathon_is_started === 'true' && config.hackathon_start_time) {
     const startTime = new Date(config.hackathon_start_time).getTime();

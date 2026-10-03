@@ -31,5 +31,6 @@ export const Errors = {
   NOT_FOUND:     (r = 'Resource') => errorResponse(`${r} not found`,   404, 'NOT_FOUND'),
   BAD_REQUEST:   (msg: string)    => errorResponse(msg,                 400, 'BAD_REQUEST'),
   CONFLICT:      (msg: string)    => errorResponse(msg,                 409, 'CONFLICT'),
+  RATE_LIMITED:  (msg = 'Too many requests. Please try again later.') => errorResponse(msg, 429, 'RATE_LIMITED'),
   INTERNAL:      (msg = 'Internal server error') => errorResponse(msg, 500, 'INTERNAL_ERROR'),
 } as const;
