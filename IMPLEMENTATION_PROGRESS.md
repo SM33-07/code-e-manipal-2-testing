@@ -21,4 +21,4 @@ Remaining work:
 - Page-level visual refinement for participant forms, judge workflows, and dense admin operational views.
 - Browser-based responsive and visual route checks.
 
-Commit: pending checkpoint commit
+Commit: `04e39f3` — `feat: recover visual foundation`
