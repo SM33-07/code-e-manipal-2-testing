@@ -8,6 +8,9 @@ export interface Profile {
   email: string | null;
   avatar_url: string | null;
   role: UserRole;
+  identifier?: string | null;
+  is_disabled?: boolean;
+  force_logout_before?: string | null;
   created_at: string;
   updated_at: string;
 }
