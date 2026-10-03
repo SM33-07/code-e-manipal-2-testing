@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Users, Scale, ShieldCheck, Images, UserPlus } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Images } from "lucide-react";
 import clsx from "clsx";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/components/AuthProvider";
@@ -34,11 +34,10 @@ export default function LoginPage() {
   const { resolvedTheme } = useTheme();
   const [isDark, setIsDark] = useState(false);
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
-  const [role, setRole] = useState<"participant" | "judge" | "admin" | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [shake, setShake] = useState(false);
@@ -55,31 +54,19 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!role) { triggerError("Please select a role"); return; }
     setLoading(true);
     setError("");
     try {
-      const data = await login(email, password);
-      const actualRole = data?.user?.user_metadata?.role || "participant";
-      if (actualRole !== role) {
-        triggerError(`Incorrect role. This account is registered as ${actualRole}.`);
-        setLoading(false);
-        return;
-      }
+      const data = await login(identifier, password);
+      const actualRole = data?.role || "participant";
       if (actualRole === "admin") router.push("/admin");
       else if (actualRole === "judge") router.push("/judging");
-      else router.push("/team");
+      else router.push("/dashboard");
     } catch {
       triggerError("Login failed. Please check your credentials.");
     }
     setLoading(false);
   };
-
-  const roles: { value: "participant" | "judge" | "admin"; label: string; Icon: React.ElementType }[] = [
-    { value: "participant", label: "Participant", Icon: Users },
-    { value: "judge",       label: "Judge",       Icon: Scale },
-    { value: "admin",       label: "Admin",       Icon: ShieldCheck },
-  ];
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
@@ -144,15 +131,16 @@ export default function LoginPage() {
 
             {/* Email */}
             <label style={{ fontFamily: "'Inter',sans-serif", fontSize: 12, fontWeight: 500, color: isDark ? "#F5EFE0" : "#5C4944", marginBottom: 6 }}>
-              Email Address
+              Participant, judge, or admin ID
             </label>
             <div className="relative">
               <Mail className="absolute transition-colors duration-300" style={{ left: 14, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: isDark ? "#A08070" : "#9A7B73" }} />
               <input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                type="text"
+                autoComplete="username"
+                placeholder="TEAM-001"
+                value={identifier}
+                onChange={e => setIdentifier(e.target.value.toUpperCase())}
                 required
                 className={clsx("w-full outline-none transition-colors duration-300", isDark ? "placeholder-[#A08070]/60" : "placeholder-[#9A7B73]/60")}
                 style={{
@@ -202,36 +190,6 @@ export default function LoginPage() {
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
-            </div>
-
-            {/* Role buttons */}
-            <div className="flex gap-2.5 mt-5">
-              {roles.map(({ value, label, Icon }) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setRole(value)}
-                  className="flex-1 flex items-center justify-center gap-1.5 transition-all duration-200"
-                  style={{
-                    height: 42,
-                    borderRadius: 10,
-                    fontSize: 13,
-                    fontWeight: 500,
-                    fontFamily: "'Inter',sans-serif",
-                    background: role === value 
-                      ? (isDark ? "linear-gradient(135deg,#D4732A,#C1440E)" : "linear-gradient(135deg,#8B1F44,#6D1632)") 
-                      : (isDark ? "rgba(15,10,5,0.4)" : "rgba(255,251,247,0.85)"),
-                    border: role === value ? "none" : (isDark ? "1px solid rgba(201,162,39,0.2)" : "1px solid #E2D0C1"),
-                    color: role === value ? "#FFFFFF" : (isDark ? "#A08070" : "#6D524A"),
-                    boxShadow: role === value 
-                      ? (isDark ? "0 4px 12px rgba(212,115,42,0.3)" : "0 4px 12px rgba(139,31,68,0.28)") 
-                      : "none",
-                  }}
-                >
-                  <Icon size={14} style={{ color: role === value ? (isDark ? "#F5EFE0" : "#F6D8B4") : (isDark ? "#A08070" : "#B48870") }} />
-                  {label}
-                </button>
-              ))}
             </div>
 
             {/* Error */}
@@ -286,19 +244,6 @@ export default function LoginPage() {
           {/* Wide divider */}
           <div className="mt-6">
             <WideDivider />
-          </div>
-
-          {/* Register link */}
-          <div className="mt-4">
-            <Link
-              href="/register"
-              className="flex items-center justify-center gap-2 hover:opacity-75 transition-opacity"
-            >
-              <UserPlus size={16} style={{ color: isDark ? "#F0C060" : "#7B1E3A" }} />
-              <span style={{ fontSize: 14, fontWeight: 600, color: isDark ? "#F0C060" : "#7B1E3A", fontFamily: "'Inter',sans-serif" }}>
-                Register for the Hackathon
-              </span>
-            </Link>
           </div>
 
           {/* Gallery link */}

@@ -21,9 +21,9 @@ interface QuickLinkItem {
 
 const RESOURCES: QuickLinkItem[] = [
   {
-    title: 'Judging Rubric',
-    desc: '4 Core Pillars: Technical, Innovation, Impact & Pitch',
-    href: '#rubric-modal',
+    title: 'Event Timeline',
+    desc: 'Track phases, milestones, and published deadlines',
+    href: '/timeline',
     icon: Shield,
   },
   {
@@ -34,16 +34,15 @@ const RESOURCES: QuickLinkItem[] = [
   },
   {
     title: 'Rules & Guidelines',
-    desc: 'Official Code-e-Manipal 2.0 hackathon playbook',
-    href: '#rules',
+    desc: 'Portal workflow, submission requirements, and support',
+    href: '/guidelines',
     icon: BookOpen,
   },
   {
-    title: 'Mentor Help Desk',
-    desc: 'Get technical guidance from faculty & industry mentors',
-    href: 'https://discord.gg/manipal',
+    title: 'Problem Statements',
+    desc: 'Review published tracks and challenge briefs',
+    href: '/problem-statements',
     icon: MessageSquare,
-    external: true,
   },
 ];
 

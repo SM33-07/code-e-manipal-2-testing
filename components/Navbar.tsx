@@ -187,6 +187,8 @@ export default function Navbar({ className }: { className?: string }) {
   const navItems = []
   if (role === "admin" || role === "participant") {
     navItems.push({ name: "Dashboard", link: "/dashboard" })
+    navItems.push({ name: "Timeline", link: "/timeline" })
+    navItems.push({ name: "Challenges", link: "/problem-statements" })
     navItems.push({ name: "Team", link: "/team" })
     navItems.push({ name: "Submit", link: "/SubmissionForm" })
   }
