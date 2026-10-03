@@ -16,6 +16,7 @@
  */
 
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { headers } from 'next/headers';
 import { query } from '@/lib/db';
 import type { Profile, UserRole } from '@/types';
 import type { User } from '@supabase/supabase-js';
@@ -45,9 +46,13 @@ export async function validateSession(): Promise<
   | { session: null; error: 'UNAUTHENTICATED' | 'DISABLED' | 'FORCE_LOGOUT' | 'NO_PROFILE' }
 > {
   try {
-    // 1. Validate GoTrue session
+    // 1. Validate GoTrue session (cookie or Authorization: Bearer <token>)
+    const headerList = await headers();
+    const authHeader = headerList.get('authorization');
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7).trim() : undefined;
+
     const supabase = await createSupabaseServerClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const { data: { user }, error } = await supabase.auth.getUser(bearerToken);
 
     if (error || !user) {
       return { session: null, error: 'UNAUTHENTICATED' };

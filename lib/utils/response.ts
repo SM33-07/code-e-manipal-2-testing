@@ -17,10 +17,11 @@ export function successResponse<T>(
 function errorResponse(
   message: string,
   status: number,
-  code?: string
+  code?: string,
+  details?: unknown
 ): NextResponse<ApiError> {
   return NextResponse.json(
-    { error: message, ...(code && { code }) },
+    { error: message, ...(code && { code }), ...(details ? { details } : {}) },
     { status }
   );
 }
@@ -29,7 +30,7 @@ export const Errors = {
   UNAUTHORIZED:  ()           => errorResponse('Unauthorized',          401, 'UNAUTHORIZED'),
   FORBIDDEN:     ()           => errorResponse('Forbidden',             403, 'FORBIDDEN'),
   NOT_FOUND:     (r = 'Resource') => errorResponse(`${r} not found`,   404, 'NOT_FOUND'),
-  BAD_REQUEST:   (msg: string)    => errorResponse(msg,                 400, 'BAD_REQUEST'),
+  BAD_REQUEST:   (msg: string, details?: unknown) => errorResponse(msg, 400, 'BAD_REQUEST', details),
   CONFLICT:      (msg: string)    => errorResponse(msg,                 409, 'CONFLICT'),
   RATE_LIMITED:  (msg = 'Too many requests. Please try again later.') => errorResponse(msg, 429, 'RATE_LIMITED'),
   INTERNAL:      (msg = 'Internal server error') => errorResponse(msg, 500, 'INTERNAL_ERROR'),

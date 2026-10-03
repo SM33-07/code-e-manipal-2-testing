@@ -1,9 +1,11 @@
 import { query } from '@/lib/db';
+import { getEffectiveResultsRelease, ResultsReleaseState } from './results-release';
+import { EventPhase } from './state-machine';
 
 export interface EventConfigState {
   id: number;
-  event_phase: 'NOT_STARTED' | 'HACKING' | 'SUBMISSION' | 'SUBMISSION_CLOSED' | 'JUDGING' | 'RESULTS' | 'ENDED';
-  results_release: 'DRAFT' | 'PUBLISHING' | 'PUBLISHED';
+  event_phase: EventPhase;
+  results_release: ResultsReleaseState;
   publish_at: string | null;
   buffer_minutes: number;
   active_release_id: string | null;
@@ -19,26 +21,56 @@ export interface EventConfigState {
 }
 
 /**
+ * Public Allowlisted Response Contract (ADR-011 / Phase 3)
+ * Strictly strips internal metadata, database IDs, and active_release_id.
+ */
+export interface PublicEventConfig {
+  event_phase: EventPhase;
+  results_release: ResultsReleaseState;
+  start_time: string | null;
+  end_time: string | null;
+  publish_at: string | null;
+  countdown_target: string | null;
+  active_round: string;
+  // Legacy compatibility fields (public timer values)
+  hackathon_is_started: string;
+  hackathon_start_time: string | null;
+  hackathon_duration_hours: string;
+  results_published: string;
+  results_publish_time: string | null;
+}
+
+/**
  * Universal Event Config Loader:
- * Automatically detects whether the database has been migrated to the typed singleton
- * or is still running the legacy key-value event_config table.
- * Returns a unified EventConfigState satisfying both v4 and legacy consumers.
+ * Reads event_config state and computes effective release status without database writes.
  */
 export async function getEventConfigState(): Promise<EventConfigState> {
+  const now = new Date();
+
   try {
     // 1. Attempt structured singleton query (Post-Migration Schema)
     const { rows } = await query('SELECT * FROM public.event_config WHERE id = 1 LIMIT 1');
     if (rows.length > 0 && 'event_phase' in rows[0]) {
       const row = rows[0];
+      const effectiveRelease = getEffectiveResultsRelease(
+        {
+          results_release: row.results_release,
+          publish_at: row.publish_at,
+          active_release_id: row.active_release_id,
+          buffer_minutes: row.buffer_minutes,
+        },
+        now
+      );
+
       const isStarted = row.event_phase !== 'NOT_STARTED';
       let legacyRelease = 'false';
-      if (row.results_release === 'PUBLISHED') legacyRelease = 'true';
-      else if (row.results_release === 'PUBLISHING') legacyRelease = 'publishing';
+      if (effectiveRelease === 'PUBLISHED') legacyRelease = 'true';
+      else if (effectiveRelease === 'PUBLISHING') legacyRelease = 'publishing';
 
       return {
         id: 1,
         event_phase: row.event_phase,
-        results_release: row.results_release,
+        results_release: effectiveRelease,
         publish_at: row.publish_at ? new Date(row.publish_at).toISOString() : null,
         buffer_minutes: row.buffer_minutes || 5,
         active_release_id: row.active_release_id || null,
@@ -66,21 +98,26 @@ export async function getEventConfigState(): Promise<EventConfigState> {
     }, {});
 
     const isStarted = kv.hackathon_is_started === 'true';
-    let phase: EventConfigState['event_phase'] = isStarted ? 'HACKING' : 'NOT_STARTED';
-    let release: EventConfigState['results_release'] = 'DRAFT';
+    let phase: EventPhase = isStarted ? 'HACKING' : 'NOT_STARTED';
+    let rawRelease: ResultsReleaseState = 'DRAFT';
 
     if (kv.results_published === 'true') {
       phase = 'RESULTS';
-      release = 'PUBLISHED';
+      rawRelease = 'PUBLISHED';
     } else if (kv.results_published === 'publishing') {
       phase = 'RESULTS';
-      release = 'PUBLISHING';
+      rawRelease = 'PUBLISHING';
     }
+
+    const effectiveRelease = getEffectiveResultsRelease(
+      { results_release: rawRelease, publish_at: kv.results_publish_time || null },
+      now
+    );
 
     return {
       id: 1,
       event_phase: phase,
-      results_release: release,
+      results_release: effectiveRelease,
       publish_at: kv.results_publish_time || null,
       buffer_minutes: 5,
       active_release_id: null,
@@ -90,7 +127,7 @@ export async function getEventConfigState(): Promise<EventConfigState> {
       hackathon_is_started: kv.hackathon_is_started || 'false',
       hackathon_start_time: kv.hackathon_start_time || null,
       hackathon_duration_hours: kv.hackathon_duration_hours || '48',
-      results_published: kv.results_published || 'false',
+      results_published: effectiveRelease === 'PUBLISHED' ? 'true' : effectiveRelease === 'PUBLISHING' ? 'publishing' : 'false',
       results_publish_time: kv.results_publish_time || null,
     };
   } catch (err: any) {
@@ -112,4 +149,43 @@ export async function getEventConfigState(): Promise<EventConfigState> {
       results_publish_time: null,
     };
   }
+}
+
+/**
+ * Returns the strictly allowlisted public representation of the event configuration.
+ *
+ * Excludes:
+ * - internal database IDs (id)
+ * - internal release IDs (active_release_id)
+ * - buffer duration
+ * - internal notes or infrastructure data
+ */
+export async function getPublicEventConfig(): Promise<PublicEventConfig> {
+  const fullConfig = await getEventConfigState();
+
+  // Determine countdown target based on current phase and release state
+  let countdownTarget: string | null = null;
+  if (fullConfig.event_phase === 'NOT_STARTED' && fullConfig.start_time) {
+    countdownTarget = fullConfig.start_time;
+  } else if (fullConfig.event_phase === 'HACKING' && fullConfig.end_time) {
+    countdownTarget = fullConfig.end_time;
+  } else if (fullConfig.event_phase === 'RESULTS' && fullConfig.results_release === 'PUBLISHING' && fullConfig.publish_at) {
+    countdownTarget = fullConfig.publish_at;
+  }
+
+  return {
+    event_phase: fullConfig.event_phase,
+    results_release: fullConfig.results_release,
+    start_time: fullConfig.start_time,
+    end_time: fullConfig.end_time,
+    publish_at: fullConfig.publish_at,
+    countdown_target: countdownTarget,
+    active_round: '1',
+    // Legacy compatibility fields
+    hackathon_is_started: fullConfig.hackathon_is_started,
+    hackathon_start_time: fullConfig.hackathon_start_time,
+    hackathon_duration_hours: fullConfig.hackathon_duration_hours,
+    results_published: fullConfig.results_published,
+    results_publish_time: fullConfig.results_publish_time,
+  };
 }
