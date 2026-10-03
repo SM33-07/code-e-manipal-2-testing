@@ -63,8 +63,30 @@ export interface JudgeReview {
   score_impact: number | null;
   feedback: string | null;
   is_complete: boolean;
+  version?: number;
+  total_score?: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface ReviewHistoryEntry {
+  id: string;
+  review_id: string;
+  submission_id: string;
+  judge_id: string;
+  round: string;
+  version: number;
+  previous_scores: {
+    score_innovation: number | null;
+    score_technical: number | null;
+    score_presentation: number | null;
+    score_impact: number | null;
+    total?: number | null;
+  };
+  previous_feedback: string | null;
+  changed_by: string;
+  changed_at: string;
+  reason: string;
 }
 
 export interface JudgeAssignment {
