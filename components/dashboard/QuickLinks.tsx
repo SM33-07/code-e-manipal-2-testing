@@ -29,7 +29,7 @@ const RESOURCES: QuickLinkItem[] = [
   {
     title: 'Submission Specs',
     desc: 'Max 3 screenshots (5MB) & 1 Presentation PDF (15MB)',
-    href: '/SubmissionForm',
+    href: '/submit',
     icon: FileText,
   },
   {

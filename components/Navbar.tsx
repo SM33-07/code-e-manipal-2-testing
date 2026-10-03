@@ -190,7 +190,7 @@ export default function Navbar({ className }: { className?: string }) {
     navItems.push({ name: "Timeline", link: "/timeline" })
     navItems.push({ name: "Challenges", link: "/problem-statements" })
     navItems.push({ name: "Team", link: "/team" })
-    navItems.push({ name: "Submit", link: "/SubmissionForm" })
+    navItems.push({ name: "Submit", link: "/submit" })
   }
   if (role === "admin" || role === "judge") {
     navItems.push({ name: "Judging", link: "/judging" })

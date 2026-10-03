@@ -37,7 +37,7 @@ export default function Gallery() {
   const isDark = mounted && resolvedTheme === "dark"
 
   return (
-    <div className="min-h-screen bg-transparent text-foreground relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-background text-foreground relative overflow-hidden transition-colors duration-300">
       {/* Scroll-fade Isometric Project Grid Background */}
       <motion.div
         style={{ opacity: gridOpacity, scale: gridScale, y: gridTranslateY }}
@@ -67,7 +67,7 @@ export default function Gallery() {
         className="absolute left-1/2 -translate-x-1/2 z-0 pointer-events-none top-[6%] h-[380px] w-[640px] max-w-[90vw]"
       >
         <Image
-          src="/images/backgrounds/hawa_mahal_right.jpg"
+          src={isDark ? "/images/heritage/dark/architectural-atmosphere.webp" : "/images/heritage/light/jaipur-atmosphere.webp"}
           alt="Hawa Mahal Jaipur Monument Silhouette"
           fill
           className="object-contain filter sepia hue-rotate-[320deg] saturate-[0.8] contrast-[1.05]"

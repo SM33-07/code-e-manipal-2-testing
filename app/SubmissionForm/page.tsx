@@ -131,6 +131,7 @@ function StatCard({
 
       {/* Label */}
       <div
+        className="submission-workspace"
         style={{
           fontSize: "0.75rem",
           color: "var(--muted-foreground)",
@@ -438,7 +439,7 @@ function UserMenu() {
 //   activeCategory: category filter pill selection
 //   headerVisible/heroVisible: entrance animation triggers
 //   showFilters: toggles category filter pills visibility
-export default function Home() {
+export default function SubmissionPage() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<
@@ -747,10 +748,13 @@ export default function Home() {
             textAlign: "center",
             paddingTop: "128px",
             paddingBottom: "40px",
-            paddingLeft: "80px",
-            paddingRight: "32px",
+          paddingLeft: "24px",
+          paddingRight: "24px",
             maxWidth: "1280px",
-            margin: "0 auto",
+          margin: "24px auto 0",
+          background: "var(--card)",
+          border: "1px solid var(--border)",
+          borderRadius: "20px",
             opacity: heroVisible ? 1 : 0,
             transform: heroVisible
               ? "translateY(0)"
@@ -764,14 +768,14 @@ export default function Home() {
             style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: "170px",
-              padding: "15px 14px",
+              gap: "10px",
+              padding: "10px 14px",
               borderRadius: "999px",
-              background: "#8F102A",
-              border: "1px solid #E9C39B",
+              background: "var(--primary)",
+              border: "1px solid var(--border)",
               marginBottom: "24px",
-              fontSize: "1.48rem",
-              color: "#FFF6EE",
+              fontSize: "clamp(0.8rem, 2vw, 1rem)",
+              color: "var(--primary-foreground)",
               fontWeight: 500,
               letterSpacing: "0.03em",
             }}

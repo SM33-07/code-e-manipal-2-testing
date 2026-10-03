@@ -45,3 +45,27 @@ Remaining work:
 - Browser-based responsive and visual route checks with provisioned test accounts.
 
 Commit: `c0d2228` — `feat: finalize participant account flow`
+
+## Stage D — final surface, navigation, and submission recovery
+
+- Kept the existing curved participant Navbar while removing its fixed desktop minimum width, constraining its content, and moving overflow navigation into an accessible More menu.
+- Set explicit opaque Navbar, popover, input, card, and table surfaces through the shared system; primary brand emphasis is now Jaipur Pink with Brass as the secondary accent and Sapphire reserved for structure/focus.
+- Removed participant navigation from admin and judge workspaces, leaving their existing purpose-built admin sidebar and judge workspace intact.
+- Added canonical `/submit` rendering of the existing secure submission workflow, rather than a redirect, and made its hero a responsive opaque surface with no legacy oversized spacing.
+- Added a route-level solid skeleton fallback and made gallery use only supplied heritage assets for its architectural atmosphere.
+- Kept blur regression checks clean and verified compilation/build after the changes.
+
+Validation performed:
+
+- `npx tsc --noEmit`
+- `npm run build`
+- `git diff --check`
+- global blur/backdrop scan
+
+Browser inspection note: the available browser automation runtime failed to initialize before it could capture the local app; no browser state was changed.
+
+Remaining work:
+
+- Deep, page-specific migration of legacy inline styles remains on older large operational views; the shared opaque system now covers their common components.
+
+Commit: pending final visual recovery checkpoint

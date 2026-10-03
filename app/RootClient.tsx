@@ -9,7 +9,7 @@ import LoaderAnimation from "@/components/LoaderAnimation"
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false })
 
 function getBackgroundClass(pathname: string) {
-  if (pathname.startsWith("/SubmissionForm")) return "route-submit"
+  if (pathname.startsWith("/SubmissionForm") || pathname.startsWith("/submit")) return "route-submit"
   if (pathname.startsWith("/submission-result")) return "route-results"
   if (pathname.startsWith("/project") || pathname.startsWith("/gallery")) return "route-gallery"
   if (pathname.startsWith("/judging")) return "route-judging"
@@ -132,7 +132,8 @@ function Shell({ children }: { children: React.ReactNode }) {
   const isLogin = pathname === "/login"
   const isRegister = pathname === "/register"
   const isGallery = pathname === "/gallery"
-  const isSubmissionForm = pathname.startsWith("/SubmissionForm")
+  const isSubmissionForm = pathname.startsWith("/SubmissionForm") || pathname.startsWith("/submit")
+  const isOperationalRoute = pathname.startsWith("/admin") || pathname.startsWith("/judging") || pathname.startsWith("/judge")
 
   const [hasBanner, setHasBanner] = useState(false)
 
@@ -141,6 +142,15 @@ function Shell({ children }: { children: React.ReactNode }) {
   }
 
   const backgroundClass = getBackgroundClass(pathname)
+
+  if (isOperationalRoute) {
+    return (
+      <>
+        <AnnouncementBanner onActiveChange={setHasBanner} />
+        <div className="min-h-screen bg-background text-foreground" style={{ paddingTop: hasBanner ? "40px" : "0px" }}>{children}</div>
+      </>
+    )
+  }
 
   return (
     <>
@@ -179,7 +189,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 function shouldShowLoader(pathname: string): boolean {
   if (pathname === "/") return true;
   if (pathname.startsWith("/team")) return true;
-  if (pathname.startsWith("/SubmissionForm")) return true;
+  if (pathname.startsWith("/SubmissionForm") || pathname.startsWith("/submit")) return true;
   if (pathname.startsWith("/judging")) return true;
   if (pathname.startsWith("/gallery")) return true;
   if (pathname === "/admin" || pathname === "/admin/") return true;

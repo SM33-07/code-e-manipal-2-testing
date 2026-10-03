@@ -9,6 +9,7 @@ export async function proxy(req: NextRequest) {
   const protectedRoutes = [
     '/submission-form',
     '/SubmissionForm',
+    '/submit',
     '/dashboard',
     '/timeline',
     '/problem-statements',
