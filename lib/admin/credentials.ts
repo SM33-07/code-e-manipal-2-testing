@@ -166,6 +166,7 @@ export async function createBulkCredentials(
           name,
           email,
           role: params.role,
+          identifier,
           password, // returned once to caller for badge printing
         };
       })
