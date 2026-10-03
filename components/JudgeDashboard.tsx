@@ -227,10 +227,10 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
   if (!mounted) return null;
 
   // Heritage theme variable classes
-  const titleClass = isDark ? "text-[#F5EFE0]" : "text-[#8F102A]";
-  const subClass = isDark ? "text-[#A08070]" : "text-[#7A5A4A]";
-  const bgCardClass = isDark ? "bg-[#1E1208] border-[#C9A227]/20" : "bg-[#FCF6EF] border-[#EBCFB5]";
-  const dividerClass = isDark ? "bg-[#C9A227]/10" : "bg-[#EBCFB5]/40";
+  const titleClass = "text-foreground";
+  const subClass = "text-muted-foreground";
+  const bgCardClass = "bg-card border-border shadow-sm";
+  const dividerClass = "bg-border";
 
   if (loading) {
     return (
@@ -305,9 +305,7 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
             onClick={onLogout}
             className={`
               w-full sm:w-auto h-11 px-5 rounded-xl font-bold transition-all
-              ${isDark 
-                ? "border-[#C9A227]/20 text-[#D4732A] hover:bg-[#C9A227]/10" 
-                : "border-[#EBCFB5] text-[#8F102A] hover:bg-[#8F102A]/5"}
+              border-border text-primary hover:bg-accent
             `}
           >
             <LogOut className="w-4 h-4 mr-2" />
@@ -317,7 +315,7 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
 
         {/* Workspace tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-transparent flex flex-row gap-4 h-auto p-0 mb-6 border-b border-[#EBCFB5]/30 dark:border-[#C9A227]/10 justify-start">
+          <TabsList className="bg-card flex flex-row gap-1 h-auto p-1 mb-6 border border-border rounded-xl justify-start">
             <TabsTrigger
               value="submissions"
               disabled={isAllGraded}

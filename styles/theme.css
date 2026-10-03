@@ -5,6 +5,10 @@
   --background: #F7F4EF;
   --foreground: #24211D;
   --card: #FFF9F0;
+  --surface: #FFF9F0;
+  --surface-elevated: #FFFFFF;
+  --surface-muted: #EEE0CC;
+  --surface-inset: #E5D0B2;
   --card-foreground: #24211D;
   --popover: #FFF9F0;
   --popover-foreground: #24211D;
@@ -47,6 +51,10 @@
   --background: #091221;
   --foreground: #E9DDC8;
   --card: #0C1728;
+  --surface: #0C1728;
+  --surface-elevated: #10223A;
+  --surface-muted: #16283D;
+  --surface-inset: #091221;
   --card-foreground: #E9DDC8;
   --popover: #10223A;
   --popover-foreground: #E9DDC8;
@@ -87,6 +95,10 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-inset: var(--surface-inset);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
@@ -201,16 +213,16 @@
  * These mappings keep those screens theme-aware while they migrate to tokens.
  */
 :root:not(.dark) [class~="bg-[#0F0A05]"] { background-color: var(--background); }
-:root:not(.dark) [class~="bg-[#0F0A05]/40"] { background-color: rgb(252 246 239 / 0.4); }
-:root:not(.dark) [class~="bg-[#0F0A05]/50"] { background-color: rgb(252 246 239 / 0.5); }
-:root:not(.dark) [class~="bg-[#0F0A05]/80"] { background-color: rgb(252 246 239 / 0.8); }
+:root:not(.dark) [class~="bg-[#0F0A05]/40"],
+:root:not(.dark) [class~="bg-[#0F0A05]/50"],
+:root:not(.dark) [class~="bg-[#0F0A05]/80"] { background-color: var(--surface); }
 :root:not(.dark) [class~="bg-[#1E1208]"] { background-color: var(--jaipur-card); }
 :root:not(.dark) [class~="bg-[#1A1F4B]"] { background-color: var(--jaipur-secondary); }
 :root:not(.dark) [class~="bg-[#A08070]"] { background-color: var(--muted); }
-:root:not(.dark) [class~="bg-[#A08070]/30"] { background-color: rgb(110 90 85 / 0.3); }
-:root:not(.dark) [class~="bg-[#A08070]/50"] { background-color: rgb(110 90 85 / 0.5); }
-:root:not(.dark) [class~="bg-[#C9A227]/10"] { background-color: rgb(164 106 73 / 0.1); }
-:root:not(.dark) [class~="bg-[#C9A227]/20"] { background-color: rgb(164 106 73 / 0.2); }
+:root:not(.dark) [class~="bg-[#A08070]/30"],
+:root:not(.dark) [class~="bg-[#A08070]/50"],
+:root:not(.dark) [class~="bg-[#C9A227]/10"],
+:root:not(.dark) [class~="bg-[#C9A227]/20"] { background-color: var(--surface-muted); }
 :root:not(.dark) [class~="bg-[#D4732A]"] { background-color: var(--jaipur-primary); }
 
 :root:not(.dark) [class~="text-[#F5EFE0]"],
@@ -247,10 +259,10 @@
 
 .dark [class~="bg-[#FAF5EE]"],
 .dark [class~="bg-[#FFF8F1]"] { background-color: var(--jaipur-card); }
-.dark [class~="bg-[#FFF8F1]/40"] { background-color: rgb(30 18 8 / 0.4); }
+.dark [class~="bg-[#FFF8F1]/40"] { background-color: var(--surface); }
 .dark [class~="bg-[#8F102A]"] { background-color: var(--jaipur-primary); }
-.dark [class~="bg-[#8F102A]/5"] { background-color: rgb(212 115 42 / 0.05); }
-.dark [class~="bg-[#8F102A]/10"] { background-color: rgb(212 115 42 / 0.1); }
+.dark [class~="bg-[#8F102A]/5"],
+.dark [class~="bg-[#8F102A]/10"] { background-color: var(--surface-muted); }
 .dark [class~="text-[#4B1F24]"],
 .dark [class~="text-[#FFF8F1]"] { color: var(--foreground); }
 .dark [class~="text-[#7A5A4A]"],

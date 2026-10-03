@@ -69,3 +69,20 @@ Remaining work:
 - Deep, page-specific migration of legacy inline styles remains on older large operational views; the shared opaque system now covers their common components.
 
 Commit: `4e70023` — `feat: complete final frontend visual recovery`
+
+## Stage E — legacy surface-system consolidation
+
+- Added explicit semantic surface tiers to the theme and changed legacy arbitrary alpha-background compatibility mappings to resolve to opaque theme surfaces.
+- Updated the judge workspace’s primary header, action control, tabs, and summary panel to use current semantic tokens and solid containers.
+- Routed remaining dashboard submission calls to canonical `/submit`.
+- Re-ran static regressions; no backdrop blur/filter remains and the production build passes.
+
+Validation performed:
+
+- `npx tsc --noEmit`
+- `npm run build`
+- `git diff --check`
+
+Browser inspection remains unavailable because the local automation runtime could not initialize; no browser validation is claimed.
+
+Commit: pending legacy surface consolidation checkpoint

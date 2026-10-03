@@ -96,7 +96,7 @@ export function SubmissionWidget({ hasTeam, submission }: SubmissionWidgetProps)
 
         <div className="mt-5 pt-4 border-t border-border/30">
           <Link
-            href="/SubmissionForm"
+            href="/submit"
             className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-95 transition-opacity"
           >
             Start Project Submission
@@ -192,7 +192,7 @@ export function SubmissionWidget({ hasTeam, submission }: SubmissionWidgetProps)
         </span>
 
         <Link
-          href="/SubmissionForm"
+          href="/submit"
           className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-lg bg-primary text-primary-foreground font-semibold text-xs hover:opacity-95 transition-opacity"
         >
           {isFinalized ? 'View Project' : 'Edit Submission'}
