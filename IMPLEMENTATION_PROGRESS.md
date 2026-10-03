@@ -44,4 +44,4 @@ Remaining work:
 - Page-level visual refinement for participant forms, judge workflows, and dense admin operational views.
 - Browser-based responsive and visual route checks with provisioned test accounts.
 
-Commit: pending participant workflow checkpoint
+Commit: `c0d2228` — `feat: finalize participant account flow`
