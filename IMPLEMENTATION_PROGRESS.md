@@ -68,4 +68,4 @@ Remaining work:
 
 - Deep, page-specific migration of legacy inline styles remains on older large operational views; the shared opaque system now covers their common components.
 
-Commit: pending final visual recovery checkpoint
+Commit: `4e70023` — `feat: complete final frontend visual recovery`
