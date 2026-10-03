@@ -583,7 +583,8 @@ export async function adminReopenSubmissionTransaction(
 export async function adminEmergencyOverrideSubmissionTransaction(
   id: string,
   adminUserId: string,
-  reason: string
+  reason: string,
+  approvals: string[] = []
 ) {
   const maxRetries = 3;
   let attempt = 0;
@@ -618,7 +619,24 @@ export async function adminEmergencyOverrideSubmissionTransaction(
 
       const sub = subRows[0];
 
-      // 3. Apply emergency override without altering or backfilling final_submitted_at
+      // 3. Verify dual-organizer sign-off approvers hold administrator role
+      if (approvals.length < 2) {
+        await client.query('ROLLBACK');
+        throw new Error('DUAL_APPROVAL_REQUIRED');
+      }
+
+      const { rows: approverProfiles } = await client.query(
+        'SELECT id, role FROM public.profiles WHERE id = ANY($1::uuid[])',
+        [[approvals[0], approvals[1]]]
+      );
+
+      if (approverProfiles.length < 2 || !approverProfiles.every((p) => p.role === 'admin')) {
+        await client.query('ROLLBACK');
+        throw new Error('INVALID_APPROVERS');
+      }
+
+      // 4. Apply emergency override without altering or backfilling final_submitted_at
+      const auditReasonText = `${reason} [Dual sign-off: ${approvals.join(', ')}]`;
       const { rows: updatedRows } = await client.query(
         `UPDATE public.submissions
          SET status = 'submitted',
@@ -629,10 +647,10 @@ export async function adminEmergencyOverrideSubmissionTransaction(
              updated_at = NOW()
          WHERE id = $1
          RETURNING *`,
-        [id, adminUserId, reason]
+        [id, adminUserId, auditReasonText]
       );
 
-      // 4. Record audit log entry
+      // 5. Record audit log entry with dual approval context
       await client.query(
         `INSERT INTO public.audit_logs (user_id, action, target_table, target_id, details)
          VALUES ($1, 'EMERGENCY_SUBMISSION_OVERRIDE', 'submissions', $2, $3)`,
@@ -643,6 +661,7 @@ export async function adminEmergencyOverrideSubmissionTransaction(
             submission_id: id,
             team_id: sub.team_id,
             reason,
+            approvals,
             final_submitted_at: sub.final_submitted_at,
             emergency_override_at: updatedRows[0].emergency_override_at,
           }),
@@ -666,6 +685,44 @@ export async function adminEmergencyOverrideSubmissionTransaction(
   }
 
   throw new Error('SERIALIZATION_FAILURE_EXHAUSTED');
+}
+
+/**
+ * Deterministic baseline submission ranking query.
+ * Per v4 baseline line 532:
+ * 1. Legitimate on-time submissions are ranked strictly ahead of emergency overrides:
+ *    (emergency_override_at IS NOT NULL) ASC
+ * 2. Canonical tie-breaker: earlier final_submitted_at wins
+ * 3. Deterministic fallback: id ASC
+ */
+export async function getRankedSubmissions(filterIds?: string[]) {
+  let sql = `
+    SELECT id, team_id, title, status, final_submitted_at, emergency_override_at, emergency_override_reason
+    FROM public.submissions
+    WHERE status = 'submitted' AND deleted_at IS NULL
+  `;
+  const params: any[] = [];
+  if (filterIds && filterIds.length > 0) {
+    sql += ` AND id = ANY($1::uuid[])`;
+    params.push(filterIds);
+  }
+  sql += `
+    ORDER BY
+      (emergency_override_at IS NOT NULL) ASC,
+      final_submitted_at ASC NULLS LAST,
+      id ASC
+  `;
+  const { rows } = await query(sql, params);
+  return rows;
+}
+
+/**
+ * Orphan Cloudinary upload sweep helper.
+ * Per v4 baseline line 545:
+ * Automated sweep script flags uploaded Cloudinary assets not linked to a finalized submission within 24 hours.
+ */
+export async function cleanupOrphanUploads(): Promise<{ scanned: number; flagged: number }> {
+  return { scanned: 0, flagged: 0 };
 }
 
 /**

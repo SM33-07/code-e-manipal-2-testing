@@ -42,12 +42,46 @@ export const POST = withAuth(async (req, { user, params }) => {
     );
   }
 
+  // Dual-organizer sign-off verification per v4 baseline
+  const approvals: string[] = Array.isArray(body.approvals) ? body.approvals : [];
+  if (approvals.length === 0) {
+    return Errors.BAD_REQUEST(
+      "Dual-organizer sign-off is required: exactly two organizer approvals must be provided."
+    );
+  }
+  if (approvals.length === 1) {
+    return Errors.BAD_REQUEST(
+      "Dual-organizer sign-off incomplete: two distinct organizer approvals are required."
+    );
+  }
+  if (approvals.length > 2) {
+    return Errors.BAD_REQUEST(
+      "Dual-organizer sign-off permits exactly two organizer approvals."
+    );
+  }
+  if (approvals[0] === approvals[1]) {
+    return Errors.BAD_REQUEST(
+      "Dual-organizer sign-off requires two distinct administrators."
+    );
+  }
+  if (!isValidUUID(approvals[0]) || !isValidUUID(approvals[1])) {
+    return Errors.BAD_REQUEST(
+      "Invalid approver ID format in dual-organizer sign-off."
+    );
+  }
+
   try {
-    const overridden = await adminEmergencyOverrideSubmissionTransaction(id, user.id, reason);
+    const overridden = await adminEmergencyOverrideSubmissionTransaction(
+      id,
+      user.id,
+      reason,
+      approvals
+    );
     logger.warn('POST /api/admin/submissions/[id]/emergency-override executed', {
       submissionId: id,
       adminId: user.id,
       reason,
+      approvals,
       emergency_override_at: overridden.emergency_override_at,
     });
 
@@ -55,6 +89,12 @@ export const POST = withAuth(async (req, { user, params }) => {
   } catch (err: any) {
     if (err.message === 'SUBMISSION_NOT_FOUND') {
       return Errors.NOT_FOUND("Submission");
+    }
+    if (err.message === 'DUAL_APPROVAL_REQUIRED') {
+      return Errors.BAD_REQUEST("Dual-organizer sign-off is required: two distinct organizer approvals must be provided.");
+    }
+    if (err.message === 'INVALID_APPROVERS') {
+      return Errors.BAD_REQUEST("One or more approvers do not hold authorized administrator privileges.");
     }
     if (err.message === 'SERIALIZATION_FAILURE_EXHAUSTED') {
       return Errors.CONFLICT("Concurrent transaction conflict. Please retry.");

@@ -79,7 +79,7 @@ export const POST = withAuth(async (req, { user, profile }) => {
       return Errors.BAD_REQUEST("Invalid JSON body.");
     }
 
-    const { asset_type, content_type } = body;
+    const { asset_type, content_type, transformation, current_count } = body;
 
     if (!asset_type || !ALLOWED_ASSET_TYPES.includes(asset_type)) {
       return Errors.BAD_REQUEST(
@@ -96,7 +96,33 @@ export const POST = withAuth(async (req, { user, profile }) => {
       );
     }
 
-    // 5. Generate signed Cloudinary upload authorization
+    // 5. Team asset quota limits (max 3 screenshots, max 1 presentation PDF)
+    const count = typeof current_count === 'number' ? current_count : 0;
+    if (asset_type === 'screenshot' && count >= 3) {
+      return Errors.BAD_REQUEST(
+        "Screenshot quota exceeded: maximum 3 screenshots allowed per team."
+      );
+    }
+    if (asset_type === 'presentation' && count >= 1) {
+      return Errors.BAD_REQUEST(
+        "Presentation quota exceeded: maximum 1 presentation slide PDF allowed per team."
+      );
+    }
+
+    // 6. Named transformation preset verification (arbitrary transformations rejected)
+    const ALLOWED_PRESETS = ['t_screenshot_thumb', 't_presentation_preview', 'none'] as const;
+    let preset: string | null = null;
+    if (transformation !== undefined && transformation !== null) {
+      const t = typeof transformation === 'string' ? transformation.trim() : '';
+      if (t && !ALLOWED_PRESETS.includes(t as any)) {
+        return Errors.BAD_REQUEST(
+          `Arbitrary client transformations are prohibited. Only approved named transformation presets accepted: ${ALLOWED_PRESETS.join(', ')}.`
+        );
+      }
+      if (t && t !== 'none') preset = t;
+    }
+
+    // 7. Generate signed Cloudinary upload authorization
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'code-e-manipal';
     const apiKey = process.env.CLOUDINARY_API_KEY || 'cem_upload_key';
     const apiSecret = process.env.CLOUDINARY_API_SECRET || 'cem_dev_secret_key_change_in_prod';
@@ -108,13 +134,17 @@ export const POST = withAuth(async (req, { user, profile }) => {
     const resourceType = constraints.resourceType;
 
     // Cloudinary signature formula:
-    // Sort parameters alphabetically: folder, public_id, tags, timestamp
-    const paramsToSign = [
+    // Sort parameters alphabetically
+    const paramsList = [
       `folder=${folder}`,
       `public_id=${publicId}`,
       `tags=${tags}`,
       `timestamp=${timestamp}`,
-    ].sort().join('&');
+    ];
+    if (preset) {
+      paramsList.push(`transformation=${preset}`);
+    }
+    const paramsToSign = paramsList.sort().join('&');
 
     const signature = crypto
       .createHash('sha1')
@@ -140,9 +170,10 @@ export const POST = withAuth(async (req, { user, profile }) => {
       public_id: publicId,
       tags,
       resource_type: resourceType,
+      transformation: preset,
       max_file_size: constraints.maxSizeBytes,
       allowed_mime_types: constraints.allowedMimeTypes,
-      expires_in_seconds: 600,
+      expires_in_seconds: 600, // 10-minute HMAC expiration window
     });
   } catch (err: any) {
     logger.error('POST /api/submissions/upload-url failed', { error: String(err), userId: user.id });
