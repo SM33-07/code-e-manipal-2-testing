@@ -269,3 +269,27 @@ Executed the final visual and navigation correction pass based on live browser i
     - `npm run build` — 60/60 routes compiled with Turbopack.
     - Verified responsive layouts across mobile (390px) and desktop viewports.
     - Verified light and dark theme contrast, brand colors, and solid surfaces.
+
+## Stage J — Final Timeline Rebuild + Global Loader Recovery + Background Asset Strategy
+
+1. **Aceternity-Inspired Timeline Architecture (`components/ui/timeline.tsx` & `app/timeline/page.tsx`):**
+   - Implemented responsive `Timeline` component with continuous vertical rail in Antique Brass (`#B08A45`), active Jaipur Pink milestone nodes (`#B95745` / `#D46868`), and sticky phase headers.
+   - Structured the real 36-hour schedule (15 & 16 October 2026, Manipal University Jaipur) across Online Phase, Day 1 (Hacking starts), and Day 2 (Code freeze & jury evaluation).
+   - High information density: clear time badges, event titles, concise descriptions, venue locations, and dynamic status tags (`COMPLETED`, `ACTIVE NOW`, `UPCOMING`, `HARD DEADLINE`).
+   - Phone-first layout (360px–430px) with single-column left-rail, zero horizontal overflow, and interactive phase filter buttons (`All Phases`, `Online Phase`, `Day 1`, `Day 2`).
+   - Zero neon/purple/green styling; strictly adheres to the official poster color system (Parchment Ivory, Jaipur Pink, Terracotta, Antique Brass in Light; Wine/Plum in Dark).
+
+2. **Global Loader Lifecycle Recovery (`components/LoaderAnimation.tsx` & `app/RootClient.tsx`):**
+   - Resolved hydration and dynamic loading delay by importing `LoaderAnimation` directly.
+   - Snappy, responsive progress ticker (reaches 100% in ~800ms) with Escape key listener and "SKIP INTRO (ESC)" button.
+   - Boot session persistence (`sessionStorage.getItem("cem_portal_booted")`) to ensure the initial intro runs on initial page load/hard refresh without repeatedly interrupting client-side route changes.
+   - Immediate bypass when `prefers-reduced-motion: reduce` is active and hard 1.5s fallback to prevent any potential blocking.
+
+3. **Background Asset & Route Atmosphere Strategy (`styles/index.css` & `app/RootClient.tsx`):**
+   - Added `.route-timeline` with restrained Jaipur atmosphere backdrop (`/images/heritage/light/jaipur-atmosphere.webp` and `/images/heritage/dark/architectural-atmosphere.webp`).
+   - Preserved solid content cards (`#FFFDF9` light, `#1D111E` dark) over atmospheric background veil for high legibility and zero transparent blur artifacts.
+
+4. **Validation & Verification:**
+   - `npx tsc --noEmit` — 0 errors.
+   - `npm run build` — 60/60 routes compiled successfully with Turbopack.
+   - Verified responsive single-column layout on mobile viewports (390px) and clean vertical flow on desktop.

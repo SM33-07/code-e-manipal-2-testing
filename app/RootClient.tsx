@@ -16,8 +16,8 @@ function getBackgroundClass(pathname: string) {
   if (pathname.startsWith("/admin/results")) return "route-results"
   if (pathname.startsWith("/admin")) return "route-admin"
   if (pathname.startsWith("/dashboard")) return "route-dashboard"
-  if (pathname.startsWith("/timeline")) return "route-dashboard"
-  if (pathname.startsWith("/problem-statements") || pathname.startsWith("/guidelines")) return "route-dashboard"
+  if (pathname.startsWith("/timeline")) return "route-timeline"
+  if (pathname.startsWith("/problem-statements") || pathname.startsWith("/guidelines") || pathname.startsWith("/faq")) return "route-dashboard"
   return "route-team"
 }
 
@@ -128,7 +128,7 @@ function AnnouncementBanner({ onActiveChange }: { onActiveChange: (active: boole
   )
 }
 
-const LoaderAnimation = dynamic(() => import("@/components/LoaderAnimation"), { ssr: false })
+import LoaderAnimation from "@/components/LoaderAnimation"
 
 function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -168,18 +168,39 @@ function Shell({ children }: { children: React.ReactNode }) {
 export default function RootClient({ children }: { children: React.ReactNode }) {
   const [showLoader, setShowLoader] = useState(true)
 
-  // Safety fallback so the page will never hang
   useEffect(() => {
+    try {
+      const alreadyBooted = sessionStorage.getItem("cem_portal_booted")
+      if (alreadyBooted) {
+        setShowLoader(false)
+        return
+      }
+    } catch {
+      // sessionStorage unavailable
+    }
+
+    // Deterministic safety fallback
     const safety = setTimeout(() => {
+      try {
+        sessionStorage.setItem("cem_portal_booted", "1")
+      } catch {}
       setShowLoader(false)
-    }, 3500)
+    }, 1500)
+
     return () => clearTimeout(safety)
   }, [])
+
+  const handleLoaderComplete = () => {
+    try {
+      sessionStorage.setItem("cem_portal_booted", "1")
+    } catch {}
+    setShowLoader(false)
+  }
 
   return (
     <AuthProvider>
       {showLoader && (
-        <LoaderAnimation onComplete={() => setShowLoader(false)} />
+        <LoaderAnimation onComplete={handleLoaderComplete} />
       )}
       <Shell>{children}</Shell>
     </AuthProvider>

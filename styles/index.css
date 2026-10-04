@@ -15,6 +15,7 @@
 
 .route-landing { background-image: url("/images/heritage/light/landing.webp"); }
 .route-dashboard { background-image: url("/images/heritage/light/dashboard.webp"); }
+.route-timeline { background-image: url("/images/heritage/light/jaipur-atmosphere.webp"); }
 .route-team { background-image: url("/images/heritage/light/albert-hall.webp"); }
 .route-submit { background-image: url("/images/heritage/light/submit-jantar-mantar.webp"); }
 .route-gallery { background-image: url("/images/heritage/light/gallery.webp"); }
@@ -24,6 +25,7 @@
 
 .dark .route-landing { background-image: url("/images/heritage/dark/architectural-atmosphere.webp"); }
 .dark .route-dashboard { background-image: url("/images/heritage/dark/dashboard.webp"); }
+.dark .route-timeline { background-image: url("/images/heritage/dark/architectural-atmosphere.webp"); }
 .dark .route-team { background-image: url("/images/heritage/dark/team-architectural-detail.webp"); }
 .dark .route-submit { background-image: url("/images/heritage/dark/workflow-teal.webp"); }
 .dark .route-gallery { background-image: url("/images/heritage/dark/architectural-atmosphere.webp"); }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   CalendarDays,
@@ -8,16 +8,12 @@ import {
   MapPin,
   CheckCircle2,
   Radio,
-  Clock3,
-  Flag,
+  Flame,
   ArrowRight,
   Sparkles,
-  Coffee,
-  Code2,
-  Users2,
-  Trophy,
-  Flame,
+  Lock,
 } from "lucide-react";
+import { Timeline, TimelineEntry } from "@/components/ui/timeline";
 
 interface ScheduleItem {
   id: string;
@@ -27,10 +23,10 @@ interface ScheduleItem {
   description: string;
   phase: "online" | "day1" | "day2";
   type: "ceremony" | "hack" | "checkpoint" | "hospitality" | "eval" | "awards";
-  status: "completed" | "current" | "upcoming";
+  status: "completed" | "current" | "upcoming" | "locked";
 }
 
-const SCHEDULE: ScheduleItem[] = [
+const RAW_SCHEDULE: ScheduleItem[] = [
   // Online Phase
   {
     id: "onl-1",
@@ -49,7 +45,7 @@ const SCHEDULE: ScheduleItem[] = [
     title: "Pre-Hack Briefing & System Verification",
     location: "Online / Discord",
     description:
-      "Final briefing on hackathon rules, submission requirements, and technical guidelines for participating teams.",
+      "Briefing on hackathon rules, submission guidelines, evaluation rubrics, and workspace readiness.",
     phase: "online",
     type: "checkpoint",
     status: "completed",
@@ -62,7 +58,7 @@ const SCHEDULE: ScheduleItem[] = [
     title: "Participant Reporting & Physical Verification",
     location: "Ground Floor Lobby, Academic Block, MUJ",
     description:
-      "Physical check-in, ID badge collection, Wi-Fi onboarding, and table workstation allocation for verified teams.",
+      "Physical check-in, ID badge distribution, Wi-Fi configuration, and table allocation for verified teams.",
     phase: "day1",
     type: "hospitality",
     status: "completed",
@@ -73,7 +69,7 @@ const SCHEDULE: ScheduleItem[] = [
     title: "Grand Opening Ceremony & Welcome Address",
     location: "Main Auditorium, MUJ",
     description:
-      "Inaugural addresses by university dignitaries, keynote speaker sessions, and introduction to the jury and mentors.",
+      "Keynote addresses by university leadership and industry partners, followed by introduction of the jury and mentors.",
     phase: "day1",
     type: "ceremony",
     status: "completed",
@@ -81,10 +77,10 @@ const SCHEDULE: ScheduleItem[] = [
   {
     id: "d1-3",
     time: "10:30 AM",
-    title: "Problem Statements Revealed & 36-Hour Hack Begins",
+    title: "Problem Statements Released & 36-Hour Hack Begins",
     location: "Central Hack Area & Online Portal",
     description:
-      "Official challenge briefs unlocked. The 36-hour hackathon timer commences. Teams begin architecture and coding.",
+      "Official challenge briefs unlocked. The 36-hour hackathon timer commences. Teams begin sprint development.",
     phase: "day1",
     type: "hack",
     status: "current",
@@ -95,7 +91,7 @@ const SCHEDULE: ScheduleItem[] = [
     title: "Lunch & Networking Break",
     location: "Food Court / Mess Area",
     description:
-      "Buffet lunch provided for all participants, mentors, and organizing staff.",
+      "Buffet lunch provided for all registered participants, mentors, and organizing staff.",
     phase: "day1",
     type: "hospitality",
     status: "upcoming",
@@ -106,7 +102,7 @@ const SCHEDULE: ScheduleItem[] = [
     title: "Mentorship Round 1 — Feasibility & Architecture Check",
     location: "Team Workstations",
     description:
-      "Assigned domain mentors visit team stations to review initial architecture, stack feasibility, and challenge alignment.",
+      "Assigned domain mentors visit team stations to review initial system architecture, tech stack feasibility, and challenge alignment.",
     phase: "day1",
     type: "checkpoint",
     status: "upcoming",
@@ -117,7 +113,7 @@ const SCHEDULE: ScheduleItem[] = [
     title: "Dinner & Refreshments",
     location: "Food Court / Mess Area",
     description:
-      "Dinner service and caffeine stations open throughout the night.",
+      "Dinner service. Midnight caffeine stations open throughout the night.",
     phase: "day1",
     type: "hospitality",
     status: "upcoming",
@@ -128,7 +124,7 @@ const SCHEDULE: ScheduleItem[] = [
     title: "Midnight Progress Check-in & Snack Surge",
     location: "Central Hack Area",
     description:
-      "Quick status ping from organizing committee. Snacks, red bull, and coffee distributed to all active teams.",
+      "Quick status ping by the organizing committee. Energy snacks, Red Bull, and tea/coffee distributed.",
     phase: "day1",
     type: "hospitality",
     status: "upcoming",
@@ -141,7 +137,7 @@ const SCHEDULE: ScheduleItem[] = [
     title: "Late Night Coding & Quiet Sprint",
     location: "Central Hack Area",
     description:
-      "Dedicated quiet sprint hours. Chill out rooms and resting bays available.",
+      "Dedicated quiet sprint hours. Chill-out bays and resting zones open.",
     phase: "day2",
     type: "hack",
     status: "upcoming",
@@ -151,7 +147,7 @@ const SCHEDULE: ScheduleItem[] = [
     time: "07:30 AM – 09:00 AM",
     title: "Breakfast & Morning Energizer",
     location: "Food Court / Mess Area",
-    description: "Hearty breakfast provided before the final stretch.",
+    description: "Breakfast service for all active hackers.",
     phase: "day2",
     type: "hospitality",
     status: "upcoming",
@@ -162,7 +158,7 @@ const SCHEDULE: ScheduleItem[] = [
     title: "Mentorship Round 2 — Prototype Polish & Demo Preparation",
     location: "Team Workstations",
     description:
-      "Mentors conduct dry runs of team pitches, live demos, and review final UI/UX polish.",
+      "Mentors conduct dry runs of team pitches, live demos, and UI/UX polish reviews before final code freeze.",
     phase: "day2",
     type: "checkpoint",
     status: "upcoming",
@@ -173,10 +169,10 @@ const SCHEDULE: ScheduleItem[] = [
     title: "Hard Code Freeze & Submission Window Closes",
     location: "Code-e-Manipal Portal",
     description:
-      "Absolute deadline. All GitHub commits, demo links, and project descriptions must be finalized in the portal.",
+      "Absolute deadline. All GitHub commits, live demo URLs, and project summaries must be finalized in the portal.",
     phase: "day2",
     type: "checkpoint",
-    status: "upcoming",
+    status: "locked",
   },
   {
     id: "d2-5",
@@ -184,7 +180,7 @@ const SCHEDULE: ScheduleItem[] = [
     title: "Final Jury Evaluation & Live Demonstrations",
     location: "Evaluation Labs & Auditoriums",
     description:
-      "Judges grade teams on the 4 weighted criteria (Innovation, Technical Execution, Demo, Impact) via the judge workspace.",
+      "Judges grade teams on the 4 weighted criteria (Innovation, Technical Execution, Demo, Impact) via the dedicated judge console.",
     phase: "day2",
     type: "eval",
     status: "upcoming",
@@ -195,7 +191,7 @@ const SCHEDULE: ScheduleItem[] = [
     title: "Valedictory Ceremony & Award Presentation",
     location: "Main Auditorium, MUJ",
     description:
-      "Announcement of track winners, grand champions, special category prizes, and distribution of certificates.",
+      "Announcement of track winners, overall champions, prize distribution, and concluding remarks.",
     phase: "day2",
     type: "awards",
     status: "upcoming",
@@ -210,12 +206,107 @@ const PHASES = [
 ] as const;
 
 export default function TimelinePage() {
-  const [activePhase, setActivePhase] = useState<string>("all");
+  const [activeFilter, setActiveFilter] = useState<string>("all");
 
-  const filteredSchedule = SCHEDULE.filter((item) => {
-    if (activePhase === "all") return true;
-    return item.phase === activePhase;
-  });
+  const renderEventCards = (items: ScheduleItem[]) => {
+    return (
+      <div className="space-y-4">
+        {items.map((item) => {
+          const isCompleted = item.status === "completed";
+          const isCurrent = item.status === "current";
+          const isLocked = item.status === "locked";
+
+          return (
+            <div
+              key={item.id}
+              className={`rounded-2xl border bg-card p-4 sm:p-5 shadow-sm transition-all ${
+                isCurrent
+                  ? "border-primary/60 ring-2 ring-primary/20 bg-card"
+                  : isCompleted
+                  ? "border-border/80 opacity-90"
+                  : "border-border hover:border-secondary/40"
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-mono text-xs font-bold text-secondary bg-secondary/15 px-2.5 py-1 rounded-md border border-secondary/25">
+                    {item.time}
+                  </span>
+
+                  {isCurrent && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/25">
+                      <Flame size={12} />
+                      <span>ACTIVE NOW</span>
+                    </span>
+                  )}
+
+                  {isCompleted && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                      <CheckCircle2 size={11} />
+                      <span>Completed</span>
+                    </span>
+                  )}
+
+                  {isLocked && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                      <Lock size={11} />
+                      <span>Hard Deadline</span>
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <MapPin size={13} className="text-secondary shrink-0" />
+                  <span className="truncate">{item.location}</span>
+                </div>
+              </div>
+
+              <h4 className="text-base sm:text-lg font-bold text-foreground">
+                {item.title}
+              </h4>
+              <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                {item.description}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // Group into Aceternity Timeline structure
+  const onlineItems = RAW_SCHEDULE.filter((i) => i.phase === "online");
+  const day1Items = RAW_SCHEDULE.filter((i) => i.phase === "day1");
+  const day2Items = RAW_SCHEDULE.filter((i) => i.phase === "day2");
+
+  const timelineData: TimelineEntry[] = [];
+
+  if (activeFilter === "all" || activeFilter === "online") {
+    timelineData.push({
+      title: "Online Phase",
+      subtitle: "Pre-Event Onboarding",
+      badge: "Stage 01",
+      content: renderEventCards(onlineItems),
+    });
+  }
+
+  if (activeFilter === "all" || activeFilter === "day1") {
+    timelineData.push({
+      title: "15 October — Day 1",
+      subtitle: "Reporting & Hacking Launch",
+      badge: "Stage 02",
+      content: renderEventCards(day1Items),
+    });
+  }
+
+  if (activeFilter === "all" || activeFilter === "day2") {
+    timelineData.push({
+      title: "16 October — Day 2",
+      subtitle: "Code Freeze & Jury Demos",
+      badge: "Stage 03",
+      content: renderEventCards(day2Items),
+    });
+  }
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 py-4 sm:py-8 px-4 sm:px-6">
@@ -231,37 +322,43 @@ export default function TimelinePage() {
             Hackathon Timeline
           </h1>
           <p className="mt-2.5 max-w-2xl text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Follow the complete chronological lifecycle of Code-e-Manipal 2.0. From reporting and
-            challenge release to mentorship rounds, code freeze, and jury evaluation.
+            Follow the complete chronological schedule of Code-e-Manipal 2.0. From registration and
+            challenge reveal to mentorship rounds, code freeze, and jury evaluation.
           </p>
 
-          {/* Quick Stats */}
+          {/* Quick Metrics */}
           <div className="mt-6 flex flex-wrap items-center gap-4 text-xs font-semibold text-muted-foreground pt-4 border-t border-border">
             <div className="flex items-center gap-1.5">
               <Clock size={15} className="text-secondary" />
-              <span>Duration: <strong className="text-foreground">36 Hours Continuous</strong></span>
+              <span>
+                Duration: <strong className="text-foreground">36 Hours Continuous</strong>
+              </span>
             </div>
             <div className="flex items-center gap-1.5">
               <CalendarDays size={15} className="text-secondary" />
-              <span>Dates: <strong className="text-foreground">15 & 16 October 2026</strong></span>
+              <span>
+                Dates: <strong className="text-foreground">15 & 16 October 2026</strong>
+              </span>
             </div>
             <div className="flex items-center gap-1.5">
               <MapPin size={15} className="text-secondary" />
-              <span>Venue: <strong className="text-foreground">Manipal University Jaipur</strong></span>
+              <span>
+                Venue: <strong className="text-foreground">Manipal University Jaipur</strong>
+              </span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Phase Filter Tabs */}
+      {/* Phase Filter Controls */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         {PHASES.map(({ id, label, badge }) => {
-          const isActive = activePhase === id;
+          const isActive = activeFilter === id;
           return (
             <button
               key={id}
               type="button"
-              onClick={() => setActivePhase(id)}
+              onClick={() => setActiveFilter(id)}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 isActive
                   ? "bg-primary text-primary-foreground shadow-sm"
@@ -283,81 +380,13 @@ export default function TimelinePage() {
         })}
       </div>
 
-      {/* Process Timeline Rail (Responsive Single-Column Left-Rail) */}
-      <div className="relative pl-6 sm:pl-8 space-y-6 before:content-[''] before:absolute before:left-2.5 sm:before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-border">
-        {filteredSchedule.map((item, index) => {
-          const isCompleted = item.status === "completed";
-          const isCurrent = item.status === "current";
+      {/* Aceternity-Inspired Continuous Timeline Component */}
+      <Timeline data={timelineData} />
 
-          return (
-            <div key={item.id} className="relative group">
-              {/* Rail Node Indicator */}
-              <div
-                className={`absolute -left-6 sm:-left-8 top-4 flex size-5 sm:size-7 -translate-x-1/2 items-center justify-center rounded-full border-2 transition-all ${
-                  isCurrent
-                    ? "border-primary bg-primary text-primary-foreground ring-4 ring-primary/20 animate-pulse"
-                    : isCompleted
-                    ? "border-emerald-600 bg-emerald-600 text-white"
-                    : "border-border bg-card text-muted-foreground"
-                }`}
-              >
-                {isCompleted ? (
-                  <CheckCircle2 size={12} className="sm:size-3.5" />
-                ) : isCurrent ? (
-                  <Radio size={12} className="sm:size-3.5 animate-spin" />
-                ) : (
-                  <div className="size-1.5 sm:size-2 rounded-full bg-muted-foreground" />
-                )}
-              </div>
-
-              {/* Event Content Card */}
-              <div
-                className={`rounded-2xl border bg-card p-4 sm:p-6 shadow-sm transition-all hover:border-primary/40 ${
-                  isCurrent
-                    ? "border-primary/60 ring-1 ring-primary/20 bg-card"
-                    : "border-border"
-                }`}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs font-bold text-secondary bg-secondary/15 px-2.5 py-1 rounded-md border border-secondary/25">
-                      {item.time}
-                    </span>
-                    {isCurrent && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/25">
-                        <Flame size={12} />
-                        <span>ACTIVE NOW</span>
-                      </span>
-                    )}
-                    {isCompleted && (
-                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                        Completed
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <MapPin size={13} className="text-secondary shrink-0" />
-                    <span className="truncate">{item.location}</span>
-                  </div>
-                </div>
-
-                <h2 className="text-base sm:text-lg font-bold text-foreground">
-                  {item.title}
-                </h2>
-                <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Bottom Nav Helper */}
+      {/* Bottom CTA Card */}
       <div className="rounded-2xl border border-border bg-card p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
         <div>
-          <h3 className="text-sm font-bold text-foreground">Ready for the challenge drop?</h3>
+          <h3 className="text-sm font-bold text-foreground">Next Hackathon Action</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
             Review challenge tracks or prepare your team workspace while the countdown ticks.
           </p>
