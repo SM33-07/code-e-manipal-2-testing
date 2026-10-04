@@ -354,11 +354,11 @@ export default function SubmissionPage() {
 
         {/* ── Hero Container ── */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-4 pb-8 text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold tracking-wider uppercase mb-5">
-            <Sparkles className="w-3.5 h-3.5 text-secondary" />
-            Hackathon Submission Workspace
-            <Sparkles className="w-3.5 h-3.5 text-secondary" />
+          {/* Approved Capsule Banner */}
+          <div className="inline-flex items-center gap-2.5 px-6 py-2 rounded-full bg-primary/15 border border-primary/30 text-primary dark:bg-[#661622] dark:text-[#FFF8E7] dark:border-[#D4AB65]/40 text-xs sm:text-sm font-bold tracking-wider uppercase mb-5 shadow-sm">
+            <Sparkles className="w-4 h-4 text-secondary shrink-0" />
+            Hackathon Submission Portal
+            <Sparkles className="w-4 h-4 text-secondary shrink-0" />
           </div>
 
           {/* Heading */}
@@ -367,24 +367,24 @@ export default function SubmissionPage() {
             <span className="block text-primary">
               <TypewriterText
                 texts={[
-                  "Submit Your Vision",
                   "Share Your Innovation",
-                  "Launch Your Idea",
-                  "Show Your Talent",
+                  "Submit Your Vision",
+                  "Launch Your Prototype",
+                  "Showcase Your Architecture",
                 ]}
               />
             </span>
           </h1>
 
           <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto mb-8 leading-relaxed">
-            Submit your solution, technical architecture, and demonstration links to complete your participation in Code-e-Manipal 2.0.
+            Join hundreds of developers building the next generation of technology. Submit your project, get discovered, and compete for glory in Code-e-Manipal 2.0.
           </p>
 
           {/* Stats */}
           <div className="flex flex-wrap gap-4 justify-center mb-8">
             <StatCard
               value={submissions.length}
-              label="Submissions"
+              label="Total Submissions"
               subtitle="registered projects"
               badge="Live"
             />
@@ -395,8 +395,8 @@ export default function SubmissionPage() {
               badge="Open"
             />
             <StatCard
-              value={timeRemainingHours}
-              label="Remaining"
+              value={timeRemainingHours || 36}
+              label="Time Remaining"
               suffix="h"
               subtitle={countdownSubtitle}
               badge={countdownBadge}
@@ -418,15 +418,17 @@ export default function SubmissionPage() {
               count={submissions.length}
             >
               <Trophy className="w-4 h-4" />
-              Review Submissions
+              Review Your Submission
             </TabButton>
-            <TabButton
-              active={activeTab === "leaderboard"}
-              onClick={() => setActiveTab("leaderboard")}
-            >
-              <Trophy className="w-4 h-4" />
-              Leaderboard
-            </TabButton>
+            {resultsMeta.published && (
+              <TabButton
+                active={activeTab === "leaderboard"}
+                onClick={() => setActiveTab("leaderboard")}
+              >
+                <Trophy className="w-4 h-4 text-secondary" />
+                Leaderboard
+              </TabButton>
+            )}
           </div>
         </section>
 

@@ -1,14 +1,44 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/components/AuthProvider';
-import { EventStatusBar } from '@/components/dashboard/EventStatusBar';
-import { TeamCard } from '@/components/dashboard/TeamCard';
-import { SubmissionWidget } from '@/components/dashboard/SubmissionWidget';
-import { AnnouncementsWidget } from '@/components/dashboard/AnnouncementsWidget';
-import { QuickLinks } from '@/components/dashboard/QuickLinks';
-import { DashboardSkeleton } from '@/components/dashboard/SkeletonLoaders';
-import { Sparkles, RefreshCw, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
+import { useAuth } from "@/components/AuthProvider";
+import {
+  Sparkles,
+  RefreshCw,
+  AlertCircle,
+  Shield,
+  Copy,
+  Check,
+  Clock,
+  ArrowRight,
+  ExternalLink,
+  Users,
+  Lock,
+  Unlock,
+  Radio,
+  FileCheck,
+  Github,
+  Globe,
+  Video,
+  Calendar,
+  CheckCircle2,
+  Flame,
+  HelpCircle,
+  FileText,
+  BookOpen,
+  MessageSquare,
+  Images,
+} from "lucide-react";
+import { toast } from "sonner";
+
+interface Member {
+  userId: string;
+  name: string;
+  email: string;
+  role: string;
+  avatarUrl?: string;
+}
 
 interface DashboardSummaryData {
   event: {
@@ -25,13 +55,7 @@ interface DashboardSummaryData {
     inviteCode: string;
     track: string;
     leaderName?: string | null;
-    members: Array<{
-      userId: string;
-      role: string;
-      name: string;
-      email: string;
-      avatarUrl?: string;
-    }>;
+    members: Member[];
   } | null;
   submission: {
     id: string;
@@ -62,17 +86,46 @@ interface DashboardSummaryData {
   };
 }
 
+const UPCOMING_MILESTONES = [
+  {
+    time: "Day 1, 10:30 AM",
+    title: "Problem Statements Released & 36h Hack Begins",
+    status: "active",
+  },
+  {
+    time: "Day 1, 04:30 PM",
+    title: "Mentorship Round 1: Architecture Check",
+    status: "upcoming",
+  },
+  {
+    time: "Day 2, 09:30 AM",
+    title: "Mentorship Round 2: Pitch & Prototype Polish",
+    status: "upcoming",
+  },
+  {
+    time: "Day 2, 12:30 PM",
+    title: "Hard Code Freeze & Submission Window Closes",
+    status: "deadline",
+  },
+  {
+    time: "Day 2, 05:00 PM",
+    title: "Valedictory Ceremony & Award Presentation",
+    status: "upcoming",
+  },
+];
+
 export function ParticipantDashboard() {
   const { user } = useAuth();
   const [data, setData] = useState<DashboardSummaryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
 
   const fetchSummary = useCallback(async (isManualRefresh = false) => {
     if (isManualRefresh) setRefreshing(true);
     try {
-      const res = await fetch('/api/dashboard/summary');
+      const res = await fetch("/api/dashboard/summary");
       if (!res.ok) {
         throw new Error(`Failed to load dashboard summary (${res.status})`);
       }
@@ -81,11 +134,11 @@ export function ParticipantDashboard() {
         setData(json.data);
         setError(null);
       } else {
-        throw new Error(json.error?.message || 'Empty response received');
+        throw new Error(json.error?.message || "Empty response received");
       }
     } catch (err: any) {
-      console.error('Error fetching dashboard summary:', err);
-      setError(err.message || 'Unable to connect to dashboard service.');
+      console.error("Error fetching dashboard summary:", err);
+      setError(err.message || "Unable to connect to dashboard service.");
     } finally {
       setLoading(false);
       if (isManualRefresh) setRefreshing(false);
@@ -96,25 +149,30 @@ export function ParticipantDashboard() {
     fetchSummary();
     const interval = setInterval(() => fetchSummary(false), 60000);
     const onFocus = () => fetchSummary(false);
-    window.addEventListener('focus', onFocus);
+    window.addEventListener("focus", onFocus);
 
     return () => {
       clearInterval(interval);
-      window.removeEventListener('focus', onFocus);
+      window.removeEventListener("focus", onFocus);
     };
   }, [fetchSummary]);
 
+  const handleCopyInviteCode = () => {
+    if (!data?.team?.inviteCode) return;
+    navigator.clipboard.writeText(data.team.inviteCode);
+    setCopiedCode(true);
+    toast.success("Team invite code copied to clipboard!");
+    setTimeout(() => setCopiedCode(false), 2500);
+  };
+
   if (loading && !data) {
     return (
-      <div className="space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-pulse">
-          <div>
-            <div className="w-48 h-8 bg-muted/60 rounded-lg mb-2" />
-            <div className="w-64 h-4 bg-muted/40 rounded" />
-          </div>
-          <div className="w-28 h-9 bg-muted/50 rounded-xl" />
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 text-center animate-pulse space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-primary/10 mx-auto flex items-center justify-center text-primary">
+          <Users size={24} />
         </div>
-        <DashboardSkeleton />
+        <h2 className="text-xl font-bold text-foreground">Loading Your Workspace...</h2>
+        <p className="text-xs text-muted-foreground">Retrieving team roster, submission status, and event schedule.</p>
       </div>
     );
   }
@@ -123,16 +181,12 @@ export function ParticipantDashboard() {
     return (
       <div className="p-8 rounded-2xl bg-destructive/10 border border-destructive/30 text-center max-w-lg mx-auto my-12">
         <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-3" />
-        <h3 className="text-lg font-bold text-foreground mb-2">
-          Unable to Load Dashboard
-        </h3>
-        <p className="text-sm text-muted-foreground mb-5">
-          {error}
-        </p>
+        <h3 className="text-lg font-bold text-foreground mb-2">Unable to Load Workspace</h3>
+        <p className="text-sm text-muted-foreground mb-5">{error}</p>
         <button
           type="button"
           onClick={() => fetchSummary(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-95 transition-opacity"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-95 transition-opacity cursor-pointer"
         >
           <RefreshCw className="w-4 h-4" />
           Retry Connection
@@ -141,73 +195,460 @@ export function ParticipantDashboard() {
     );
   }
 
-  const displayName = data?.profile?.name || user?.user_metadata?.name || 'Hacker';
-  const displayIdentifier = data?.profile?.identifier || user?.user_metadata?.identifier || 'PARTICIPANT';
+  const team = data?.team;
+  const submission = data?.submission;
+  const event = data?.event;
+  const announcement = data?.announcement;
+  const profile = data?.profile;
+
+  const displayName = profile?.name || user?.user_metadata?.name || "Hacker";
+  const displayIdentifier = profile?.identifier || user?.user_metadata?.identifier || "PARTICIPANT";
+
+  const isFinalized = submission?.status === "submitted" || submission?.isLocked;
+  const isDraft = submission?.status === "draft" && !submission?.isLocked;
+  const hasSubmission = !!submission?.id;
+
+  const membersList = team?.members && team.members.length > 0 ? team.members : [
+    {
+      userId: profile?.id || "1",
+      name: displayName,
+      email: profile?.email || user?.email || "",
+      role: "leader",
+    },
+  ];
 
   return (
-    <div className="space-y-8">
-      {/* Welcome & Top Controls Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
-              Live Participant Workspace
-            </span>
-            <span className="text-xs text-muted-foreground">&bull;</span>
-            <span className="text-xs font-mono text-muted-foreground">
-              {displayIdentifier}
-            </span>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8 pb-16">
+      {/* ── 1. Team Identity & Workspace Header ── */}
+      <div className="rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-sm relative overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="px-3 py-1 rounded-full bg-primary/10 border border-primary/25 text-primary text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <Shield size={13} />
+                Team Leader Workspace
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-secondary/15 border border-secondary/30 text-secondary text-xs font-mono font-bold">
+                {team?.id ? `ID: ${team.id.slice(0, 8)}` : displayIdentifier}
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-success/15 text-success border border-success/30 text-xs font-semibold flex items-center gap-1">
+                <Unlock size={12} /> Active Account
+              </span>
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight">
+              {team?.name || `${displayName}'s Squad`}
+            </h1>
+
+            <div className="text-xs sm:text-sm text-muted-foreground flex flex-wrap items-center gap-2">
+              <span>Domain Track: <strong className="text-foreground">{team?.track || "AI & Intelligent Systems"}</strong></span>
+              <span>&bull;</span>
+              <span>Leader: <strong className="text-foreground">{team?.leaderName || displayName}</strong></span>
+              <span>&bull;</span>
+              <span>Roster: <strong className="text-foreground">{membersList.length}/4 Members</strong></span>
+            </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-            Welcome back, {displayName}
-          </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-            Monitor event deadlines, coordinate your team, and track your project submission in real time.
-          </p>
+
+          {/* Quick Actions & Invite Code Box */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            {team?.inviteCode && (
+              <div className="px-4 py-2.5 rounded-2xl bg-accent/50 border border-border flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Team Invite Code
+                  </div>
+                  <div className="font-mono text-sm font-bold text-foreground">
+                    {team.inviteCode}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyInviteCode}
+                  className="p-2 rounded-xl bg-card border border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all cursor-pointer shadow-xs"
+                  title="Copy Invite Code"
+                >
+                  {copiedCode ? <Check size={16} className="text-success" /> : <Copy size={16} />}
+                </button>
+              </div>
+            )}
+
+            <Link
+              href="/submit"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-xs sm:text-sm shadow-md hover:bg-primary/90 transition-all cursor-pointer"
+            >
+              <span>{isFinalized ? "View Submission" : hasSubmission ? "Continue Submission" : "Start Submission"}</span>
+              <ArrowRight size={15} />
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => fetchSummary(true)}
+              disabled={refreshing}
+              className="p-3 rounded-2xl border border-border bg-card hover:bg-accent text-foreground transition-colors cursor-pointer shrink-0"
+              title="Sync Workspace"
+            >
+              <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <button
-            type="button"
-            onClick={() => fetchSummary(true)}
-            disabled={refreshing}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-accent hover:bg-muted border border-border text-foreground text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
-            title="Refresh dashboard state"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-            {refreshing ? 'Syncing...' : 'Sync State'}
-          </button>
+        {/* Live Announcement Banner if exists */}
+        {announcement && (
+          <div className="mt-6 pt-5 border-t border-border flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse shrink-0" />
+            <span className="font-semibold text-foreground uppercase tracking-wider text-[11px]">Notice:</span>
+            <span className="truncate">{announcement.content}</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── 2. Primary Status Row: Event Phase & Submission Status ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* Phase Card */}
+        <div className="p-5 rounded-2xl border border-border bg-card shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between text-muted-foreground mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider">Event Phase</span>
+            <Clock size={16} className="text-secondary" />
+          </div>
+          <div>
+            <div className="text-xl sm:text-2xl font-black text-foreground uppercase tracking-wide">
+              {event?.phase || "HACKING"}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>36-Hour Continuous Sprint</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Submission Status Card */}
+        <div className="p-5 rounded-2xl border border-border bg-card shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between text-muted-foreground mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider">Project State</span>
+            <FileCheck size={16} className="text-secondary" />
+          </div>
+          <div>
+            <div className="text-xl sm:text-2xl font-black text-foreground">
+              {isFinalized ? (
+                <span className="text-emerald-600 dark:text-emerald-400">Finalized</span>
+              ) : hasSubmission ? (
+                <span className="text-amber-600 dark:text-amber-400">In Draft</span>
+              ) : (
+                <span className="text-muted-foreground">Not Started</span>
+              )}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {isFinalized
+                ? "Locked for Jury Evaluation"
+                : hasSubmission
+                ? "Ready to polish & finalize"
+                : "Awaiting initial write-up"}
+            </div>
+          </div>
+        </div>
+
+        {/* Team Capacity Meter */}
+        <div className="p-5 rounded-2xl border border-border bg-card shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between text-muted-foreground mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider">Roster Capacity</span>
+            <Users size={16} className="text-secondary" />
+          </div>
+          <div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-black text-foreground">{membersList.length}</span>
+              <span className="text-sm font-semibold text-muted-foreground">/ 4 members</span>
+            </div>
+            <div className="w-full bg-accent/60 h-2 rounded-full mt-2 overflow-hidden">
+              <div
+                className="bg-primary h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, (membersList.length / 4) * 100)}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Next Hard Checkpoint */}
+        <div className="p-5 rounded-2xl border border-border bg-card shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between text-muted-foreground mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider">Code Freeze</span>
+            <Flame size={16} className="text-primary" />
+          </div>
+          <div>
+            <div className="text-xl sm:text-2xl font-black text-foreground">
+              Day 2 • 12:30 PM
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Submission window closes sharp
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Event Status Bar with Pipeline & Countdown */}
-      {data?.event && (
-        <EventStatusBar
-          phase={data.event.phase}
-          startTime={data.event.startTime}
-          endTime={data.event.endTime}
-          bufferMinutes={data.event.bufferMinutes}
-          publishAt={data.event.publishAt}
-        />
-      )}
+      {/* ── 3. Central Two-Column Grid: Team Roster & Project Submission ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        {/* Left Column: Team Roster & Member Management */}
+        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-4 border-b border-border mb-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-foreground flex items-center gap-2">
+                  <Users className="text-primary" size={18} />
+                  Team Roster ({membersList.length}/4)
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Verified members collaborating under team {team?.name || "Squad"}.
+                </p>
+              </div>
+            </div>
 
-      {/* Primary Action Grid (Team & Submission Widgets) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TeamCard team={data?.team || null} />
-        <SubmissionWidget
-          hasTeam={!!data?.team}
-          submission={data?.submission || null}
-        />
+            <div className="space-y-2.5">
+              {membersList.map((member, idx) => {
+                const isLeader = member.role === "leader" || idx === 0;
+                return (
+                  <div
+                    key={member.userId || idx}
+                    className="p-3.5 rounded-2xl bg-accent/30 border border-border flex items-center justify-between gap-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary font-bold flex items-center justify-center text-xs">
+                        {member.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-foreground flex items-center gap-2">
+                          <span>{member.name}</span>
+                          {isLeader && (
+                            <span className="px-2 py-0.5 rounded-full bg-secondary/15 text-secondary text-[10px] font-bold uppercase border border-secondary/25">
+                              Leader
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate max-w-[200px] sm:max-w-xs">
+                          {member.email}
+                        </div>
+                      </div>
+                    </div>
+
+                    <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 shrink-0">
+                      Verified
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+            <span>Need roster adjustments?</span>
+            <Link href="/faq" className="text-primary font-semibold hover:underline">
+              Review Roster FAQs →
+            </Link>
+          </div>
+        </div>
+
+        {/* Right Column: Project Submission Details & Quick Links */}
+        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-4 border-b border-border mb-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-foreground flex items-center gap-2">
+                  <FileCheck className="text-primary" size={18} />
+                  Project Submission
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Track repository, live demonstration, and write-up details.
+                </p>
+              </div>
+
+              <span
+                className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                  isFinalized
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25"
+                    : hasSubmission
+                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25"
+                    : "bg-muted text-muted-foreground border border-border"
+                }`}
+              >
+                {isFinalized ? "Locked for Evaluation" : hasSubmission ? "Draft Saved" : "Pending Submission"}
+              </span>
+            </div>
+
+            {hasSubmission ? (
+              <div className="space-y-4">
+                <div className="p-4 rounded-2xl bg-accent/30 border border-border">
+                  <h4 className="text-base font-bold text-foreground">{submission.title}</h4>
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                    {submission.summary || "No summary write-up provided yet."}
+                  </p>
+                </div>
+
+                <div className="space-y-2 text-xs">
+                  {submission.githubUrl && (
+                    <a
+                      href={submission.githubUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-between p-3 rounded-xl bg-card border border-border hover:bg-accent transition-colors"
+                    >
+                      <div className="flex items-center gap-2 font-mono text-foreground truncate">
+                        <Github size={15} className="text-secondary shrink-0" />
+                        <span className="truncate">{submission.githubUrl}</span>
+                      </div>
+                      <ExternalLink size={13} className="text-muted-foreground shrink-0" />
+                    </a>
+                  )}
+
+                  {submission.demoUrl && (
+                    <a
+                      href={submission.demoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-between p-3 rounded-xl bg-card border border-border hover:bg-accent transition-colors"
+                    >
+                      <div className="flex items-center gap-2 font-mono text-foreground truncate">
+                        <Globe size={15} className="text-secondary shrink-0" />
+                        <span className="truncate">{submission.demoUrl}</span>
+                      </div>
+                      <ExternalLink size={13} className="text-muted-foreground shrink-0" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="p-6 rounded-2xl bg-accent/20 border border-dashed border-border text-center space-y-3">
+                <FileText size={32} className="mx-auto text-muted-foreground opacity-50" />
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">No Project Submitted Yet</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5 max-w-sm mx-auto">
+                    Fill in your project overview, GitHub repository, live demonstration link, and technical architecture.
+                  </p>
+                </div>
+                <Link
+                  href="/submit"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors shadow-sm"
+                >
+                  <span>Open Submission Form</span>
+                  <ArrowRight size={13} />
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
+            <Link
+              href="/submit"
+              className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+            >
+              <span>{isFinalized ? "Inspect Full Write-up" : "Open Submission Form"}</span>
+              <ArrowRight size={12} />
+            </Link>
+            <Link href="/guidelines" className="text-xs text-muted-foreground hover:text-foreground">
+              Submission Specs →
+            </Link>
+          </div>
+        </div>
       </div>
 
-      {/* Secondary Content Grid (Broadcasts & Resource Links) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <AnnouncementsWidget announcement={data?.announcement || null} />
+      {/* ── 4. Timeline Milestones & Participant Resources ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+        {/* Upcoming Milestones Schedule */}
+        <div className="lg:col-span-2 rounded-3xl border border-border bg-card p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-border">
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-foreground flex items-center gap-2">
+                <Calendar className="text-secondary" size={18} />
+                Event Journey Milestones
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Key checkpoints across the 36-hour schedule.
+              </p>
+            </div>
+            <Link
+              href="/timeline"
+              className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+            >
+              <span>Full Schedule</span>
+              <ArrowRight size={12} />
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            {UPCOMING_MILESTONES.map((m, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-accent/30 border border-border/70 text-xs"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-mono font-bold text-secondary bg-secondary/15 px-2.5 py-1 rounded-md border border-secondary/25">
+                    {m.time}
+                  </span>
+                  <span className="font-semibold text-foreground">{m.title}</span>
+                </div>
+
+                {m.status === "active" ? (
+                  <span className="inline-flex items-center gap-1 font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20 text-[10px]">
+                    <Flame size={11} /> LIVE
+                  </span>
+                ) : m.status === "deadline" ? (
+                  <span className="font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md text-[10px] border border-amber-500/20">
+                    DEADLINE
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground text-[10px]">UPCOMING</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
-        <div>
-          <QuickLinks />
+
+        {/* Resources & Support Links */}
+        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="pb-3 border-b border-border mb-3">
+              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+                <Sparkles className="text-primary" size={16} />
+                Participant Resources
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Quick access to portals and rules.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              {[
+                { title: "Problem Statements", desc: "Challenge briefs & tracks", href: "/problem-statements", icon: MessageSquare },
+                { title: "Event Schedule", desc: "Detailed 36-hour timeline", href: "/timeline", icon: Calendar },
+                { title: "Participant FAQ", desc: "Support & common queries", href: "/faq", icon: HelpCircle },
+                { title: "Rules & Rubrics", desc: "Judging criteria specs", href: "/guidelines", icon: BookOpen },
+                { title: "Event Gallery", desc: "Previous editions archive", href: "/gallery", icon: Images },
+              ].map((res, i) => {
+                const Icon = res.icon;
+                return (
+                  <Link
+                    key={i}
+                    href={res.href}
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-accent/30 hover:bg-accent border border-border/50 hover:border-primary/40 transition-colors group cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 text-primary flex items-center justify-center shrink-0">
+                        <Icon size={14} />
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">
+                          {res.title}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">{res.desc}</div>
+                      </div>
+                    </div>
+                    <ArrowRight size={13} className="text-muted-foreground group-hover:text-foreground transition-colors" />
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-border mt-4 text-[11px] text-muted-foreground text-center">
+            Need urgent help? Visit Lab Block 3 Help Desk.
+          </div>
         </div>
       </div>
     </div>

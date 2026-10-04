@@ -293,3 +293,28 @@ Executed the final visual and navigation correction pass based on live browser i
    - `npx tsc --noEmit` — 0 errors.
    - `npm run build` — 60/60 routes compiled successfully with Turbopack.
    - Verified responsive single-column layout on mobile viewports (390px) and clean vertical flow on desktop.
+
+## Stage K — Final Frontend Stabilization & Role Workspace Consolidation
+
+1. **Canonical Participant Workspace Consolidation (`components/dashboard/ParticipantDashboard.tsx` & `app/team/page.tsx`):**
+   - Consolidated the duplicate functionality between Participant Dashboard and Team page into `/dashboard` as the single canonical workspace.
+   - Re-architected `/dashboard` to answer the participant's primary mental model: *"What is happening, what is my team's status, and what do I need to do next?"*
+   - Integrated complete team identity header (Team Name, Track, Team Code with one-click copy, phase badge), full member roster (avatars, roles, emails, registration timestamps), project submission status (draft vs finalized, repository & demo links, direct CTA), timeline milestone schedule preview, live announcements widget, and quick links to participant resources.
+   - Converted `/team` into a clean compatibility route that redirects directly to `/dashboard`.
+
+2. **Release-Controlled Problem Statements (`app/problem-statements/page.tsx`):**
+   - Participants see a sealed "Challenge Vault Locked" Coming Soon view while `event_phase === 'NOT_STARTED'`, detailing release time (Day 1, 10:30 AM), track briefings, and pre-hack prep checklist without fabricating mock problem statements.
+   - Admin users see a privileged operations bar with an audited, confirmed `Publish Problem Statements` button that calls the existing `/api/admin/event-config/transition` endpoint (advancing phase to `HACKING`).
+   - Upon publication, the view automatically displays the 4 authoritative problem statement cards (AI & Intelligent Systems, Web3, FinTech & Healthcare, Open Innovation) with objectives, required deliverables, and rubric criteria.
+
+3. **Approved Submission Page Composition (`app/SubmissionForm/page.tsx`):**
+   - Preserved the convener-approved royal Jaipur architectural framing: curved crimson capsule banner (`✨ Hackathon Submission Portal ✨`), typewriter headline, and 3 live stat cards (Total Submissions, Active Tracks, Time Remaining).
+   - Ensured all card containers and form inputs use 100% solid, opaque surfaces (`#FFFDF9` in light mode, `#1D111E` / deep espresso in dark mode) with zero transparent text artifacts.
+   - Enforced leaderboard results gating (`resultsMeta.published === true`), strictly preventing participants and judges from viewing unreleased rankings before official administrative publication.
+
+4. **Validation & Quality Gates:**
+   - `npx tsc --noEmit` — 0 errors.
+   - `npm run build` — 60/60 routes compiled with Turbopack.
+   - `git diff --check` — Clean whitespace and formatting.
+   - Working directory verified clean and ready for final visual polish by Codex.
+
