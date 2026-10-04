@@ -52,23 +52,31 @@ export async function POST(req: NextRequest) {
       return Errors.BAD_REQUEST('identifier and password are required.');
     }
 
-    // ── Step 1: Normalize identifier (ADR-009) ──
-    const normalized = normalizeIdentifier(rawIdentifier);
-    if (!normalized) {
-      // Don't reveal that the format is invalid — generic error
-      logger.debug('Login attempt with invalid identifier format', {
-        rawIdentifier: rawIdentifier.substring(0, 20),
-      });
-      // Still apply a small delay to prevent format enumeration
-      await serverSleep(200);
-      return NextResponse.json(
-        { error: GENERIC_AUTH_ERROR },
-        { status: 401 }
-      );
-    }
+    // ── Step 1: Normalize identifier or email ──
+    const trimmedInput = rawIdentifier.trim();
+    let identityKey: string;
+    let syntheticEmail: string;
 
-    const { canonical: identityKey } = normalized;
-    const syntheticEmail = identifierToEmail(identityKey);
+    if (trimmedInput.includes('@')) {
+      identityKey = trimmedInput.toLowerCase();
+      syntheticEmail = identityKey;
+    } else {
+      const normalized = normalizeIdentifier(trimmedInput);
+      if (!normalized) {
+        // Don't reveal that the format is invalid — generic error
+        logger.debug('Login attempt with invalid identifier format', {
+          rawIdentifier: rawIdentifier.substring(0, 20),
+        });
+        // Still apply a small delay to prevent format enumeration
+        await serverSleep(200);
+        return NextResponse.json(
+          { error: GENERIC_AUTH_ERROR },
+          { status: 401 }
+        );
+      }
+      identityKey = normalized.canonical;
+      syntheticEmail = identifierToEmail(identityKey);
+    }
 
     // ── Step 2: Layer 2 — Coarse endpoint rate limit ──
     const rawIp = extractClientIp(req.headers);

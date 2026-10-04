@@ -146,3 +146,126 @@ Validation performed:
 - Global grep audits: `#1E1208` (0 matches), `#0F0A05` (0 matches), `#C9A227` (0 matches), `#D4732A` (0 matches), `#FCF6EF` (0 matches), `#8B1F44` (0 matches), `#A08070` (0 matches).
 - Live browser validation across desktop & mobile (390px) viewports in both Light & Dark modes; captured screenshots confirmed solid opaque cards, crisp buttons, and zero transparent content surfaces.
 
+Commit: `e5cf64d` — `fix: complete frontend recovery from forensic audit`
+
+## Stage G — Final Visual & UX Correction Pass (Rendered UI Alignment & Case Handling)
+
+Executed the final visual and navigation correction pass based on live browser inspection and forensic audit requirements:
+
+1. **Light Theme Photographic Veil Rebalance:**
+   - Softened `.route-background-veil` in `styles/index.css` from an 88%–95% opaque wash down to `linear-gradient(180deg, rgba(247, 244, 239, 0.40) 0%, rgba(247, 244, 239, 0.62) 45%, rgba(247, 244, 239, 0.82) 100%)`.
+   - Architectural details across Albert Hall, Hawa Mahal, Jantar Mantar, and Jal Mahal are visibly recognizable and authentic, while content panels (`bg-card`, `#FFFDF9`) remain 100% opaque for clear readability.
+
+2. **Light Theme Color Hierarchy & Contrast:**
+   - Primary: Jaipur Pink (`#B95745` light / `#C97878` dark)
+   - Secondary: Antique Brass (`#B08A45` light / `#D2AC68` dark)
+   - Support: Terracotta (`#A64B3E`)
+   - Foundation: Warm architectural neutral (`#FFFDF9` card, `#F7F4EF` canvas)
+   - Deepened light mode text foreground to `#141210`, muted text to `#5C5349`, and border framing to `#D0BEA7` for crisp, accessible contrast.
+
+3. **Identifier Input Case Handling & Email Authentication:**
+   - Resolved uppercase input forcing in `app/login/page.tsx`: removed `.toUpperCase()` on `onChange`, enabled lowercase typing for IDs (`team-001`) and emails (`admin@learnit-muj.com`).
+   - Extended `app/api/auth/login/route.ts` to natively support standard email-based authentication alongside provisioned identifiers (`TEAM-xxx`, `JUDGE-xx`, `ADMIN-xx`).
+   - Password input is preserved intact with zero transformation.
+
+4. **Universal Brand Identity (`components/BrandLogo.tsx`):**
+   - Created a reusable, high-contrast brand mark component with dark sapphire/charcoal badge framing the white diamond emblem, paired with `Code-e-Manipal 2.0` typography and contextual role subtitles.
+   - Unified across Participant Navbar, Admin Header, Judge Header, and Login page.
+
+5. **Universal Navigation Architecture:**
+   - **Participant:** Floating curved navbar with BrandLogo, primary workflow pills, hackathon timer, compact ThemeToggle, and notifications.
+   - **Judge:** Built persistent `components/judge/JudgeHeader.tsx` with BrandLogo, Evaluation badge, judge name/pill, compact ThemeToggle, and logout. Eliminated workspace isolation in both assignment list and scoring views.
+   - **Admin:** Dedicated AdminHeader with BrandLogo, Admin badge, live ops indicator, theme toggle, desktop sidebar, and slide-out mobile drawer.
+
+6. **Compact Technical Console ThemeToggle (`components/ThemeToggle.tsx`):**
+   - Replaced floating legacy pill with a compact `h-8` console toggle using semantic tokens (`border-border bg-card/90 text-foreground`) with spring active indicator and full keyboard accessibility.
+
+7. **Validation & Verification:**
+   - `npx tsc --noEmit` — 0 errors (clean exit code 0).
+   - `npm run build` — 52/52 routes successfully compiled with Turbopack.
+   - `git diff --check` — 0 whitespace or formatting issues.
+   - Real browser visual QA verified with captured screenshots:
+     * `/login` (Light mode): `login_light_mode_1791131200364.png`
+     * `/admin` (Light mode): `admin_dashboard_light_1791131413411.png`
+     * `/admin` (Dark mode): `admin_dashboard_dark_1791131445693.png`
+     * `/dashboard` (Light mode): `dashboard_light_mode_1791131622544.png`
+     * `/judging` (Light mode): `judging_light_mode_1791131551076.png`
+     * `/gallery` (Light mode): `gallery_light_mode_1791131640651.png`
+     * Mobile 390px QA: `admin_mobile_1791131806233.png` & `admin_nav_drawer_1791131776271.png`
+
+## Stage H — Loader Animation Recovery & Operations Center Global Navbar Integration
+
+1. **High-Tech Branded Loader Animation (`components/LoaderAnimation.tsx`):**
+   - Restored the full-featured, cinematic Jaipur/Manipal HUD loader animation.
+   - Features: MUJ Campus wireframe background (`/MUJ-BUILD.webp`), pulsing LearnIT diamond brand logo with circuit lines, floating amber particles, HUD corner brackets, numerical progress ticker (0% → 100%), and glowing gold progress indicator.
+   - Ergonomics: Fast, responsive ~1.2s completion curve; includes "SKIP INTRO (ESC)" button and keyboard Escape listener for instant dismissal.
+   - Mounted client-side in `app/RootClient.tsx` during initial portal load and refresh with a safety timeout fallback to guarantee zero artificial blocking.
+
+2. **Global Platform Navbar in Admin Operations Center (`/admin`):**
+   - Integrated universal platform `Navbar` at the top of the Operations Center (`/admin` and all operational submodules).
+   - Top Navbar dynamically highlights **Operations Center** when in `/admin/*`, exposes the global hackathon countdown timer, results pill, notification center, theme toggle, and authenticated admin profile avatar with logout.
+   - Removed redundant local `AdminHeader` stacking; `app/admin/layout.tsx` cleanly renders beneath the global `Navbar` with `pt-20`.
+
+3. **Desktop & Mobile Operations Workspace Navigation:**
+   - **Desktop:** Sticky `w-64` Operations Navigation sidebar on the left (`Operations Center`, `Event Control`, `Teams & Roster`, `Users & Access`, `Results & Awards`, `Report & Export`, `Live Analytics`) with active state tracking.
+   - **Mobile:** Sticky sub-bar below the top Navbar with dynamic section label and dedicated "Operations Menu" button that toggles the slide-out operational drawer.
+
+4. **Validation & Verification:**
+   - `npx tsc --noEmit` — 0 errors.
+   - `npm run build` — 59/59 routes compiled with Turbopack.
+   - Browser subagent visual verification completed:
+     * Desktop Operations Center with top Navbar: `admin_desktop_navbar_1791137044040.png`
+     * Mobile Operations Center with sub-bar and drawer: `admin_mobile_navbar_1791137111743.png`
+     * Mobile Platform Navbar drawer: `admin_mobile_main_navbar_1791137142505.png`
+     * Video session: `verify_loader_navbar_1791136843283.webp`
+
+## Stage I — Final Product Recovery + Role Workspaces + Navigation + Timeline + Judging + Visual System
+
+1. **Authoritative Visual Identity & Poster Alignment:**
+   - **Light Theme:** Grounded in the official Code-e-Manipal 2.0 poster palette — parchment ivory, Jaipur pink (`#B95745`), terracotta (`#A64B3E`), and antique brass (`#B08A45`) with architectural linework.
+   - **Dark Theme ("Same Brand at Night"):** Completely purged generic navy/blue SaaS styling. Replaced with deep wine and plum (`#120A12`, `#1D111E`, `--border: #3E243D`, `--primary: #D46868`, `--secondary: #D4AB65`). Blue is strictly supporting technical accents.
+   - **Background Layer Architecture:** Repaired veil opacity (`0.35`-`0.80` light, `0.65`-`0.94` dark) so Jaipur heritage photography remains intentionally visible around and behind cards without sacrificing contrast or readability. Content cards remain 100% solid (`#FFFDF9` light, `#1D111E` dark) — zero blurry/transparent text surfaces.
+   - **Authentic Brand Logo (`components/BrandLogo.tsx`):** Displays the official palace dome + Hindi linework artwork (`public/logo.png`) inside an emblem container with "2.0" tag and role-specific subtitle.
+
+2. **Universal Brand Header Architecture (`components/Navbar.tsx` & `app/RootClient.tsx`):**
+   - One universal platform header permanently present across ALL routes (public, participant, judge `/judge`, and admin `/admin`).
+   - Role-adaptive link distribution: Participant (`Dashboard`, `Timeline`, `Challenges`, `Team`, `Submit`, `Gallery`, `FAQ`), Judge (`Dashboard`, `Judge Workspace`, `Timeline`, `Guidelines`), Admin (`Dashboard`, `Operations Center`, `Event Control`, `Live Analytics`).
+   - Theme control, countdown timer, results pill, notification bell, and authenticated profile avatar with logout accessible everywhere.
+
+3. **Role-Aware Landing Page (`/dashboard`):**
+   - `/dashboard` is the authenticated home for all three roles — Admin lands on `/dashboard` overview (NOT redirected straight to `/admin`).
+   - **Participant:** "My Hackathon Workspace" — team identity, event phase timeline, countdown, submission status widget, broadcast announcements, and quick resource links.
+   - **Judge:** "My Evaluation Workspace" — assigned teams summary, pending evaluations, next team CTA linking to evaluation, and judging instructions.
+   - **Admin:** "Event Operations Overview" — event phase banner, team & submission metrics, judging status, system alerts, and direct shortcuts to deep operational modules.
+
+4. **Canonical Judge Evaluation Workflow:**
+   - Dedicated evaluation route: `/judge/evaluate/[teamId]` with phone-first UX (optimized for 360px-430px viewports).
+   - Mobile-friendly 1-10 tap buttons (no tiny sliders or fragile dropdowns).
+   - Authoritative rubric criteria and weights preserved: Innovation (30%), Technical (30%), Presentation (20%), Impact (20%) on a 100-point scale.
+   - On evaluation submission, redirects to `/judge` (dedicated judge workspace & assignment queue) to prevent stranding.
+
+5. **Participant Team Leader Workspace (`/team`):**
+   - Replaced member-only presentation with a true Command Center: team code with one-click copy, event phase badge, capacity meter, submission status card with direct CTA, member roster, and timeline milestones.
+
+6. **Administrative Console Modules:**
+   - **Teams & Roster (`/admin/teams`):** Dedicated administrative console with search, track filters, submission status, per-team and global submission freeze switches (`PATCH /api/admin/teams`), and deadline extension modal.
+   - **Submissions Oversight (`/admin/submissions`):** Real-time project submissions list, repository and demo URL inspection, and audited "Reopen Submission" action (`POST /api/admin/submissions/[id]/reopen`) enforcing a mandatory justification (min 10 characters).
+   - **Judging Operations (`/admin/judging`):** Judge assignment distribution table, auto-assign trigger, and audited score correction route (`POST /api/admin/reviews/[id]/reopen`).
+   - **Reconciled Navigation (`app/admin/layout.tsx`):** Unified sidebar & mobile drawer across Operations Center, Event Control, Teams & Roster, Submissions, Judging, Users & Access, Results & Awards, Report & Export, and Live Analytics.
+
+7. **Problem Statements ("Coming Soon" Experience — `/problem-statements`):**
+   - High-end pre-drop briefing with live release schedule (Day 1, 10:30 AM), 4 track previews (AI & Intelligent Systems, Web3, FinTech & Healthcare, Open Innovation), and participant preparation checklist.
+
+8. **Detailed Process Timeline (`/timeline`):**
+   - Real 36-hour schedule for 15 & 16 October 2026 at Manipal University Jaipur.
+   - Grouped into Online Phase, Day 1 (Hacking starts), and Day 2 (Code freeze, jury demos, and valedictory ceremony).
+   - Responsive left-rail layout with milestone nodes, active flame badges, location tags, and phase filter tabs.
+
+9. **Dedicated Participant FAQ (`/faq`):**
+   - Searchable, categorized accessible accordion covering Account & Access, Team Management, Problem Statements, Submissions, Judging, and Schedule.
+
+10. **Validation & Quality Gates:**
+    - `npx tsc --noEmit` — 0 errors.
+    - `npm run build` — 60/60 routes compiled with Turbopack.
+    - Verified responsive layouts across mobile (390px) and desktop viewports.
+    - Verified light and dark theme contrast, brand colors, and solid surfaces.

@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect } from "react"
 import { Bell, Clock, AlertCircle, Info, X } from "lucide-react"
+import { BrandLogo } from "@/components/BrandLogo"
 
 import {
   Navbar as ResizableNavbar,
@@ -175,7 +176,7 @@ export default function Navbar({ className }: { className?: string }) {
   }
 
   const mobileLinkClass = (path: string) => {
-    const isActive = pathname === path
+    const isActive = pathname === path || (path !== "/" && !!pathname?.startsWith(path))
     return isActive
       ? "block py-3 px-4 text-primary font-semibold bg-primary/10 rounded-lg text-center"
       : "block py-3 px-4 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors duration-200 text-center font-medium"
@@ -183,22 +184,26 @@ export default function Navbar({ className }: { className?: string }) {
 
   if (pathname === "/login") return null
 
-  // Generate dynamic links based on user role
+  // Generate dynamic links strictly based on user role
   const navItems = []
-  if (role === "admin" || role === "participant") {
+  if (role === "admin") {
+    navItems.push({ name: "Dashboard", link: "/dashboard" })
+    navItems.push({ name: "Operations Center", link: "/admin" })
+    navItems.push({ name: "Gallery", link: "/gallery" })
+  } else if (role === "judge") {
+    navItems.push({ name: "Dashboard", link: "/dashboard" })
+    navItems.push({ name: "Evaluation", link: "/judge" })
+    navItems.push({ name: "Guidelines", link: "/guidelines" })
+    navItems.push({ name: "Gallery", link: "/gallery" })
+  } else {
     navItems.push({ name: "Dashboard", link: "/dashboard" })
     navItems.push({ name: "Timeline", link: "/timeline" })
     navItems.push({ name: "Challenges", link: "/problem-statements" })
     navItems.push({ name: "Team", link: "/team" })
     navItems.push({ name: "Submit", link: "/submit" })
+    navItems.push({ name: "Gallery", link: "/gallery" })
+    navItems.push({ name: "FAQ", link: "/faq" })
   }
-  if (role === "admin" || role === "judge") {
-    navItems.push({ name: "Judging", link: "/judging" })
-  }
-  if (role === "admin") {
-    navItems.push({ name: "Admin", link: "/admin" })
-  }
-  navItems.push({ name: "Gallery", link: "/gallery" })
 
   const isSubmissionForm = pathname?.startsWith("/SubmissionForm")
 
@@ -207,16 +212,7 @@ export default function Navbar({ className }: { className?: string }) {
       {/* ── Desktop Navigation ── */}
       <NavBody className="bg-card border border-border shadow-sm">
         {/* Logo */}
-        <Link href="/" className="flex items-center no-underline h-12 flex-shrink-0 z-20">
-          <Image
-            src="/logo.png"
-            width={200}
-            height={52}
-            alt="Code-e-Manipal 2.0"
-            className="h-12 w-auto object-contain"
-            priority
-          />
-        </Link>
+        <BrandLogo size="md" />
 
         {/* Dynamic Navigation Links */}
         <NavItems items={navItems} pathname={pathname} />
@@ -255,11 +251,11 @@ export default function Navbar({ className }: { className?: string }) {
                 setNotifsOpen(!notifsOpen);
                 if (menuOpen) setMenuOpen(false);
               }}
-              className="relative p-1.5 rounded-full hover:bg-jaipur-secondary transition-colors focus:outline-none cursor-pointer flex items-center justify-center"
+              className="relative p-1.5 rounded-lg hover:bg-accent transition-colors focus:outline-none cursor-pointer flex items-center justify-center"
             >
               <Bell size={isSubmissionForm ? 24 : 20} className="text-muted-foreground transition-all duration-300" />
               {hasUnread && (
-                <div className={`absolute rounded-full bg-jaipur-pink transition-all duration-300 ${isSubmissionForm ? "top-1 right-2.5 w-2.5 h-2.5" : "top-1 right-1.5 w-2 h-2"}`} />
+                <div className={`absolute rounded-full bg-primary transition-all duration-300 ${isSubmissionForm ? "top-1 right-2.5 w-2.5 h-2.5" : "top-1 right-1.5 w-2 h-2"}`} />
               )}
             </button>
 
@@ -355,16 +351,7 @@ export default function Navbar({ className }: { className?: string }) {
       {/* ── Mobile Navigation ── */}
       <MobileNav className="bg-card border-b border-border shadow-sm">
         <MobileNavHeader>
-          <Link href="/" className="flex items-center no-underline h-10">
-            <Image
-              src="/logo.png"
-              width={160}
-              height={40}
-              alt="Code-e-Manipal 2.0"
-              className="h-9 w-auto object-contain"
-              priority
-            />
-          </Link>
+          <BrandLogo size="sm" />
           <div className="flex items-center gap-2.5">
             {timerConfig && (
               <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-accent/60 border border-border text-[10px] font-mono font-bold text-secondary">

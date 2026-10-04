@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,6 +12,7 @@ import { JudgingInterface } from "./JudgingInterface";
 import { Leaderboard } from "./Leaderboard";
 import { Confetti } from "./ui/Confetti";
 import { SuccessSummaryCard } from "./SuccessSummaryCard";
+import { JudgeHeader } from "./judge/JudgeHeader";
 import { Score } from "@/types/judging";
 import { calculateWeightedScore } from "@/utils/scoring";
 
@@ -211,37 +213,21 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
     }
   };
 
+  const router = useRouter();
+
   if (!mounted) return null;
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] p-6 flex items-center justify-center">
+      <div className="min-h-[50vh] p-6 flex items-center justify-center">
         <p className="text-muted-foreground font-semibold text-sm animate-pulse">Loading assigned submissions...</p>
       </div>
     );
   }
 
-  // Active Scoring View Takeover
-  if (selectedSubmission) {
-    return (
-      <div className="w-full max-w-5xl mx-auto px-4 py-8">
-        <JudgingInterface
-          submission={selectedSubmission}
-          judgeId={judgeId}
-          existingScore={existingScore}
-          onSave={handleSaveScore}
-          onBack={() => setSelectedSubmissionId(null)}
-          onNext={handleNextSubmission}
-          onPrev={handlePrevSubmission}
-          hasNext={hasNext}
-          hasPrev={hasPrev}
-        />
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full pb-16">
+    <div className="text-foreground flex flex-col pb-16">
+
       {/* Celebration overlay */}
       {showCelebration && (
         <>
@@ -257,37 +243,7 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
         </>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header section */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-8 mt-6">
-          <div className="flex items-center gap-4">
-            <Image
-              src="/logo.png"
-              alt="logo"
-              width={48}
-              height={48}
-              className="w-12 h-12 object-contain"
-            />
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground m-0">
-                Judge Workspace
-              </h1>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 mb-0">
-                Welcome, {judgeName}
-              </p>
-            </div>
-          </div>
-          
-          <Button
-            variant="outline"
-            onClick={onLogout}
-            className="w-full sm:w-auto h-10 px-4 rounded-xl font-bold text-xs border-border text-foreground hover:bg-muted"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </Button>
-        </div>
+      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 
         {/* Workspace tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -394,7 +350,7 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
             {/* Submission Grid Cards */}
             <SubmissionList
               submissions={activePageSubmissions}
-              onSelectSubmission={setSelectedSubmissionId}
+              onSelectSubmission={(id) => router.push(`/judge/evaluate/${id}`)}
             />
 
             {/* Grid Pagination Actions */}

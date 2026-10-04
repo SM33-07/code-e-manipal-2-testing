@@ -5,7 +5,7 @@ import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-export function ThemeToggle() {
+export function ThemeToggle({ className = "" }: { className?: string }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -15,18 +15,25 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="w-[124px] h-11 rounded-full border border-jaipur-gold/20 bg-jaipur-card/50" aria-hidden="true" />
+      <div
+        className={`w-[102px] h-8 rounded-lg border border-border bg-card/50 ${className}`}
+        aria-hidden="true"
+      />
     );
   }
 
   const options = [
     { value: "system", icon: Monitor, label: "System default" },
-    { value: "light", icon: Sun, label: "Light theme" },
-    { value: "dark", icon: Moon, label: "Dark theme" },
+    { value: "light", icon: Sun, label: "Light mode" },
+    { value: "dark", icon: Moon, label: "Dark mode" },
   ] as const;
 
   return (
-    <div className="relative flex items-center p-1 gap-1 rounded-full border border-jaipur-gold/30 bg-jaipur-card text-jaipur-primary shadow-sm h-11">
+    <div
+      role="group"
+      aria-label="Theme selector"
+      className={`relative inline-flex items-center p-0.5 rounded-lg border border-border bg-card/90 text-foreground shadow-sm h-8 select-none ${className}`}
+    >
       {options.map((option) => {
         const Icon = option.icon;
         const isActive = theme === option.value;
@@ -36,21 +43,24 @@ export function ThemeToggle() {
             key={option.value}
             type="button"
             onClick={() => setTheme(option.value)}
-            className="relative size-9 rounded-full text-muted-foreground hover:text-foreground transition-colors duration-200 outline-none flex items-center justify-center cursor-pointer"
+            aria-pressed={isActive}
             aria-label={option.label}
             title={option.label}
+            className="relative size-7 rounded-md text-muted-foreground hover:text-foreground transition-colors duration-150 outline-none focus-visible:ring-1 focus-visible:ring-primary flex items-center justify-center cursor-pointer"
           >
             {isActive && (
               <motion.div
                 layoutId="activeThemeHighlight"
-                className="absolute inset-0 rounded-full bg-black/5 dark:bg-white/10"
-                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                className="absolute inset-0 rounded-md bg-secondary/15 border border-secondary/30 dark:bg-white/10 dark:border-white/15"
+                transition={{ type: "spring", stiffness: 450, damping: 35 }}
               />
             )}
             <Icon
-              size={20}
-              className={`relative z-10 transition-colors duration-200 ${
-                isActive ? "text-foreground stroke-[2px]" : "text-muted-foreground/60 hover:text-muted-foreground stroke-[1.5px]"
+              size={15}
+              className={`relative z-10 transition-colors duration-150 ${
+                isActive
+                  ? "text-secondary dark:text-foreground stroke-[2.2px]"
+                  : "text-muted-foreground/70 hover:text-foreground stroke-[1.7px]"
               }`}
             />
           </button>

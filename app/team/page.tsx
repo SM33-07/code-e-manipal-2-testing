@@ -1,31 +1,38 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import dynamic from "next/dynamic"
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import { useAuth } from "@/components/AuthProvider";
 
-import { useAuth } from "@/components/AuthProvider"
-
-const TeamManagement = dynamic(
-  () => import("@/components/TeamManagement").then((m) => m.TeamManagement),
+const TeamLeaderWorkspace = dynamic(
+  () => import("@/components/team/TeamLeaderWorkspace").then((m) => m.TeamLeaderWorkspace),
   { ssr: false }
-)
+);
 
+/**
+ * Participant Team Leader Command Center.
+ * Exposes team identity, progress, submission tracking, roster, and key milestones.
+ */
 export default function TeamPage() {
-  const { role, isAuthenticated } = useAuth()
-  const router = useRouter()
+  const { role, isAuthenticated } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push("/login")
-      return
+      router.push("/login");
+      return;
     }
     if (role !== "participant" && role !== "admin") {
-      router.push("/")
+      router.push("/dashboard");
     }
-  }, [role, isAuthenticated, router])
+  }, [role, isAuthenticated, router]);
 
-  if (!isAuthenticated || (role !== "participant" && role !== "admin")) return null
+  if (!isAuthenticated || (role !== "participant" && role !== "admin")) return null;
 
-  return <TeamManagement />
+  return (
+    <div className="pt-2">
+      <TeamLeaderWorkspace />
+    </div>
+  );
 }

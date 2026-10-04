@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import {
   ArrowRight, ChevronDown, CheckCircle, FileText,
-  Scale, Shuffle, Trophy, UserCircle, Users, Trash2, UserPlus,
+  Scale, Shuffle, Trophy, UserCircle, Users, Trash2, UserPlus, ShieldAlert,
 } from "lucide-react"
 
 
@@ -226,14 +226,63 @@ export default function AdminPage() {
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col gap-8 pb-12">
 
-      {/* Hero Header */}
-      <div>
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-          Admin Dashboard
-        </h1>
-        <p className="text-muted-foreground">
-          Manage hackathon operations, assign judges, and review results.
-        </p>
+      {/* Operations Center Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+              <ShieldAlert className="w-3.5 h-3.5" />
+              Operations Command Center
+            </span>
+            <span className="text-xs text-muted-foreground">&bull;</span>
+            <span className="text-xs font-mono text-muted-foreground">LIVE EVENT OPERATIONS</span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
+            Admin Operations Center
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Unified command for judge assignments, evaluation tracking, user roles, and system workflows.
+          </p>
+        </div>
+
+        {/* Quick Module Navigation Pills */}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => router.push("/admin/event-control")}
+            className="px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
+          >
+            Event Control
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/admin/registrations")}
+            className="px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
+          >
+            Teams
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/admin/results")}
+            className="px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
+          >
+            Results
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/admin/report")}
+            className="px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
+          >
+            Report & Audit
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/admin/analytics")}
+            className="px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
+          >
+            Analytics
+          </button>
+        </div>
       </div>
 
       {/* STAT CARDS ROW */}

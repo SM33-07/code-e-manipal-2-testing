@@ -128,13 +128,12 @@ function AnnouncementBanner({ onActiveChange }: { onActiveChange: (active: boole
   )
 }
 
+const LoaderAnimation = dynamic(() => import("@/components/LoaderAnimation"), { ssr: false })
+
 function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isLogin = pathname === "/login"
   const isRegister = pathname === "/register"
-  const isGallery = pathname === "/gallery"
-  const isSubmissionForm = pathname.startsWith("/SubmissionForm") || pathname.startsWith("/submit")
-  const isOperationalRoute = pathname.startsWith("/admin") || pathname.startsWith("/judging") || pathname.startsWith("/judge")
 
   const [hasBanner, setHasBanner] = useState(false)
 
@@ -142,16 +141,8 @@ function Shell({ children }: { children: React.ReactNode }) {
     return <>{children}</>
   }
 
-  if (isOperationalRoute) {
-    return (
-      <>
-        <AnnouncementBanner onActiveChange={setHasBanner} />
-        <div style={{ paddingTop: hasBanner ? "40px" : "0px" }}>{children}</div>
-      </>
-    )
-  }
-
   const backgroundClass = getBackgroundClass(pathname)
+  const isFullBleedRoute = pathname.startsWith("/admin") || pathname.startsWith("/judge") || pathname.startsWith("/judging")
 
   return (
     <>
@@ -166,7 +157,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <Suspense fallback={null}>
           <Navbar className={hasBanner ? "top-[40px]" : "top-0"} />
         </Suspense>
-        <div className="relative z-10 min-h-screen pt-24 pb-12">
+        <div className={`relative z-10 min-h-screen ${isFullBleedRoute ? "pt-20" : "pt-24 pb-12"}`}>
           {children}
         </div>
       </div>
@@ -175,8 +166,21 @@ function Shell({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootClient({ children }: { children: React.ReactNode }) {
+  const [showLoader, setShowLoader] = useState(true)
+
+  // Safety fallback so the page will never hang
+  useEffect(() => {
+    const safety = setTimeout(() => {
+      setShowLoader(false)
+    }, 3500)
+    return () => clearTimeout(safety)
+  }, [])
+
   return (
     <AuthProvider>
+      {showLoader && (
+        <LoaderAnimation onComplete={() => setShowLoader(false)} />
+      )}
       <Shell>{children}</Shell>
     </AuthProvider>
   )

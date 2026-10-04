@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BrandLogo } from "@/components/BrandLogo";
 import { ShieldCheck, LogOut, Menu, X, Radio } from "lucide-react";
 
 interface AdminHeaderProps {
@@ -38,30 +39,12 @@ export function AdminHeader({ mobileOpen, onToggleMobile }: AdminHeaderProps) {
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
 
-        <Link href="/admin" className="flex items-center gap-3">
-          <div className="relative w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-card border border-border">
-            <Image
-              src="/logo.png"
-              alt="Code-e-Manipal"
-              width={32}
-              height={32}
-              className="object-contain"
-            />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-sm md:text-base tracking-tight text-foreground font-sans">
-                Code-e-Manipal <span className="text-primary font-mono text-xs">2.0</span>
-              </span>
-              <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/10 text-primary border border-primary/20">
-                <Radio size={10} className="animate-pulse" /> Live Ops
-              </span>
-            </div>
-            <p className="text-[11px] text-muted-foreground hidden sm:block tracking-wide">
-              Event Operations & Evaluation Console
-            </p>
-          </div>
-        </Link>
+        <BrandLogo
+          href="/admin"
+          size="sm"
+          subtitle="Event Operations & Evaluation Console"
+          badge="Admin"
+        />
       </div>
 
       {/* Right Controls */}

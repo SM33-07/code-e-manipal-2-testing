@@ -27,9 +27,9 @@ export default function GuidelinesPage() {
           </article>
         ))}
       </div>
-      <div className="flex flex-col gap-3 rounded-xl border border-border bg-secondary p-5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3"><CircleHelp className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden="true" /><p className="text-sm text-secondary-foreground">Need help with a team or submission? Check event announcements first, then contact the official support channel shared by organisers.</p></div>
-        <Link href="/dashboard" className="shrink-0 rounded-lg border border-border bg-card px-4 py-2 text-center text-sm font-semibold text-card-foreground hover:bg-accent">Back to dashboard</Link>
+      <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between shadow-sm">
+        <div className="flex items-start gap-3"><CircleHelp className="mt-0.5 size-5 shrink-0 text-secondary" aria-hidden="true" /><p className="text-sm text-muted-foreground">Need help with a team or submission? Check event announcements first, then contact the official support channel shared by organisers.</p></div>
+        <Link href="/dashboard" className="shrink-0 rounded-lg border border-border bg-accent/50 px-4 py-2 text-center text-sm font-semibold text-foreground hover:bg-accent transition-colors">Back to dashboard</Link>
       </div>
     </section>
   );

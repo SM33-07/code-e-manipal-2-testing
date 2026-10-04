@@ -44,6 +44,12 @@ const RESOURCES: QuickLinkItem[] = [
     href: '/problem-statements',
     icon: MessageSquare,
   },
+  {
+    title: 'Participant FAQ',
+    desc: 'Answers to login, teams, submission, and rubric queries',
+    href: '/faq',
+    icon: HelpCircle,
+  },
 ];
 
 export function QuickLinks() {

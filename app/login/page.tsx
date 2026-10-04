@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Images, Sparkles } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,35 +32,24 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
-      const data = await login(identifier, password);
-      const actualRole = data?.role || "participant";
-      if (actualRole === "admin") router.push("/admin");
-      else if (actualRole === "judge") router.push("/judging");
-      else router.push("/dashboard");
-    } catch {
-      triggerError("Login failed. Please verify your ID and password.");
+      const cleanIdentifier = identifier.trim().toLowerCase();
+      await login(cleanIdentifier, password);
+      router.push("/dashboard");
+    } catch (err: any) {
+      triggerError(err?.message || "Login failed. Please verify your ID and password.");
     }
     setLoading(false);
   };
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-background">
-      {/* Heritage Photographic Atmosphere with Veil */}
-      <div className="absolute inset-0 login-background opacity-40 dark:opacity-30 pointer-events-none" />
-      <div className="absolute inset-0 bg-background/80 dark:bg-background/90 pointer-events-none" />
+      {/* Heritage Photographic Atmosphere with directional vignette veil */}
+      <div className="absolute inset-0 login-background opacity-85 dark:opacity-45 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/35 via-background/65 to-background/95 dark:from-background/60 dark:via-background/85 dark:to-background/95 pointer-events-none" />
 
       {/* Top Bar with Brand & Theme Toggle */}
       <div className="absolute top-0 inset-x-0 z-20 flex items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-3">
-          <Image
-            src="/logo.png"
-            width={160}
-            height={40}
-            alt="Code-e-Manipal 2.0"
-            className="h-9 w-auto object-contain"
-            priority
-          />
-        </Link>
+        <BrandLogo size="md" subtitle="Technical Hackathon Console" />
         <ThemeToggle />
       </div>
 
@@ -98,16 +87,18 @@ export default function LoginPage() {
             {/* Identifier input */}
             <div className="space-y-1.5 text-left">
               <label className="text-xs font-semibold text-foreground">
-                User / Team ID
+                User ID / Email
               </label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type="text"
                   autoComplete="username"
-                  placeholder="e.g. TEAM-001 or admin@manipal.edu"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  placeholder="e.g. TEAM-001"
                   value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value.toUpperCase())}
+                  onChange={(e) => setIdentifier(e.target.value.toLowerCase())}
                   required
                   className="w-full h-11 pl-10 pr-4 text-sm bg-input border border-border rounded-lg text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors"
                 />

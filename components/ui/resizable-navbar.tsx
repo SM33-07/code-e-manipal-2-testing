@@ -105,9 +105,9 @@ export const NavItems = ({ items, className, onItemClick, pathname }: NavItemsPr
   const [hovered, setHovered] = useState<number | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
 
-  // Show up to 6 primary items directly so Dashboard, Timeline, Challenges, Team, Submit, Gallery all fit!
-  const primaryItems = items.slice(0, 6);
-  const overflowItems = items.slice(6);
+  // Show up to 7 primary items directly so Dashboard, Timeline, Challenges, Team, Submit, Gallery, FAQ all fit!
+  const primaryItems = items.slice(0, 7);
+  const overflowItems = items.slice(7);
 
   return (
     <div
@@ -118,7 +118,7 @@ export const NavItems = ({ items, className, onItemClick, pathname }: NavItemsPr
       )}
     >
       {primaryItems.map((item, idx) => {
-        const isActive = pathname === item.link;
+        const isActive = pathname === item.link || (item.link !== "/" && !!pathname?.startsWith(item.link));
         const isSubmit = item.link === "/submit";
 
         return (
