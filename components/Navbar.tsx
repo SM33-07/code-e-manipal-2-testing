@@ -177,8 +177,8 @@ export default function Navbar({ className }: { className?: string }) {
   const mobileLinkClass = (path: string) => {
     const isActive = pathname === path
     return isActive
-      ? "block py-3 px-4 text-jaipur-primary font-semibold bg-jaipur-primary/10 rounded-lg text-center"
-      : "block py-3 px-4 text-muted-foreground hover:text-jaipur-primary hover:bg-jaipur-primary/10 rounded-lg transition-colors duration-200 text-center"
+      ? "block py-3 px-4 text-primary font-semibold bg-primary/10 rounded-lg text-center"
+      : "block py-3 px-4 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors duration-200 text-center font-medium"
   }
 
   if (pathname === "/login") return null
@@ -205,7 +205,7 @@ export default function Navbar({ className }: { className?: string }) {
   return (
     <ResizableNavbar isSubmissionForm={isSubmissionForm} className={className}>
       {/* ── Desktop Navigation ── */}
-      <NavBody className="bg-background border border-jaipur-gold/30 shadow-md">
+      <NavBody className="bg-card border border-border shadow-sm">
         {/* Logo */}
         <Link href="/" className="flex items-center no-underline h-12 flex-shrink-0 z-20">
           <Image
@@ -213,7 +213,7 @@ export default function Navbar({ className }: { className?: string }) {
             width={200}
             height={52}
             alt="Code-e-Manipal 2.0"
-            className="h-13 w-auto object-contain"
+            className="h-12 w-auto object-contain"
             priority
           />
         </Link>
@@ -222,17 +222,17 @@ export default function Navbar({ className }: { className?: string }) {
         <NavItems items={navItems} pathname={pathname} />
 
         {/* Desktop Actions */}
-        <div className="flex items-center gap-4 flex-shrink-0 z-20">
+        <div className="flex items-center gap-3 flex-shrink-0 z-20">
           {/* Role Badge */}
           {role && (
-            <span className="hidden xl:inline-block text-xs px-3 py-1 rounded-full bg-jaipur-secondary border border-jaipur-secondary-light text-foreground font-medium capitalize">
+            <span className="hidden xl:inline-block text-xs px-2.5 py-0.5 rounded-full bg-secondary/15 border border-secondary/30 text-secondary font-medium capitalize">
               {role}
             </span>
           )}
 
           {/* Hackathon Timer */}
           {timerConfig && (
-            <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-jaipur-secondary/50 border border-jaipur-gold/20 text-xs font-mono font-bold text-[#F0C060]">
+            <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/60 border border-border text-xs font-mono font-bold text-secondary">
               <span className={timeLeftStr !== "Not Started" && timeLeftStr !== "Closed" ? "animate-pulse" : ""}>⏳</span>
               <span>{timeLeftStr}</span>
             </div>
@@ -353,7 +353,7 @@ export default function Navbar({ className }: { className?: string }) {
       </NavBody>
 
       {/* ── Mobile Navigation ── */}
-      <MobileNav className="bg-background border-b border-jaipur-gold/20 shadow-sm">
+      <MobileNav className="bg-card border-b border-border shadow-sm">
         <MobileNavHeader>
           <Link href="/" className="flex items-center no-underline h-10">
             <Image
@@ -361,13 +361,13 @@ export default function Navbar({ className }: { className?: string }) {
               width={160}
               height={40}
               alt="Code-e-Manipal 2.0"
-              className="h-10 w-auto object-contain"
+              className="h-9 w-auto object-contain"
               priority
             />
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {timerConfig && (
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-jaipur-secondary/50 border border-jaipur-gold/20 text-[10px] font-mono font-bold text-[#F0C060]">
+              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-accent/60 border border-border text-[10px] font-mono font-bold text-secondary">
                 <span className={timeLeftStr !== "Not Started" && timeLeftStr !== "Closed" ? "animate-pulse" : ""}>⏳</span>
                 <span>{timeLeftStr}</span>
               </div>
@@ -383,7 +383,7 @@ export default function Navbar({ className }: { className?: string }) {
         <MobileNavMenu
           isOpen={mobileNavOpen}
           onClose={() => setMobileNavOpen(false)}
-          className="border border-jaipur-gold/20"
+          className="border border-border bg-card shadow-2xl"
         >
           {navItems.map((item) => (
             <Link
@@ -396,9 +396,9 @@ export default function Navbar({ className }: { className?: string }) {
             </Link>
           ))}
           
-          <div className="flex w-full flex-col gap-4 pt-4 border-t border-jaipur-gold/10 items-center">
+          <div className="flex w-full flex-col gap-3 pt-4 border-t border-border items-center">
             {role && (
-              <span className="text-xs px-3 py-1 rounded-full bg-jaipur-secondary border border-jaipur-secondary-light text-foreground font-medium capitalize">
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-secondary/15 border border-secondary/30 text-secondary font-medium capitalize">
                 Role: {role}
               </span>
             )}
@@ -408,8 +408,9 @@ export default function Navbar({ className }: { className?: string }) {
               </span>
             )}
             <button
+              type="button"
               onClick={handleLogout}
-              className="w-full py-2.5 rounded-lg bg-jaipur-primary/10 hover:bg-jaipur-primary/20 text-jaipur-primary font-semibold text-sm transition duration-200 cursor-pointer"
+              className="w-full py-2.5 rounded-lg bg-destructive/10 border border-destructive/30 hover:bg-destructive/20 text-destructive font-semibold text-sm transition duration-200 cursor-pointer"
             >
               Logout
             </button>

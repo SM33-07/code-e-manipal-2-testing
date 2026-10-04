@@ -2,10 +2,9 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
-import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Award, FileText, ClipboardList, CheckSquare } from "lucide-react";
+import { LogOut, Award, FileText, CheckSquare } from "lucide-react";
 
 import { SubmissionList, JudgeSubmission } from "./SubmissionList";
 import { JudgingInterface } from "./JudgingInterface";
@@ -22,7 +21,6 @@ interface Props {
 }
 
 export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
-  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   const [submissions, setSubmissions] = useState<JudgeSubmission[]>([]);
@@ -48,7 +46,6 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
   const loadAssignments = async () => {
     setLoading(true);
     try {
-      // Fetch assignments
       const res = await fetch("/api/judging/assignments");
       if (!res.ok) {
         throw new Error(`Failed to fetch assignments: ${res.status} ${res.statusText}`);
@@ -73,7 +70,6 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
 
       setSubmissions(mapped);
 
-      // Fetch existing reviews / scores
       const reviewsRes = await fetch("/api/judging/reviews");
       if (!reviewsRes.ok) {
         throw new Error(`Failed to fetch reviews: ${reviewsRes.status} ${reviewsRes.statusText}`);
@@ -89,9 +85,6 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
     }
   };
 
-  const isDark = resolvedTheme === "dark";
-
-  // Counts based on active submissions data
   const allCount = submissions.length;
   const gradedCount = submissions.filter((s) => s.judged).length;
   const pendingCount = allCount - gradedCount;
@@ -105,7 +98,6 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
     }
   }, [isAllGraded]);
 
-  // Filter Submissions
   const filteredSubmissions = useMemo(() => {
     return submissions.filter((s) => {
       const query = searchQuery.trim().toLowerCase();
@@ -123,7 +115,6 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
     });
   }, [submissions, searchQuery, statusFilter]);
 
-  // Paginated Submissions Slice
   const totalPages = Math.max(1, Math.ceil(filteredSubmissions.length / itemsPerPage));
   const activePageSubmissions = useMemo(() => {
     const adjustedPage = Math.min(currentPage, totalPages);
@@ -131,14 +122,12 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
     return filteredSubmissions.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredSubmissions, currentPage, totalPages]);
 
-  // Adjust page indicator dynamically
   useEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages);
     }
   }, [filteredSubmissions, totalPages, currentPage]);
 
-  // Calculate top 3 rankings for SuccessSummaryCard
   const topThreeRanked = useMemo(() => {
     return allScores
       .filter((s) => s.isComplete)
@@ -154,10 +143,8 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
       .slice(0, 3);
   }, [allScores, submissions]);
 
-  // Celebration trigger: all projects graded and not dismissed
   const showCelebration = allCount > 0 && gradedCount === allCount && !dismissedCelebration;
 
-  // Navigation Logic for Scoring View Takeover
   const selectedIndexInFiltered = useMemo(() => {
     if (!selectedSubmissionId) return -1;
     return filteredSubmissions.findIndex((s) => s.id === selectedSubmissionId);
@@ -226,16 +213,10 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
 
   if (!mounted) return null;
 
-  // Heritage theme variable classes
-  const titleClass = "text-foreground";
-  const subClass = "text-muted-foreground";
-  const bgCardClass = "bg-card border-border shadow-sm";
-  const dividerClass = "bg-border";
-
   if (loading) {
     return (
       <div className="min-h-[60vh] p-6 flex items-center justify-center">
-        <p className="text-[#A08070] font-bold text-base animate-pulse">Loading your assigned submissions...</p>
+        <p className="text-muted-foreground font-semibold text-sm animate-pulse">Loading assigned submissions...</p>
       </div>
     );
   }
@@ -261,7 +242,7 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
 
   return (
     <div className="w-full pb-16">
-      {/* Confetti & Success summary celebration overlay */}
+      {/* Celebration overlay */}
       {showCelebration && (
         <>
           <Confetti />
@@ -284,17 +265,15 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
             <Image
               src="/logo.png"
               alt="logo"
-              width={56}
-              height={56}
-              className="w-14 h-14 object-contain"
+              width={48}
+              height={48}
+              className="w-12 h-12 object-contain"
             />
             <div>
-              <h1
-                className={`text-3xl sm:text-4xl font-black tracking-tight font-serif ${titleClass}`}
-              >
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground m-0">
                 Judge Workspace
               </h1>
-              <p className={`text-base font-medium mt-1 ${subClass}`}>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 mb-0">
                 Welcome, {judgeName}
               </p>
             </div>
@@ -303,10 +282,7 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
           <Button
             variant="outline"
             onClick={onLogout}
-            className={`
-              w-full sm:w-auto h-11 px-5 rounded-xl font-bold transition-all
-              border-border text-primary hover:bg-accent
-            `}
+            className="w-full sm:w-auto h-10 px-4 rounded-xl font-bold text-xs border-border text-foreground hover:bg-muted"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Logout
@@ -319,28 +295,14 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
             <TabsTrigger
               value="submissions"
               disabled={isAllGraded}
-              className={`
-                px-5 pb-3 pt-1 rounded-none border-b-2 border-transparent bg-transparent
-                text-base font-bold shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed
-                data-[state=active]:bg-transparent data-[state=active]:shadow-none
-                ${isDark
-                  ? "text-[#A08070] data-[state=active]:border-b-[#F0C060] data-[state=active]:text-[#F0C060]"
-                  : "text-[#B89A85] data-[state=active]:border-b-[#8F102A] data-[state=active]:text-[#8F102A]"}
-              `}
+              className="px-5 py-2 rounded-lg text-sm font-semibold transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground"
             >
               <Award className="w-4 h-4 mr-2" />
               Submissions {isAllGraded && "(Completed)"}
             </TabsTrigger>
             <TabsTrigger
               value="leaderboard"
-              className={`
-                px-5 pb-3 pt-1 rounded-none border-b-2 border-transparent bg-transparent
-                text-base font-bold shadow-none transition-all
-                data-[state=active]:bg-transparent data-[state=active]:shadow-none
-                ${isDark
-                  ? "text-[#A08070] data-[state=active]:border-b-[#F0C060] data-[state=active]:text-[#F0C060]"
-                  : "text-[#B89A85] data-[state=active]:border-b-[#8F102A] data-[state=active]:text-[#8F102A]"}
-              `}
+              className="px-5 py-2 rounded-lg text-sm font-semibold transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground"
             >
               <FileText className="w-4 h-4 mr-2" />
               Leaderboard
@@ -351,30 +313,30 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
           <TabsContent value="submissions" className="mt-0 outline-none">
             
             {/* Quick overview stats banner */}
-            <div className={`p-6 border rounded-2xl mb-8 flex flex-col md:flex-row items-center justify-between gap-6 ${bgCardClass}`}>
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-[#8F102A]/5 dark:bg-[#D4732A]/5 text-[#8F102A] dark:text-[#F0C060]">
+            <div className="p-6 border border-border rounded-2xl mb-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-card shadow-sm">
+              <div className="flex items-center gap-3.5">
+                <div className="p-3 rounded-xl bg-primary/10 text-primary">
                   <CheckSquare className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className={`font-bold font-serif text-lg ${titleClass}`}>
-                    Assigned Evaluations Progress
+                  <h3 className="font-bold text-base text-foreground m-0">
+                    Evaluation Progress
                   </h3>
-                  <p className={`text-xs ${subClass}`}>
-                    Review and grade each assigned project.
+                  <p className="text-xs text-muted-foreground mt-0.5 mb-0">
+                    Review and score each assigned project.
                   </p>
                 </div>
               </div>
 
               {/* Progress bar info */}
               <div className="w-full md:max-w-xs space-y-2">
-                <div className="flex justify-between items-center text-xs font-bold">
-                  <span className={subClass}>Grading Complete</span>
-                  <span className={titleClass}>{gradedCount} / {allCount} projects</span>
+                <div className="flex justify-between items-center text-xs font-semibold">
+                  <span className="text-muted-foreground">Completed</span>
+                  <span className="text-foreground">{gradedCount} / {allCount} projects</span>
                 </div>
-                <div className="w-full bg-neutral-200 dark:bg-neutral-800 rounded-full h-1.5 overflow-hidden">
+                <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                   <div
-                    className="bg-[#8F102A] dark:bg-[#D4732A] h-1.5 transition-all duration-500"
+                    className="bg-primary h-2 transition-all duration-500 rounded-full"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
@@ -383,7 +345,6 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
 
             {/* Filters and search container */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-              {/* Search bar input */}
               <div className="relative w-full md:max-w-xs">
                 <input
                   type="text"
@@ -393,12 +354,7 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
                     setSearchQuery(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="
-                    w-full h-11 pl-4 pr-10 text-sm rounded-xl border focus:outline-none focus:ring-1
-                    bg-[#FCF6EF]/50 border-[#EBCFB5] text-[#6A4635] focus:border-[#8F102A] focus:ring-[#8F102A]
-                    dark:bg-[#0F0A05] dark:border-[#C9A227]/35 dark:text-[#F5EFE0] dark:focus:border-[#D4732A] dark:focus:ring-[#D4732A]
-                    transition-all duration-200
-                  "
+                  className="w-full h-10 pl-4 pr-4 text-xs rounded-xl border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
                 />
               </div>
 
@@ -417,20 +373,16 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
                         setStatusFilter(filter.key);
                         setCurrentPage(1);
                       }}
-                      className={`
-                        h-10 px-4 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-2 border
-                        ${isActive
-                          ? "bg-[#8F102A] text-white border-[#8F102A] dark:bg-[#D4732A] dark:text-[#0F0A05] dark:border-[#D4732A] shadow-sm"
-                          : "bg-[#FCF6EF]/40 border-[#EBCFB5] text-[#6A4635] hover:bg-[#8F102A]/5 dark:bg-[#1E1208]/40 dark:border-[#C9A227]/25 dark:text-[#A08070] dark:hover:bg-[#C9A227]/10"}
-                      `}
+                      className={`h-9 px-3.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 border cursor-pointer ${
+                        isActive
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                          : "bg-card border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
                     >
                       {filter.label}
-                      <span className={`
-                        px-1.5 py-0.5 rounded-md text-[10px] font-extrabold
-                        ${isActive 
-                          ? "bg-white/20 text-white dark:bg-[#0F0A05]/20 dark:text-[#0F0A05]" 
-                          : "bg-[#8F102A]/10 text-[#8F102A] dark:bg-[#D4732A]/10 dark:text-[#F0C060]"}
-                      `}>
+                      <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
+                        isActive ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
+                      }`}>
                         {filter.count}
                       </span>
                     </button>
@@ -452,28 +404,18 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
                   variant="outline"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className={`
-                    h-10 px-4 rounded-xl font-bold transition-all text-xs
-                    ${isDark 
-                      ? "border-[#C9A227]/20 text-[#A08070] hover:bg-[#C9A227]/10 disabled:opacity-35" 
-                      : "border-[#EBCFB5] text-[#6A4635] hover:bg-[#8F102A]/5 disabled:opacity-35"}
-                  `}
+                  className="h-9 px-4 rounded-xl font-bold text-xs border-border text-foreground hover:bg-muted disabled:opacity-35"
                 >
                   Previous
                 </Button>
-                <span className="text-sm font-bold text-[#B89A85] dark:text-[#A08070]">
+                <span className="text-xs font-bold text-muted-foreground">
                   Page {currentPage} of {totalPages}
                 </span>
                 <Button
                   variant="outline"
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className={`
-                    h-10 px-4 rounded-xl font-bold transition-all text-xs
-                    ${isDark 
-                      ? "border-[#C9A227]/20 text-[#A08070] hover:bg-[#C9A227]/10 disabled:opacity-35" 
-                      : "border-[#EBCFB5] text-[#6A4635] hover:bg-[#8F102A]/5 disabled:opacity-35"}
-                  `}
+                  className="h-9 px-4 rounded-xl font-bold text-xs border-border text-foreground hover:bg-muted disabled:opacity-35"
                 >
                   Next
                 </Button>

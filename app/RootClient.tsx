@@ -4,18 +4,20 @@ import { AuthProvider, useAuth } from "@/components/AuthProvider"
 import { Suspense, useState, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { usePathname } from "next/navigation"
-import LoaderAnimation from "@/components/LoaderAnimation"
 
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false })
 
 function getBackgroundClass(pathname: string) {
+  if (pathname === "/") return "route-landing"
   if (pathname.startsWith("/SubmissionForm") || pathname.startsWith("/submit")) return "route-submit"
   if (pathname.startsWith("/submission-result")) return "route-results"
   if (pathname.startsWith("/project") || pathname.startsWith("/gallery")) return "route-gallery"
-  if (pathname.startsWith("/judging")) return "route-judging"
+  if (pathname.startsWith("/judging") || pathname.startsWith("/judge")) return "route-judging"
   if (pathname.startsWith("/admin/results")) return "route-results"
   if (pathname.startsWith("/admin")) return "route-admin"
   if (pathname.startsWith("/dashboard")) return "route-dashboard"
+  if (pathname.startsWith("/timeline")) return "route-dashboard"
+  if (pathname.startsWith("/problem-statements") || pathname.startsWith("/guidelines")) return "route-dashboard"
   return "route-team"
 }
 
@@ -72,8 +74,7 @@ function AnnouncementBanner({ onActiveChange }: { onActiveChange: (active: boole
     }
 
     fetchStatus()
-    // Poll every 5 seconds for fast response during publishing buffer
-    const interval = setInterval(fetchStatus, 5000)
+    const interval = setInterval(fetchStatus, 15000)
     return () => {
       clearInterval(interval)
     }
@@ -96,15 +97,15 @@ function AnnouncementBanner({ onActiveChange }: { onActiveChange: (active: boole
 
   const typeStyles = {
     info: {
-      bg: "bg-blue-600 dark:bg-blue-900/90 text-white border-blue-500",
+      bg: "bg-primary text-primary-foreground border-primary/30",
       icon: "ℹ️"
     },
     warning: {
-      bg: "bg-amber-500 dark:bg-amber-800/90 text-white border-amber-500",
+      bg: "bg-secondary text-secondary-foreground border-secondary/30",
       icon: "⚠️"
     },
     urgent: {
-      bg: "bg-red-600 dark:bg-red-950/95 text-white border-red-600 animate-pulse",
+      bg: "bg-destructive text-destructive-foreground border-destructive/40 animate-pulse",
       icon: "🚨"
     },
     success: {
@@ -141,16 +142,16 @@ function Shell({ children }: { children: React.ReactNode }) {
     return <>{children}</>
   }
 
-  const backgroundClass = getBackgroundClass(pathname)
-
   if (isOperationalRoute) {
     return (
       <>
         <AnnouncementBanner onActiveChange={setHasBanner} />
-        <div className="min-h-screen bg-background text-foreground" style={{ paddingTop: hasBanner ? "40px" : "0px" }}>{children}</div>
+        <div style={{ paddingTop: hasBanner ? "40px" : "0px" }}>{children}</div>
       </>
     )
   }
+
+  const backgroundClass = getBackgroundClass(pathname)
 
   return (
     <>
@@ -161,72 +162,22 @@ function Shell({ children }: { children: React.ReactNode }) {
       <div className="route-background-veil" aria-hidden="true" />
       <AnnouncementBanner onActiveChange={setHasBanner} />
       
-      {isGallery ? (
-        <div style={{ paddingTop: hasBanner ? "40px" : "0px" }}>
+      <div style={{ paddingTop: hasBanner ? "40px" : "0px" }}>
+        <Suspense fallback={null}>
+          <Navbar className={hasBanner ? "top-[40px]" : "top-0"} />
+        </Suspense>
+        <div className="relative z-10 min-h-screen pt-24 pb-12">
           {children}
         </div>
-      ) : isSubmissionForm ? (
-        <div style={{ paddingTop: hasBanner ? "40px" : "0px" }}>
-          <Suspense fallback={null}>
-            <Navbar className={hasBanner ? "top-[40px]" : "top-0"} />
-          </Suspense>
-          {children}
-        </div>
-      ) : (
-        <div style={{ paddingTop: hasBanner ? "40px" : "0px" }}>
-          <Suspense fallback={null}>
-            <Navbar className={hasBanner ? "top-[40px]" : "top-0"} />
-          </Suspense>
-          <main className="relative z-10 min-h-screen container mx-auto px-6 pt-28 pb-10">
-            {children}
-          </main>
-        </div>
-      )}
+      </div>
     </>
   )
 }
 
-function shouldShowLoader(pathname: string): boolean {
-  if (pathname === "/") return true;
-  if (pathname.startsWith("/team")) return true;
-  if (pathname.startsWith("/SubmissionForm") || pathname.startsWith("/submit")) return true;
-  if (pathname.startsWith("/judging")) return true;
-  if (pathname.startsWith("/gallery")) return true;
-  if (pathname === "/admin" || pathname === "/admin/") return true;
-  return false;
-}
-
 export default function RootClient({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const showLoaderForPath = shouldShowLoader(pathname);
-  const [showLoader, setShowLoader] = useState(showLoaderForPath);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Trigger loader on every route transition for designated main pages
-  useEffect(() => {
-    if (showLoaderForPath) {
-      setShowLoader(true);
-    } else {
-      setShowLoader(false);
-    }
-  }, [pathname, showLoaderForPath]);
-
-  const handleLoaderComplete = () => {
-    setShowLoader(false);
-  };
-
   return (
     <AuthProvider>
-      {(!showLoaderForPath || !showLoader) && (
-        <Shell>{children}</Shell>
-      )}
-      {mounted && showLoader && showLoaderForPath && (
-        <LoaderAnimation onComplete={handleLoaderComplete} />
-      )}
+      <Shell>{children}</Shell>
     </AuthProvider>
   )
 }

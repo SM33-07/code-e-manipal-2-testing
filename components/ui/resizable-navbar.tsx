@@ -59,7 +59,7 @@ export const Navbar = ({ children, className, isSubmissionForm }: NavbarProps) =
   const [visible, setVisible] = useState<boolean>(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 100) {
+    if (latest > 60) {
       setVisible(true);
     } else {
       setVisible(false);
@@ -67,10 +67,13 @@ export const Navbar = ({ children, className, isSubmissionForm }: NavbarProps) =
   });
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      // Fixed at the top, top-0 or top-4 depending on scroll
-      className={cn("fixed inset-x-0 top-0 z-50 w-full flex flex-col items-center transition-all duration-300", className)}
+      className={cn(
+        "fixed inset-x-0 top-0 z-50 w-full flex flex-col items-center transition-all duration-200",
+        visible ? "py-2 bg-background/95 border-b border-border shadow-sm" : "py-3 bg-transparent",
+        className
+      )}
     >
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
@@ -80,82 +83,87 @@ export const Navbar = ({ children, className, isSubmissionForm }: NavbarProps) =
             )
           : child,
       )}
-    </motion.div>
+    </div>
   );
 };
 
 export const NavBody = ({ children, className, visible, isSubmissionForm }: NavBodyProps) => {
   return (
-    <motion.div
-      animate={{
-        boxShadow: visible ? "0 8px 20px rgba(0, 0, 0, 0.14)" : "none",
-        width: visible ? "75%" : "100%",
-        y: visible ? 12 : 0,
-      }}
-      transition={{
-        type: "spring",
-        stiffness: 200,
-        damping: 35,
-      }}
+    <div
       className={cn(
-        "relative z-[60] mx-auto hidden w-[calc(100%-2rem)] max-w-7xl flex-row items-center justify-between rounded-full bg-background px-5 py-2.5 lg:flex transition-all duration-300 border border-border",
-        visible && "border border-jaipur-gold/30",
+        "relative z-[60] mx-auto hidden w-[calc(100%-2rem)] max-w-7xl flex-row items-center justify-between rounded-xl bg-card text-card-foreground px-5 py-2.5 lg:flex transition-all duration-200 border border-border shadow-sm",
+        visible && "border-secondary/50 shadow-md",
         className,
       )}
     >
       {children}
-    </motion.div>
+    </div>
   );
 };
 
 export const NavItems = ({ items, className, onItemClick, pathname }: NavItemsProps) => {
   const [hovered, setHovered] = useState<number | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
-  const primaryItems = items.slice(0, 4);
-  const overflowItems = items.slice(4);
+
+  // Show up to 6 primary items directly so Dashboard, Timeline, Challenges, Team, Submit, Gallery all fit!
+  const primaryItems = items.slice(0, 6);
+  const overflowItems = items.slice(6);
 
   return (
-    <motion.div
+    <div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "flex min-w-0 flex-1 flex-row items-center justify-center gap-1 text-sm font-medium transition duration-200 lg:flex",
+        "flex min-w-0 flex-1 flex-row items-center justify-center gap-1.5 text-sm font-medium transition duration-200 lg:flex",
         className,
       )}
     >
       {primaryItems.map((item, idx) => {
         const isActive = pathname === item.link;
+        const isSubmit = item.link === "/submit";
+
         return (
           <Link
             onMouseEnter={() => setHovered(idx)}
             onClick={onItemClick}
             className={cn(
-              "relative whitespace-nowrap px-3 py-2 transition-colors duration-200 rounded-full inline-block",
-              isActive
-                ? "text-jaipur-primary font-semibold"
-                : "text-muted-foreground hover:text-foreground"
+              "relative whitespace-nowrap px-3.5 py-1.5 transition-colors duration-150 rounded-lg inline-flex items-center text-sm font-medium cursor-pointer",
+              isSubmit
+                ? "bg-primary text-primary-foreground font-semibold shadow-sm hover:bg-primary/90"
+                : isActive
+                ? "text-primary font-semibold bg-primary/10"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent/60"
             )}
             key={`link-${idx}`}
             href={item.link}
           >
-            {hovered === idx && (
-              <motion.div
-                layoutId="hovered"
-                className="absolute inset-0 h-full w-full rounded-full bg-jaipur-secondary dark:bg-[#2A1D16]"
-              />
-            )}
             <span className="relative z-20">{item.name}</span>
           </Link>
         );
       })}
       {overflowItems.length > 0 && (
         <div className="relative">
-          <button type="button" onClick={() => setMoreOpen((open) => !open)} className="rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-expanded={moreOpen} aria-haspopup="menu">
+          <button
+            type="button"
+            onClick={() => setMoreOpen((open) => !open)}
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+            aria-expanded={moreOpen}
+            aria-haspopup="menu"
+          >
             More
           </button>
           {moreOpen && (
-            <div role="menu" className="absolute right-0 top-full mt-2 min-w-40 rounded-xl border border-border bg-popover p-1 shadow-lg">
+            <div role="menu" className="absolute right-0 top-full mt-2 min-w-44 rounded-xl border border-border bg-popover p-1.5 shadow-xl z-50">
               {overflowItems.map((item) => (
-                <Link key={item.link} href={item.link} role="menuitem" onClick={() => { setMoreOpen(false); onItemClick?.(); }} className={cn("block rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent", pathname === item.link ? "bg-secondary text-primary" : "text-popover-foreground")}>
+                <Link
+                  key={item.link}
+                  href={item.link}
+                  role="menuitem"
+                  onClick={() => { setMoreOpen(false); onItemClick?.(); }}
+                  className={cn(
+                    "block rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent",
+                    pathname === item.link ? "bg-accent text-primary font-semibold" : "text-popover-foreground"
+                  )}
+                >
                   {item.name}
                 </Link>
               ))}
@@ -163,41 +171,25 @@ export const NavItems = ({ items, className, onItemClick, pathname }: NavItemsPr
           )}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 };
 
 export const MobileNav = ({ children, className, visible, isSubmissionForm }: MobileNavProps) => {
   return (
-    <motion.div
-      animate={{
-        boxShadow: visible ? "0 8px 20px rgba(0, 0, 0, 0.14)" : "none",
-        width: visible ? "90%" : "100%",
-        paddingRight: visible ? "16px" : "12px",
-        paddingLeft: visible ? "16px" : "12px",
-        borderRadius: visible ? "20px" : "0px",
-        y: visible ? 10 : 0,
-      }}
-      transition={{
-        type: "spring",
-        stiffness: 200,
-        damping: 35,
-      }}
+    <div
       className={cn(
-        "relative z-50 mx-auto flex w-[calc(100%-1rem)] max-w-[calc(100vw-1rem)] flex-col items-center justify-between rounded-2xl bg-background px-3 py-3 lg:hidden transition-all duration-300 border border-border",
-        visible && "border border-jaipur-gold/30",
+        "relative z-[60] mx-auto flex w-[calc(100%-1.5rem)] flex-row items-center justify-between rounded-xl bg-card text-card-foreground px-4 py-2.5 lg:hidden transition-all duration-200 border border-border shadow-sm",
+        visible && "border-secondary/50 shadow-md",
         className,
       )}
     >
       {children}
-    </motion.div>
+    </div>
   );
 };
 
-export const MobileNavHeader = ({
-  children,
-  className,
-}: MobileNavHeaderProps) => {
+export const MobileNavHeader = ({ children, className }: MobileNavHeaderProps) => {
   return (
     <div
       className={cn(
@@ -220,11 +212,12 @@ export const MobileNavMenu = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.18 }}
           className={cn(
-            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-xl bg-card px-6 py-8 shadow-lg border border-border",
+            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-3 rounded-2xl bg-card text-card-foreground px-6 py-6 shadow-2xl border border-border",
             className,
           )}
         >
@@ -243,9 +236,9 @@ export const MobileNavToggle = ({
   onClick: () => void;
 }) => {
   return isOpen ? (
-    <X className="text-foreground cursor-pointer size-6" onClick={onClick} />
+    <X className="text-foreground cursor-pointer size-6 hover:text-primary transition-colors" onClick={onClick} />
   ) : (
-    <Menu className="text-foreground cursor-pointer size-6" onClick={onClick} />
+    <Menu className="text-foreground cursor-pointer size-6 hover:text-primary transition-colors" onClick={onClick} />
   );
 };
 
@@ -257,8 +250,8 @@ export const NavbarLogo = () => {
     >
       <img
         src="/logo.png"
-        alt="logo"
-        className="h-10 w-auto object-contain"
+        alt="Code-e-Manipal 2.0"
+        className="h-9 w-auto object-contain"
       />
     </Link>
   );
@@ -282,13 +275,13 @@ export const NavbarButton = ({
   | React.ComponentPropsWithoutRef<"button">
 )) => {
   const baseStyles =
-    "px-4 py-2 rounded-md bg-card text-card-foreground text-sm font-bold relative cursor-pointer transition-colors inline-block text-center border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+    "px-4 py-2 rounded-lg text-sm font-semibold relative cursor-pointer transition-colors inline-block text-center border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
   const variantStyles = {
-    primary: "bg-primary text-primary-foreground border-primary hover:bg-primary/90",
-    secondary: "bg-secondary text-secondary-foreground border-border hover:bg-accent",
+    primary: "bg-primary text-primary-foreground border-primary hover:bg-primary/90 shadow-sm",
+    secondary: "bg-secondary text-secondary-foreground border-secondary hover:bg-secondary/90 shadow-sm",
     dark: "bg-foreground text-background border-foreground hover:opacity-90",
-    gradient: "bg-primary text-primary-foreground border-primary hover:bg-primary/90",
+    gradient: "bg-primary text-primary-foreground border-primary hover:bg-primary/90 shadow-sm",
   };
 
   return (

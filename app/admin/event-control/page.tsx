@@ -387,36 +387,36 @@ export default function EventControlPage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto p-2">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#C9A227]/20 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
           <h1 className="text-3xl font-extrabold text-foreground flex items-center gap-2">
-            <Radio className="text-[#D4732A]" />
+            <Radio className="text-primary" />
             Event Day Control Panel
           </h1>
-          <p className="text-sm text-[#A08070] mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Real-time management for team submissions, deadline extensions, and system broadcasts.
           </p>
         </div>
 
         {/* Global Freeze Switch */}
-        <div className="bg-[#FCF6EF] dark:bg-[#1E1208] border border-[#EBCFB5] dark:border-[#C9A227]/20 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 rounded-2xl p-4 flex items-center gap-4 shadow-lg">
+        <div className="bg-card border border-border hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 rounded-2xl p-4 flex items-center gap-4 shadow-lg">
           <div className="text-left">
             <h4 className="text-sm font-bold text-foreground">Global Freeze</h4>
-            <p className="text-xs text-[#A08070]">Controls all team portals</p>
+            <p className="text-xs text-muted-foreground">Controls all team portals</p>
           </div>
           {togglingGlobal ? (
-            <Loader2 className="animate-spin text-[#D4732A] size-5" />
+            <Loader2 className="animate-spin text-primary size-5" />
           ) : (
             <div className="flex gap-2">
               <button
                 onClick={() => handleGlobalFreeze(true)}
-                className="flex items-center gap-1.5 px-4 py-2 bg-red-950 text-red-200 border border-red-800 hover:bg-red-900 rounded-xl text-xs font-bold transition duration-200 cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-2 bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 rounded-xl text-xs font-bold transition duration-200 cursor-pointer"
               >
                 <Lock size={14} /> Freeze All
               </button>
               <button
                 onClick={() => handleGlobalFreeze(false)}
-                className="flex items-center gap-1.5 px-4 py-2 bg-emerald-950 text-emerald-200 border border-emerald-800 hover:bg-emerald-900 rounded-xl text-xs font-bold transition duration-200 cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 rounded-xl text-xs font-bold transition duration-200 cursor-pointer"
               >
                 <Unlock size={14} /> Unfreeze All
               </button>
@@ -428,37 +428,37 @@ export default function EventControlPage() {
       {/* Quick Controls Grid (3 Equal Columns) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Timer Settings Card */}
-        <div className="bg-[#FCF6EF] dark:bg-[#1E1208] border border-[#EBCFB5] dark:border-[#C9A227]/20 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between">
+        <div className="bg-card border border-border hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between">
           <div>
             <div className="absolute top-0 right-0 p-3 opacity-10">
-              <Clock size={80} className="text-[#D4732A]" />
+              <Clock size={80} className="text-secondary" />
             </div>
             
             <h3 className="text-lg font-bold text-foreground flex items-center gap-2 mb-4">
-              <Clock size={18} className="text-[#D4732A]" />
+              <Clock size={18} className="text-secondary" />
               Hackathon Event Timer
             </h3>
 
             <div className="space-y-4">
-              <div className="flex justify-between items-center bg-black/20 p-3 rounded-xl border border-[#C9A227]/10">
+              <div className="flex justify-between items-center bg-muted/40 p-3 rounded-xl border border-border">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#A08070]">Status</span>
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground">Status</span>
                   <p className="text-sm font-bold text-foreground">
                     {isStarted ? (
-                      <span className="text-emerald-400">● Live Running</span>
+                      <span className="text-emerald-500">● Live Running</span>
                     ) : (
-                      <span className="text-[#A08070]">● Not Started</span>
+                      <span className="text-muted-foreground">● Not Started</span>
                     )}
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] uppercase font-bold text-[#A08070]">Time Left</span>
-                  <p className="text-sm font-mono font-bold text-[#F0C060]">{timeRemainingStr}</p>
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground">Time Left</span>
+                  <p className="text-sm font-mono font-bold text-secondary">{timeRemainingStr}</p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#A08070] mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
                   Hackathon Start Time
                 </label>
                 <input
@@ -466,12 +466,12 @@ export default function EventControlPage() {
                   value={startTime ? new Date(new Date(startTime).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
                   onChange={(e) => setStartTime(e.target.value ? new Date(e.target.value).toISOString() : "")}
                   disabled={isStarted}
-                  className="w-full bg-black/35 border border-[#C9A227]/20 rounded-xl p-3 text-xs text-foreground focus:ring-1 focus:ring-[#D4732A] focus:outline-none disabled:opacity-50"
+                  className="w-full bg-background border border-border rounded-xl p-3 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-none disabled:opacity-50"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#A08070] mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
                   Duration (Hours)
                 </label>
                 <input
@@ -481,7 +481,7 @@ export default function EventControlPage() {
                   value={durationHours}
                   onChange={(e) => setDurationHours(Math.max(1, parseInt(e.target.value) || 0))}
                   disabled={isStarted}
-                  className="w-full bg-black/35 border border-[#C9A227]/20 rounded-xl p-3 text-xs text-foreground focus:ring-1 focus:ring-[#D4732A] focus:outline-none disabled:opacity-50"
+                  className="w-full bg-background border border-border rounded-xl p-3 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-none disabled:opacity-50"
                 />
               </div>
             </div>
@@ -501,7 +501,7 @@ export default function EventControlPage() {
               <button
                 onClick={handleStopTimer}
                 disabled={updatingTimer}
-                className="flex-1 py-3 rounded-xl bg-red-950 text-red-200 border border-red-800 hover:bg-red-900 transition duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-md"
+                className="flex-1 py-3 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-md"
               >
                 {updatingTimer ? <Loader2 className="animate-spin size-4" /> : <Lock size={14} />}
                 Stop / Reset Timer
@@ -512,7 +512,7 @@ export default function EventControlPage() {
               <button
                 onClick={() => handleSaveTimer(false)}
                 disabled={updatingTimer || !startTime}
-                className="flex-1 py-3 rounded-xl bg-[#D4732A] text-[#1E1208] font-bold text-xs hover:bg-[#D4732A]/90 transition duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition duration-200 cursor-pointer flex items-center justify-center gap-1.5 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Set Schedule
               </button>
@@ -521,42 +521,42 @@ export default function EventControlPage() {
         </div>
 
         {/* LEADERBOARD & RESULTS PUBLISHING CARD */}
-        <div className="bg-[#FCF6EF] dark:bg-[#1E1208] border border-[#EBCFB5] dark:border-[#C9A227]/20 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between">
+        <div className="bg-card border border-border hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-[#D4732A]/10 border border-[#D4732A]/30 rounded-xl text-[#D4732A]">
+              <div className="p-3 bg-secondary/10 border border-secondary/30 rounded-xl text-secondary">
                 <Sparkles size={20} />
               </div>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-[#F0C060] bg-[#C9A227]/10 px-2.5 py-1 rounded-full border border-[#C9A227]/20">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-secondary bg-secondary/10 px-2.5 py-1 rounded-full border border-secondary/20">
                 Results Control
               </span>
             </div>
 
-            <h3 className="text-xl font-bold font-serif text-foreground mb-1">
+            <h3 className="text-xl font-bold text-foreground mb-1">
               Leaderboard & Results
             </h3>
-            <p className="text-xs text-[#A08070] mb-4">
+            <p className="text-xs text-muted-foreground mb-4">
               Publish competition rankings to participants with a 5-minute announcement buffer.
             </p>
 
             <div className="space-y-4">
-              <div className="flex justify-between items-center bg-black/20 p-3 rounded-xl border border-[#C9A227]/10">
+              <div className="flex justify-between items-center bg-muted/40 p-3 rounded-xl border border-border">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#A08070]">Publish Status</span>
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground">Publish Status</span>
                   <p className="text-sm font-bold text-foreground">
                     {resultsPublished === "true" ? (
-                      <span className="text-emerald-400">● Published Live</span>
+                      <span className="text-emerald-500">● Published Live</span>
                     ) : resultsPublished === "publishing" ? (
-                      <span className="text-[#F0C060] animate-pulse">● Publishing (5m Buffer)</span>
+                      <span className="text-secondary animate-pulse">● Publishing (5m Buffer)</span>
                     ) : (
-                      <span className="text-[#A08070]">● Unpublished (Hidden)</span>
+                      <span className="text-muted-foreground">● Unpublished (Hidden)</span>
                     )}
                   </p>
                 </div>
                 {resultsPublished === "publishing" && resultsPublishTime && (
                   <div className="text-right">
-                    <span className="text-[10px] uppercase font-bold text-[#A08070]">Goes Live</span>
-                    <p className="text-xs font-mono text-[#F0C060]">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground">Goes Live</span>
+                    <p className="text-xs font-mono text-secondary">
                       {new Date(resultsPublishTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
@@ -568,7 +568,7 @@ export default function EventControlPage() {
                   <button
                     onClick={() => setShowPublishModal(true)}
                     disabled={publishingResults}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-[#D4732A] to-[#C1440E] text-white font-bold text-xs hover:from-[#E8924A] hover:to-[#D4732A] transition duration-200 cursor-pointer flex items-center justify-center gap-2 shadow-md"
+                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 transition duration-200 cursor-pointer flex items-center justify-center gap-2 shadow-md"
                   >
                     <Sparkles size={16} /> Publish Results (5-Min Buffer)
                   </button>
@@ -579,7 +579,7 @@ export default function EventControlPage() {
                     <button
                       onClick={handleCancelPublish}
                       disabled={publishingResults}
-                      className="w-full py-3 rounded-xl bg-red-950 text-red-200 border border-red-800 hover:bg-red-900 font-bold text-xs transition duration-200 cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full py-3 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 font-bold text-xs transition duration-200 cursor-pointer flex items-center justify-center gap-2"
                     >
                       {publishingResults ? <Loader2 className="animate-spin size-4" /> : <Lock size={14} />} Cancel Publishing
                     </button>
@@ -590,7 +590,7 @@ export default function EventControlPage() {
                   <button
                     onClick={handleCancelPublish}
                     disabled={publishingResults}
-                    className="w-full py-3 rounded-xl bg-neutral-900 border border-[#C9A227]/30 text-[#A08070] hover:text-foreground font-bold text-xs transition duration-200 cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full py-3 rounded-xl bg-card border border-border text-foreground hover:bg-muted font-bold text-xs transition duration-200 cursor-pointer flex items-center justify-center gap-2 shadow-sm"
                   >
                     {publishingResults ? <Loader2 className="animate-spin size-4" /> : <Unlock size={14} />} Unpublish Leaderboard
                   </button>
@@ -601,34 +601,34 @@ export default function EventControlPage() {
         </div>
 
         {/* Broadcaster Form */}
-        <div className="bg-[#FCF6EF] dark:bg-[#1E1208] border border-[#EBCFB5] dark:border-[#C9A227]/20 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between">
+        <div className="bg-card border border-border hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between">
           <div>
             <div className="absolute top-0 right-0 p-3 opacity-10">
-              <Megaphone size={80} className="text-[#D4732A]" />
+              <Megaphone size={80} className="text-secondary" />
             </div>
             
             <h3 className="text-lg font-bold text-foreground flex items-center gap-2 mb-4">
-              <Megaphone size={18} className="text-[#D4732A]" />
+              <Megaphone size={18} className="text-secondary" />
               Live Broadcast Alert
             </h3>
 
             <form onSubmit={handleBroadcast} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#A08070] mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
                   Announcement Message
                 </label>
                 <textarea
                   value={announcementContent}
                   onChange={(e) => setAnnouncementContent(e.target.value)}
                   placeholder="Type message to broadcast to all participants..."
-                  className="w-full min-h-[90px] bg-black/35 border border-[#C9A227]/20 rounded-xl p-3 text-sm text-foreground focus:ring-1 focus:ring-[#D4732A] focus:outline-none placeholder-[#A08070]/50"
+                  className="w-full min-h-[90px] bg-background border border-border rounded-xl p-3 text-sm text-foreground focus:ring-1 focus:ring-primary focus:outline-none placeholder:text-muted-foreground/60"
                   maxLength={250}
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#A08070] mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
                   Alert Severity / Type
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -639,11 +639,11 @@ export default function EventControlPage() {
                       onClick={() => setAnnouncementType(type)}
                       className={`px-3 py-2 text-xs font-semibold rounded-lg capitalize border cursor-pointer transition ${
                         announcementType === type
-                          ? type === "info" ? "bg-blue-950 text-blue-200 border-blue-600"
-                            : type === "success" ? "bg-emerald-950 text-emerald-200 border-emerald-600"
-                            : type === "warning" ? "bg-amber-950 text-amber-200 border-amber-600"
-                            : "bg-red-950 text-red-200 border-red-600"
-                          : "bg-black/20 text-[#A08070] border-transparent hover:border-[#C9A227]/20"
+                          ? type === "info" ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30"
+                            : type === "success" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+                            : type === "warning" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
+                            : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30"
+                          : "bg-muted/30 text-muted-foreground border-border hover:border-muted-foreground/40"
                       }`}
                     >
                       {type}
@@ -655,7 +655,7 @@ export default function EventControlPage() {
               <button
                 type="submit"
                 disabled={submittingBroadcast || !announcementContent.trim()}
-                className="w-full py-3 rounded-xl bg-[#D4732A] text-[#1E1208] font-bold text-sm hover:bg-[#D4732A]/90 transition duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md mt-2"
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-sm transition duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md mt-2"
               >
                 {submittingBroadcast ? (
                   <Loader2 className="animate-spin size-4" />
@@ -673,28 +673,28 @@ export default function EventControlPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Past Announcements */}
         <div className="lg:col-span-1">
-          <div className="bg-[#FCF6EF] dark:bg-[#1E1208] border border-[#EBCFB5] dark:border-[#C9A227]/20 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 rounded-2xl p-6 shadow-xl space-y-4 h-full">
+          <div className="bg-card border border-border hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 rounded-2xl p-6 shadow-xl space-y-4 h-full">
             <h3 className="text-lg font-bold text-foreground">Announcement History</h3>
             
             {loadingAnnouncements ? (
               <div className="flex justify-center p-6">
-                <Loader2 className="animate-spin text-[#D4732A]" />
+                <Loader2 className="animate-spin text-primary" />
               </div>
             ) : announcements.length === 0 ? (
-              <p className="text-xs text-[#A08070] text-center py-6">No announcements broadcasted yet.</p>
+              <p className="text-xs text-muted-foreground text-center py-6">No announcements broadcasted yet.</p>
             ) : (
               <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
                 {announcements.map((ann) => (
                   <div
                     key={ann.id}
-                    className="p-3 bg-black/20 rounded-xl border border-[#C9A227]/10 flex flex-col gap-2 relative group"
+                    className="p-3 bg-muted/30 rounded-xl border border-border flex flex-col gap-2 relative group"
                   >
                     <div className="flex justify-between items-start gap-2">
                       <span className={`text-[10px] px-2 py-0.5 rounded-full capitalize font-bold ${
-                        ann.type === "info" ? "bg-blue-950 text-blue-300"
-                          : ann.type === "success" ? "bg-emerald-950 text-emerald-300"
-                          : ann.type === "warning" ? "bg-amber-950 text-amber-300"
-                          : "bg-red-950 text-red-300"
+                        ann.type === "info" ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                          : ann.type === "success" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                          : ann.type === "warning" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                          : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
                       }`}>
                         {ann.type}
                       </span>
@@ -702,21 +702,21 @@ export default function EventControlPage() {
                         <button
                           onClick={() => handleToggleAnnouncement(ann.id, !ann.is_active)}
                           className={`text-[10px] px-2 py-0.5 rounded font-bold cursor-pointer transition ${
-                            ann.is_active ? "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30" : "bg-[#A08070]/20 text-[#A08070] hover:bg-[#A08070]/30"
+                            ann.is_active ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/30" : "bg-muted text-muted-foreground hover:bg-muted/80"
                           }`}
                         >
                           {ann.is_active ? "Active" : "Inactive"}
                         </button>
                         <button
                           onClick={() => handleDeleteAnnouncement(ann.id)}
-                          className="text-[#A08070] hover:text-red-400 p-0.5 rounded cursor-pointer"
+                          className="text-muted-foreground hover:text-destructive p-0.5 rounded cursor-pointer"
                         >
                           <Trash2 size={12} />
                         </button>
                       </div>
                     </div>
                     <p className="text-xs text-foreground font-medium line-clamp-3">{ann.content}</p>
-                    <div className="flex justify-between text-[9px] text-[#A08070]">
+                    <div className="flex justify-between text-[9px] text-muted-foreground">
                       <span>By {ann.creator_name || "Admin"}</span>
                       <span>{new Date(ann.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
@@ -729,37 +729,37 @@ export default function EventControlPage() {
 
         {/* Right Column: Submission & Deadline Table */}
         <div className="lg:col-span-2">
-          <div className="bg-[#FCF6EF] dark:bg-[#1E1208] border border-[#EBCFB5] dark:border-[#C9A227]/20 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 rounded-2xl p-6 shadow-xl space-y-6 h-full">
+          <div className="bg-card border border-border hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 rounded-2xl p-6 shadow-xl space-y-6 h-full">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-lg font-bold text-foreground">Team Submissions Manager</h3>
-                <p className="text-xs text-[#A08070] mt-0.5">Configure individual grace extensions or locks.</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Configure individual grace extensions or locks.</p>
               </div>
 
               {/* Search Bar */}
               <div className="relative">
-                <Search className="absolute left-3 top-2.5 text-[#A08070]/60 size-4" />
+                <Search className="absolute left-3 top-2.5 text-muted-foreground size-4" />
                 <input
                   type="text"
                   placeholder="Search team name..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-black/30 border border-[#C9A227]/20 rounded-xl pl-9 pr-4 py-2 text-xs text-foreground focus:ring-1 focus:ring-[#D4732A] focus:outline-none placeholder-[#A08070]/40 w-full sm:w-60"
+                  className="bg-background border border-border rounded-xl pl-9 pr-4 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:outline-none placeholder:text-muted-foreground/60 w-full sm:w-60"
                 />
               </div>
             </div>
 
             {loadingTeams ? (
               <div className="flex justify-center py-20">
-                <Loader2 className="animate-spin text-[#D4732A]" />
+                <Loader2 className="animate-spin text-primary" />
               </div>
             ) : filteredTeams.length === 0 ? (
-              <div className="text-center py-20 text-[#A08070]">No teams found.</div>
+              <div className="text-center py-20 text-muted-foreground">No teams found.</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-[#C9A227]/20 text-[#A08070] font-bold uppercase tracking-wider text-[10px]">
+                    <tr className="border-b border-border text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
                       <th className="pb-3 pl-2">Team Details</th>
                       <th className="pb-3">Submission Status</th>
                       <th className="pb-3">Submitted At</th>
@@ -769,19 +769,19 @@ export default function EventControlPage() {
                   </thead>
                   <tbody>
                     {filteredTeams.map((team) => (
-                      <tr key={team.id} className="border-b border-[#C9A227]/10 hover:bg-black/10 transition">
+                      <tr key={team.id} className="border-b border-border/60 hover:bg-muted/30 transition">
                         {/* Team Info */}
                         <td className="py-4 pl-2">
                           <p className="font-semibold text-foreground">{team.name}</p>
-                          <span className="text-[10px] text-[#A08070]">{team.member_count} Members</span>
+                          <span className="text-[10px] text-muted-foreground">{team.member_count} Members</span>
                         </td>
                         
                         {/* Status badge */}
                         <td className="py-4">
                           <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
-                            team.submission_frozen 
-                              ? "bg-red-950 text-red-300 border border-red-800" 
-                              : "bg-emerald-950 text-emerald-300 border border-emerald-800"
+                            team.submission_frozen
+                              ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20"
+                              : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
                           }`}>
                             {team.submission_frozen ? <Lock size={10} /> : <Unlock size={10} />}
                             {team.submission_frozen ? "Frozen" : "Open"}
@@ -792,11 +792,11 @@ export default function EventControlPage() {
                         <td className="py-4">
                           {team.submitted_at ? (
                             <div className="flex flex-col gap-0.5">
-                              <span className="font-semibold text-[#D4732A]">
+                              <span className="font-semibold text-primary">
                                 {formatDateTime(team.submitted_at)}
                               </span>
                               {isStarted && startTime && (
-                                <span className="text-[10px] text-[#A08070]">
+                                <span className="text-[10px] text-muted-foreground">
                                   {(() => {
                                     const subMs = new Date(team.submitted_at).getTime();
                                     const startMs = new Date(startTime).getTime();
@@ -810,7 +810,7 @@ export default function EventControlPage() {
                               )}
                             </div>
                           ) : (
-                            <span className="text-[#A08070]/60 italic font-medium">Not submitted</span>
+                            <span className="text-muted-foreground/60 italic font-medium">Not submitted</span>
                           )}
                         </td>
 
@@ -831,8 +831,8 @@ export default function EventControlPage() {
                             onClick={() => handleTeamFreeze(team.id, !team.submission_frozen)}
                             className={`px-3 py-1.5 rounded-lg border font-bold text-[10px] cursor-pointer transition ${
                               team.submission_frozen
-                                ? "bg-emerald-950 text-emerald-200 border-emerald-700 hover:bg-emerald-900"
-                                : "bg-red-950 text-red-200 border-red-700 hover:bg-red-900"
+                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
+                                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20 hover:bg-rose-500/20"
                             }`}
                           >
                             {team.submission_frozen ? "Unlock Portal" : "Lock Portal"}
@@ -851,9 +851,9 @@ export default function EventControlPage() {
       {/* PUBLISH RESULTS CONFIRMATION MODAL */}
       {showPublishModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-[#FCF6EF] dark:bg-[#1E1208] border border-[#EBCFB5] dark:border-[#C9A227]/30 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
-            <div className="flex items-center justify-between pb-4 border-b border-[#C9A227]/20 mb-4">
-              <h3 className="text-xl font-bold font-serif text-foreground">
+          <div className="w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+            <div className="flex items-center justify-between pb-4 border-b border-border mb-4">
+              <h3 className="text-xl font-bold text-foreground">
                 Publish Results Confirmation
               </h3>
               <button
@@ -865,16 +865,16 @@ export default function EventControlPage() {
               </button>
             </div>
 
-            <p className="text-sm text-[#A08070] leading-relaxed mb-6">
+            <p className="text-sm text-muted-foreground leading-relaxed mb-6">
               The leaderboard will be published in 5 minutes.
             </p>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-[#C9A227]/20">
+            <div className="flex justify-end gap-3 pt-4 border-t border-border">
               <button
                 type="button"
                 onClick={() => setShowPublishModal(false)}
                 disabled={publishingResults}
-                className="h-10 px-4 rounded-xl border border-[#C9A227]/30 text-xs font-bold text-[#A08070] hover:bg-[#C9A227]/10 transition-colors cursor-pointer"
+                className="h-10 px-4 rounded-xl border border-border text-xs font-bold text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -882,7 +882,7 @@ export default function EventControlPage() {
                 type="button"
                 onClick={handleStartPublish}
                 disabled={publishingResults}
-                className="h-10 px-5 rounded-xl bg-gradient-to-r from-[#D4732A] to-[#C1440E] text-white text-xs font-bold flex items-center justify-center gap-2 hover:from-[#E8924A] hover:to-[#D4732A] transition-all cursor-pointer"
+                className="h-10 px-5 rounded-xl bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center gap-2 hover:bg-primary/90 transition-all cursor-pointer shadow-sm"
               >
                 {publishingResults ? "Initiating..." : "Confirm & Publish"}
               </button>
@@ -950,7 +950,7 @@ function ExtensionPicker({
 
   if (!startTime) {
     return (
-      <span className="text-[10px] font-semibold text-[#A08070]/60 italic">
+      <span className="text-[10px] font-semibold text-muted-foreground/60 italic">
         Timer not started
       </span>
     );
@@ -960,13 +960,13 @@ function ExtensionPicker({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-[10px] font-semibold text-[#C9A227]">
+      <span className="text-[10px] font-semibold text-secondary">
         {hasExtension
           ? `${parseInt(hours) || 0}h ${parseInt(minutes) || 0}m extension`
           : "No extension"}
       </span>
       <div className="flex gap-1 items-center">
-        <div className="flex gap-1 items-center bg-black/30 border border-[#C9A227]/20 rounded px-1.5 py-0.5">
+        <div className="flex gap-1 items-center bg-muted/40 border border-border rounded px-1.5 py-0.5">
           <input
             type="number"
             min="0"
@@ -981,7 +981,7 @@ function ExtensionPicker({
             }}
             className="w-7 bg-transparent border-none text-[10px] focus:outline-none text-foreground text-center p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
-          <span className="text-[9px] text-[#A08070] font-bold">h</span>
+          <span className="text-[9px] text-muted-foreground font-bold">h</span>
           <input
             type="number"
             min="0"
@@ -997,7 +997,7 @@ function ExtensionPicker({
             }}
             className="w-7 bg-transparent border-none text-[10px] focus:outline-none text-foreground text-center p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
-          <span className="text-[9px] text-[#A08070] font-bold">m</span>
+          <span className="text-[9px] text-muted-foreground font-bold">m</span>
         </div>
         {deadlineExtension && (
           <button
@@ -1006,7 +1006,7 @@ function ExtensionPicker({
               setMinutes("");
               onSave(teamId, null);
             }}
-            className="text-[#A08070] hover:text-red-400 font-bold px-1.5 py-0.5 border border-[#C9A227]/20 rounded hover:border-red-400 cursor-pointer text-[9px]"
+            className="text-muted-foreground hover:text-destructive font-bold px-1.5 py-0.5 border border-border rounded hover:border-destructive/40 cursor-pointer text-[9px]"
           >
             Clear
           </button>

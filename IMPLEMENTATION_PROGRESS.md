@@ -86,3 +86,63 @@ Validation performed:
 Browser inspection remains unavailable because the local automation runtime could not initialize; no browser validation is claimed.
 
 Commit: `7f3c750` — `feat: finalize frontend experience and visual system`
+
+## Stage F — Master Frontend Recovery + Final UI Implementation (from Forensic Audit)
+
+Based directly on `FRONTEND_UI_FORENSIC_AUDIT.md`, executed root-cause recovery across the entire frontend:
+
+1. **Tailwind v4 Theme Pipeline & Semantic Token Compilation (P0-1):**
+   - Repaired `@theme inline` pipeline in `styles/theme.css` so semantic tokens (`--card`, `--background`, `--foreground`, `--primary`, `--secondary`, `--border`) compile into actual solid browser styles.
+   - Cleaned `styles/tailwind.css` entrypoint and stripped duplicate CSS variable declarations.
+   - Confirmed `bg-card` computes to opaque `#FFFDF9` (Light: Pink City Atelier) and `#0C1728` (Dark: Sapphire Haveli) with 100% opacity.
+
+2. **Opaque Surfaces & Zero Content Transparency (P0-2):**
+   - Eliminated all transparent content surfaces; cards, panels, forms, modals, tables, and submission cards now render solid background fills.
+   - Eliminated glassmorphism/backdrop-blur hacks across cards and navigation.
+   - Heritage photography serves purely as restrained atmospheric framing, not background bleeding through text.
+
+3. **Admin Shell & Navigation Recovery (P0-3):**
+   - Created dedicated `components/admin/AdminHeader.tsx` displaying the event state banner, active user info, role badge, theme switcher, and direct sign-out.
+   - Rebuilt `app/admin/layout.tsx` with a dual navigation system:
+     - Desktop: Fixed full-height sidebar with high-contrast active route badges, logout button, and clear separation from participant workflows.
+     - Mobile: Full drawer overlay with hamburger trigger, zero horizontal scrollbar overflow, and accessible logout.
+   - Verified that admin views are isolated and never inherit participant navigation.
+
+4. **Participant Navbar & Mobile Menu Recovery (P0-4):**
+   - Refactored `components/ui/resizable-navbar.tsx` and `components/Navbar.tsx`:
+     - Opaque background shield (`bg-background/95 border-b border-border shadow-sm`) with zero collision on scroll.
+     - Prioritized desktop navigation: 6 primary links (`/dashboard`, `/timeline`, `/problem-statements`, `/guidelines`, `/team`, `/submit`, `/gallery`) rendered within available width, with overflow handled gracefully.
+     - Fully opaque mobile menu drawer with backdrop dismissal, smooth spring transitions, and accessible touch targets.
+
+5. **Legacy Brown/Gold System Removal at Source (P0-5):**
+   - Eradicated legacy brown/gold hex codes (`#1E1208`, `#0F0A05`, `#C9A227`, `#D4732A`, `#FCF6EF`, `#8B1F44`, `#A08070`, `#5E142B`) across all application components and views.
+   - Replaced old serif font declarations (`font-serif`, `Cormorant Garamond`) with modern technical sans-serif typography.
+   - Updated confetti palette to Jaipur Pink, Antique Brass, and Terracotta.
+   - Deprecated unused legacy components `components/AdminSidebar.tsx` and `components/HeaderGallery.tsx`.
+
+6. **Jaipur Brand Palette Realignment (P0-6):**
+   - Primary: Jaipur Pink (`#C97878` / `#B95745`)
+   - Secondary: Antique Brass (`#D2AC68` / `#B08A45`)
+   - Support: Terracotta (`#A64B3E`)
+   - Structural: Sapphire / Indigo (`#091221` / `#0C1728`)
+   - Eliminated blue-first corporate styling and brown-first heritage styling.
+
+7. **Page-by-Page Recovery:**
+   - **`/submit` & `SubmissionForm`:** Completely rewrote `components/SubmissionForm.tsx` and `app/SubmissionForm/page.tsx` (centered container, removed nested `<main>`, solid card backgrounds, primary pink submit button, clean tech stack & track badges).
+   - **`/team` & `TeamManagement`:** Rewrote `components/TeamManagement.tsx` (solid member cards, phase bar, invite codes, admin team view).
+   - **`/judging` & `JudgingInterface`:** Rewrote `components/JudgingInterface.tsx`, `components/SubmissionList.tsx`, `components/JudgeDashboard.tsx`, `components/Leaderboard.tsx`, `components/SuccessSummaryCard.tsx`, and `components/JudgeAssignment.tsx` (solid rubric sliders, scoring criteria, action buttons).
+   - **`/admin` subpages:** Rewrote `app/admin/page.tsx`, `app/admin/registrations/page.tsx`, `app/admin/event-control/page.tsx`, `app/admin/report/page.tsx`, `app/admin/results/page.tsx`, `app/admin/analytics/page.tsx`, and `app/admin/users/page.tsx` (solid cards, clean tables, CSV/Excel export, real-time controls).
+   - **`/gallery`:** Rewrote `components/FeaturedProjects.tsx`, `components/VideoCarousel.tsx`, `components/ProjectGrid.tsx`, and `app/gallery/page.tsx` (eliminated 3D laptop fold gimmick and "Shahi Darbar" fantasy; replaced with modern 3-tier podium showcase and clean project grid/list view).
+   - **`/login`:** Rebuilt `app/login/page.tsx` into a technical console login card with high-contrast inputs and instant theme switcher.
+   - **`/project/[id]`:** Removed leaked `Header.tsx` ("LearnIT Admin Dashboard") from public project view.
+
+8. **Loading UX & Navigation Delay Removal:**
+   - Replaced artificial 3-second `LoaderAnimation` in `app/RootClient.tsx` with instantaneous route transitions and real async loading states.
+
+Validation performed:
+- `npx tsc --noEmit` — 0 errors (clean exit code 0).
+- `npm run build` — 52/52 routes compiled successfully in 3.6s with Turbopack (clean exit code 0).
+- `git diff --check` — 0 whitespace or formatting issues.
+- Global grep audits: `#1E1208` (0 matches), `#0F0A05` (0 matches), `#C9A227` (0 matches), `#D4732A` (0 matches), `#FCF6EF` (0 matches), `#8B1F44` (0 matches), `#A08070` (0 matches).
+- Live browser validation across desktop & mobile (390px) viewports in both Light & Dark modes; captured screenshots confirmed solid opaque cards, crisp buttons, and zero transparent content surfaces.
+
