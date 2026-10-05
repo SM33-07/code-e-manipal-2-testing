@@ -41,7 +41,10 @@ export function SpotlightCard({
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only track pointer for devices with a fine pointer (mouse/trackpad), ignoring touch taps
     if (prefersReducedMotion || !cardRef.current) return;
+    if (typeof window !== "undefined" && !window.matchMedia("(pointer: fine)").matches) return;
+
     const rect = cardRef.current.getBoundingClientRect();
     setPosition({
       x: e.clientX - rect.left,
@@ -53,10 +56,6 @@ export function SpotlightCard({
     setPosition(null);
   };
 
-  const defaultSpotlight =
-    spotlightColor ||
-    "var(--spotlight-gradient, radial-gradient(350px circle at var(--mouse-x, 0px) var(--mouse-y, 0px), rgba(185, 87, 69, 0.09), transparent 70%))";
-
   return (
     <div
       ref={cardRef}
@@ -65,8 +64,8 @@ export function SpotlightCard({
       onFocus={() => setIsFocused(true)}
       onBlur={() => setIsFocused(false)}
       className={cn(
-        "relative rounded-2xl border border-border bg-card text-card-foreground shadow-sm transition-all duration-200 overflow-hidden",
-        "hover:border-secondary/50 hover:shadow-md",
+        "relative rounded-2xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden",
+        "animate-entrance card-hover-lift hover:border-secondary/50 hover:shadow-md",
         isFocused && "ring-2 ring-primary/30 border-primary",
         className
       )}
@@ -80,18 +79,18 @@ export function SpotlightCard({
       }
       {...props}
     >
-      {/* Dynamic Radial Spotlight Highlight */}
+      {/* Restrained Localized Edge Spotlight (Never washes out content or text readability) */}
       {!prefersReducedMotion && position && (
         <div
           className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-300"
           style={{
-            background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, var(--jaipur-primary-light, rgba(201, 120, 120, 0.12)), transparent 70%)`,
+            background: `radial-gradient(260px circle at ${position.x}px ${position.y}px, var(--jaipur-primary-light, rgba(201, 120, 120, 0.055)), transparent 72%)`,
           }}
           aria-hidden="true"
         />
       )}
 
-      {/* Card Content */}
+      {/* High-Contrast Card Content */}
       <div className="relative z-10">{children}</div>
     </div>
   );

@@ -279,7 +279,7 @@ export function ParticipantDashboard() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8 pb-16">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8 pb-16 animate-entrance">
       {/* ── 1. Team Identity & Workspace Header ── */}
       <SpotlightCard className="rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-sm relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">

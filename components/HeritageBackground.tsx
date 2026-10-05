@@ -78,11 +78,11 @@ export function HeritageBackground() {
         style={{
           background: isDark
             ? routeConfig.mode === "hero"
-              ? "linear-gradient(180deg, rgba(23, 17, 14, 0.35) 0%, rgba(23, 17, 14, 0.65) 45%, rgba(23, 17, 14, 0.88) 100%)"
-              : "linear-gradient(180deg, rgba(23, 17, 14, 0.55) 0%, rgba(23, 17, 14, 0.80) 50%, rgba(23, 17, 14, 0.94) 100%)"
+              ? "linear-gradient(180deg, rgba(23, 17, 14, 0.35) 0%, rgba(27, 20, 18, 0.65) 45%, rgba(23, 17, 14, 0.89) 100%)"
+              : "linear-gradient(180deg, rgba(23, 17, 14, 0.55) 0%, rgba(27, 20, 18, 0.78) 50%, rgba(23, 17, 14, 0.94) 100%)"
             : routeConfig.mode === "hero"
-            ? "linear-gradient(180deg, rgba(247, 244, 239, 0.25) 0%, rgba(247, 244, 239, 0.55) 45%, rgba(247, 244, 239, 0.82) 100%)"
-            : "linear-gradient(180deg, rgba(247, 244, 239, 0.45) 0%, rgba(247, 244, 239, 0.70) 50%, rgba(247, 244, 239, 0.88) 100%)",
+            ? "linear-gradient(180deg, rgba(247, 244, 239, 0.22) 0%, rgba(242, 235, 225, 0.55) 45%, rgba(247, 244, 239, 0.84) 100%)"
+            : "linear-gradient(180deg, rgba(247, 244, 239, 0.42) 0%, rgba(242, 235, 225, 0.68) 50%, rgba(247, 244, 239, 0.90) 100%)",
         }}
       />
     </div>

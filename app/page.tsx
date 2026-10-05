@@ -69,7 +69,7 @@ export default function HomePage() {
   return (
     <div className="mx-auto max-w-6xl space-y-12 sm:space-y-16 py-8 sm:py-14 px-4 sm:px-6">
       {/* ── HERO BANNER ── */}
-      <section className="relative rounded-3xl border border-border bg-card p-6 sm:p-12 lg:p-16 shadow-md overflow-hidden text-center sm:text-left">
+      <section className="relative rounded-3xl border border-border bg-card p-6 sm:p-12 lg:p-16 shadow-md overflow-hidden text-center sm:text-left animate-entrance">
         <div className="relative z-10 max-w-3xl space-y-6">
           {/* Technical Pill */}
           <div className="inline-flex items-center gap-2 rounded-full border border-secondary/35 bg-secondary/15 px-3.5 py-1 text-xs font-bold text-secondary">
@@ -151,7 +151,7 @@ export default function HomePage() {
       </section>
 
       {/* ── SYSTEM HIGHLIGHTS / METRICS ── */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-entrance-stagger-1">
         {highlights.map((item, idx) => (
           <SpotlightCard
             key={idx}
@@ -172,7 +172,7 @@ export default function HomePage() {
       </section>
 
       {/* ── TECHNICAL TRACKS & OPTION WHEEL EXPLORER ── */}
-      <section className="space-y-6">
+      <section className="space-y-6 animate-entrance-stagger-2">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-secondary uppercase tracking-wider mb-1">
@@ -228,7 +228,7 @@ export default function HomePage() {
       </section>
 
       {/* ── CONSOLE CAPABILITIES / SYSTEM ARCHITECTURE ── */}
-      <section className="rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-sm space-y-6">
+      <section className="rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-sm space-y-6 animate-entrance-stagger-3">
         <div className="space-y-2">
           <div className="inline-flex items-center gap-1.5 text-xs font-bold text-primary uppercase tracking-wider">
             <Cpu size={14} />

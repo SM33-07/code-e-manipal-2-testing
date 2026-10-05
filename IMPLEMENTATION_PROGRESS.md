@@ -512,3 +512,44 @@ Executed the final visual and navigation correction pass based on live browser i
    - `npm run build`: 60/60 routes compiled successfully with Turbopack.
    - `git diff --check`: 0 formatting/whitespace errors.
 
+## Stage R — Sub-Phase A: Targeted Visual Correction & Frontend Motion
+
+1. **A1. Navbar Logo Collision Resolution:**
+   - Established strict deterministic layout boundaries in `components/Navbar.tsx`:
+     - Brand region wrapped in `shrink-0 min-w-max mr-3 xl:mr-6`.
+     - Navigation items wrapped in `flex-1 flex items-center justify-center min-w-0 px-1 xl:px-3`.
+     - Actions region wrapped in `shrink-0 min-w-max ml-3 xl:ml-6 z-20`.
+   - Updated `components/BrandLogo.tsx` with explicit `shrink-0` on outer `<Link>` and container.
+   - Updated `components/ui/resizable-navbar.tsx`:
+     - Scrolled pill container width expanded to `max-w-6xl xl:max-w-7xl` with generous padding.
+     - Responsive item slicing in `NavItems` (5 primary items directly visible; overflow items neatly placed in "More" menu) prevents any horizontal collision at 1024px, 1280px, 1440px, and under 125%/150%/200% zoom.
+   - Verified via browser testing in scrolled desktop (1440px), tablet (1024px), and mobile (390px).
+
+2. **A2 & A3. Page / Section Entrance & Outer Card Motion:**
+   - Created `@keyframes entranceReveal` and utility classes (`.animate-entrance`, `.animate-entrance-stagger-1`, `.animate-entrance-stagger-2`, `.animate-entrance-stagger-3`) in `styles/index.css`.
+   - Subtle vertical translate (6px) and fade (280–340ms) with `cubic-bezier(0.16, 1, 0.3, 1)`.
+   - Added outer-card settling and restrained hover lift (`.card-hover-lift hover:-translate-y-0.5`).
+   - Integrated entrance animation into `components/ui/SpotlightCard.tsx`, `app/page.tsx`, `app/login/page.tsx`, and `components/dashboard/ParticipantDashboard.tsx`.
+   - Full reduced-motion fallback (`@media (prefers-reduced-motion: reduce)`) universally disables transforms and forces instant appearance.
+
+3. **A4. Spotlight Readability Correction:**
+   - Refined `components/ui/SpotlightCard.tsx`:
+     - Reduced radial spotlight radius from 400px to 260px.
+     - Reduced highlight opacity to `rgba(201, 120, 120, 0.055)`, preventing any pink/brass wash over text.
+     - Added pointer fine check (`@media (pointer: fine)`) so touch devices do not receive unwanted sticky hover effects.
+     - Preserved `relative z-10` high-contrast content layer.
+
+4. **A5. Canvas / Outer Background Depth:**
+   - Added subtle fixed radial gradient depth to `body` in `styles/index.css`:
+     - Light mode: Warm ivory canvas with soft dusty rose/terracotta (`rgba(185, 87, 69, 0.035)`) and sandstone/brass (`rgba(176, 138, 69, 0.03)`).
+     - Dark mode: Deep espresso canvas with subtle wine/terracotta (`rgba(168, 83, 70, 0.045)`) and warm brass (`rgba(184, 138, 69, 0.03)`).
+   - Refined `components/HeritageBackground.tsx` atmospheric veil overlay to add directional richness while keeping photography clear and recognizable.
+
+5. **Static Verification & Acceptance Gate:**
+   - `npx tsc --noEmit`: 0 errors.
+   - `npm run build`: 60/60 routes compiled successfully.
+   - `git diff --check`: 0 errors.
+   - Backdrop-filter scan: 0 matches.
+   - Legacy asset scan: 0 matches.
+
+

@@ -87,6 +87,66 @@
   100% { background-position: 0% 50%; }
 }
 
+/* ── Section & Container Entrance Motion Layer ── */
+@keyframes entranceReveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-entrance {
+  animation: entranceReveal 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-entrance-stagger-1 {
+  animation: entranceReveal 300ms cubic-bezier(0.16, 1, 0.3, 1) 40ms forwards;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.animate-entrance-stagger-2 {
+  animation: entranceReveal 320ms cubic-bezier(0.16, 1, 0.3, 1) 80ms forwards;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.animate-entrance-stagger-3 {
+  animation: entranceReveal 340ms cubic-bezier(0.16, 1, 0.3, 1) 120ms forwards;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+/* ── Outer Card Settling & Restrained Hover Lift ── */
+.card-hover-lift {
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease;
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* ── Canvas Background Depth (Light: warm ivory -> sandstone/rose, Dark: espresso -> charcoal/wine) ── */
+body {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse at 12% 10%, rgba(185, 87, 69, 0.035) 0%, transparent 50%),
+    radial-gradient(ellipse at 88% 90%, rgba(176, 138, 69, 0.03) 0%, transparent 45%);
+  background-attachment: fixed;
+}
+
+.dark body {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse at 10% 12%, rgba(168, 83, 70, 0.045) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 88%, rgba(184, 138, 69, 0.03) 0%, transparent 45%);
+  background-attachment: fixed;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

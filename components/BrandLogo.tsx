@@ -62,7 +62,7 @@ export function BrandLogo({
   }
 
   return (
-    <Link href={href} className="group inline-flex items-center no-underline focus:outline-none">
+    <Link href={href} className="group inline-flex items-center no-underline focus:outline-none shrink-0">
       {content}
     </Link>
   );

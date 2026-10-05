@@ -93,7 +93,7 @@ export const NavBody = ({ children, className, visible, isSubmissionForm }: NavB
       className={cn(
         "relative z-[60] mx-auto hidden lg:flex w-[calc(100%-2rem)] flex-row items-center justify-between transition-all duration-300 pointer-events-auto",
         visible
-          ? "max-w-6xl rounded-full bg-card text-card-foreground px-6 py-2 border border-secondary/40 shadow-xl"
+          ? "max-w-6xl xl:max-w-7xl rounded-full bg-card text-card-foreground px-5 xl:px-6 py-2 border border-secondary/40 shadow-xl"
           : "max-w-7xl rounded-2xl bg-card text-card-foreground px-5 py-2.5 border border-border shadow-md",
         className,
       )}
@@ -107,15 +107,17 @@ export const NavItems = ({ items, className, onItemClick, pathname }: NavItemsPr
   const [hovered, setHovered] = useState<number | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
 
-  // Show up to 7 primary items directly so Dashboard, Timeline, Challenges, Team, Submit, Gallery, FAQ all fit!
-  const primaryItems = items.slice(0, 7);
-  const overflowItems = items.slice(7);
+  // Responsive item slicing: show 5 primary items directly, overflow the rest cleanly into More.
+  // This guarantees brand logo and status actions never collide across any screen width or zoom factor.
+  const primaryCount = 5;
+  const primaryItems = items.slice(0, primaryCount);
+  const overflowItems = items.slice(primaryCount);
 
   return (
     <div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "flex min-w-0 flex-1 flex-row items-center justify-center gap-1.5 text-sm font-medium transition duration-200 lg:flex",
+        "flex min-w-0 flex-1 flex-row items-center justify-center gap-1 xl:gap-1.5 text-xs xl:text-sm font-medium transition duration-200 lg:flex",
         className,
       )}
     >
@@ -128,7 +130,7 @@ export const NavItems = ({ items, className, onItemClick, pathname }: NavItemsPr
             onMouseEnter={() => setHovered(idx)}
             onClick={onItemClick}
             className={cn(
-              "relative whitespace-nowrap px-3.5 py-1.5 transition-colors duration-150 rounded-lg inline-flex items-center text-sm font-medium cursor-pointer",
+              "relative whitespace-nowrap px-2.5 xl:px-3.5 py-1.5 transition-colors duration-150 rounded-lg inline-flex items-center text-xs xl:text-sm font-medium cursor-pointer shrink-0",
               isSubmit
                 ? "bg-primary text-primary-foreground font-semibold shadow-sm hover:bg-primary/90"
                 : isActive

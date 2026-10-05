@@ -65,7 +65,7 @@ export default function LoginPage() {
       <div className="relative z-10 w-full h-full flex items-center justify-center px-4 lg:justify-end lg:px-20 pt-16">
         <div
           className={clsx(
-            "w-full max-w-[440px] bg-card text-card-foreground border border-border rounded-2xl p-8 sm:p-10 shadow-2xl transition-all duration-200",
+            "w-full max-w-[440px] bg-card text-card-foreground border border-border rounded-2xl p-8 sm:p-10 shadow-2xl transition-all duration-200 animate-entrance",
             shake && "animate-shake"
           )}
         >
