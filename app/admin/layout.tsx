@@ -9,7 +9,6 @@ import {
   FileText,
   BarChart3,
   LogOut,
-  ClipboardList,
   Radio,
   Users,
   ShieldAlert,
@@ -17,9 +16,6 @@ import {
   Menu,
   FileCode,
   Gavel,
-  Megaphone,
-  Sparkles,
-  ShieldCheck,
   FileQuestion,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
@@ -31,10 +27,7 @@ const sideNav = [
   { label: "Teams & Roster",    icon: Users,           href: "/admin/teams" },
   { label: "Submissions",       icon: FileCode,        href: "/admin/submissions" },
   { label: "Judging Operations",icon: Gavel,           href: "/admin/judging" },
-  { label: "Announcements",     icon: Megaphone,       href: "/admin/announcements" },
   { label: "Results & Awards",  icon: Trophy,          href: "/admin/results" },
-  { label: "Grand Ceremony",    icon: Sparkles,        href: "/admin/ceremony" },
-  { label: "Audit & Security",  icon: ShieldCheck,     href: "/admin/audit" },
   { label: "Report & Export",   icon: FileText,        href: "/admin/report" },
   { label: "Live Analytics",    icon: BarChart3,       href: "/admin/analytics" },
   { label: "Users & Access",    icon: ShieldAlert,     href: "/admin/users" },

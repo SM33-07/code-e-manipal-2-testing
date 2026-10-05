@@ -382,4 +382,24 @@ Executed the final visual and navigation correction pass based on live browser i
    - `npm run build` — 63/63 routes compiled successfully.
    - `git diff --check` — passed with 0 formatting/whitespace issues.
 
+## Stage O — Phase 2.1 Targeted Admin Route Cleanup & Users Light-Theme Fix
+
+1. **Redundant Admin Route Consolidation (`app/admin/audit`, `app/admin/announcements`, `app/admin/ceremony`):**
+   - Removed redirect-only placeholder routes (`/admin/audit` -> `/admin/report`, `/admin/announcements` -> `/admin/event`, `/admin/ceremony` -> `/admin/results`) after confirming they contained no independent functionality.
+   - Preserved all underlying canonical admin destinations (`/admin/event`, `/admin/results`, `/admin/report`) and active backend APIs (`/api/admin/announcements`, etc.).
+   - Updated Admin sidebar in `app/admin/layout.tsx` and route config in `lib/heritage/routeConfig.ts`.
+   - Verified zero broken or stale references across the entire codebase.
+
+2. **/admin/users Light-Mode Contrast & Surface Recovery (`app/admin/users/page.tsx`):**
+   - Replaced hardcoded dark/white classes (`text-white`, `text-gray-400`, `bg-black/40`, `border-white/10`) with semantic theme tokens (`text-foreground`, `text-muted-foreground`, `bg-card`, `bg-background`, `border-border`).
+   - Restored high-contrast, fully opaque metric cards, search/filter bars, table headers, table rows, and modals in both Light and Dark modes.
+   - Ensured zero backdrop-blur / glassmorphic overlays across all admin user views.
+
+3. **Validation & Quality Gates:**
+   - `npx tsc --noEmit` — 0 errors.
+   - `npm run build` — 60/60 routes compiled successfully with Turbopack.
+   - `git diff --check` — 0 errors.
+   - `grep_search "backdrop-blur|backdrop-filter|backdropFilter"` — 0 matches in code (`app`, `components`, `styles`).
+
+
 

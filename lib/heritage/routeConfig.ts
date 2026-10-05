@@ -225,9 +225,6 @@ export const HERITAGE_ROUTE_MAP: Record<string, HeritageRouteConfig> = {
   "/admin/analytics": {
     mode: "none",
   },
-  "/admin/audit": {
-    mode: "none",
-  },
   "/admin/registrations": {
     mode: "none",
   },
@@ -260,41 +257,11 @@ export const HERITAGE_ROUTE_MAP: Record<string, HeritageRouteConfig> = {
     },
   },
 
-  // Admin Announcements (Subtle atmosphere)
-  "/admin/announcements": {
-    mode: "subtle",
-    light: {
-      asset: "/images/heritage/light/16-city-palace-complex-courtyard.webp",
-      position: "center center",
-      opacity: 0.45,
-    },
-    dark: {
-      asset: "/images/heritage/dark/04-nahargarh-sunset-city.webp",
-      position: "center center",
-      opacity: 0.28,
-    },
-  },
-
   // Admin Results Preparation (Subtle ceremonial atmosphere)
   "/admin/results": {
     mode: "subtle",
     light: {
       asset: "/images/heritage/light/15-city-palace-hall-arches.webp",
-      position: "center center",
-      opacity: 0.50,
-    },
-    dark: {
-      asset: "/images/heritage/dark/09-albert-hall-night.webp",
-      position: "center center",
-      opacity: 0.30,
-    },
-  },
-
-  // Admin Ceremony (Subtle ceremonial atmosphere)
-  "/admin/ceremony": {
-    mode: "subtle",
-    light: {
-      asset: "/images/heritage/light/04-city-palace-exterior.webp",
       position: "center center",
       opacity: 0.50,
     },
