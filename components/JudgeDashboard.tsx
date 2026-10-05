@@ -10,7 +10,6 @@ import { LogOut, Award, FileText, CheckSquare } from "lucide-react";
 import { SubmissionList, JudgeSubmission } from "./SubmissionList";
 import { JudgingInterface } from "./JudgingInterface";
 import { Confetti } from "./ui/Confetti";
-import { JudgeHeader } from "./judge/JudgeHeader";
 import { Score } from "@/types/judging";
 import { calculateWeightedScore } from "@/utils/scoring";
 

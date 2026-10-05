@@ -326,3 +326,30 @@ Executed the final visual and navigation correction pass based on live browser i
    - `npm run build` — 62/62 routes successfully compiled with Turbopack, including `ƒ Proxy (Middleware)`.
    - Verified live dev server rendering, theme toggling, and clean responsive layouts.
 
+## Stage M — Phase 2 Global Portal Shell, Role Architecture & Route Consolidation
+
+1. **Canonical role-aware portal shell (`app/RootClient.tsx`, `components/Navbar.tsx`, `lib/navigation/portal.ts`):**
+   - Kept the existing single root-level Navbar instance and made its mode explicit: protected portal routes receive role-aware portal navigation; public routes receive public navigation without account, logout, timer, notification, or announcement controls.
+   - Centralized Participant, Judge, and Admin link definitions in one navigation configuration. Admin navigation includes supervisory entry points for dashboard, participant-facing workspaces, judge workspace, and Operations.
+   - Kept the existing admin sidebar as specialized secondary navigation beneath the global shell. Removed the unused Judge header import so the judge workspace does not introduce a competing header.
+
+2. **Access and account behavior (`proxy.ts`, `app/login/page.tsx`, `app/account/page.tsx`):**
+   - Added an authenticated Account route backed by the existing session/profile context and exposed it from desktop and mobile account menus for every role.
+   - Added `/account` to edge protected routes.
+   - Updated the edge proxy to resolve role from `profiles.role`, rather than auth metadata, before enforcing `/admin` and `/judge` route guards.
+   - Admin login and `/login` redirects now lead to `/dashboard`; Admin retains access to `/admin` and is not forced into it.
+
+3. **Navbar regressions (`components/ui/resizable-navbar.tsx`):**
+   - Preserved the recovered `lg:flex` desktop visibility behavior and mobile fallback.
+   - Removed both navbar `backdrop-blur-md` uses and changed the surfaces to opaque `bg-card`.
+
+4. **Route inventory:**
+   - Kept intentional compatibility redirects: `/team` → `/dashboard`, `/judging` → `/judge`, `/SubmissionForm` → `/submit`, `/schedule` → `/timeline`, and the existing admin compatibility redirects.
+   - No working operational routes or backend APIs were deleted in this phase.
+
+5. **Validation:**
+   - `npx tsc --noEmit` — passed with 0 errors.
+   - `npm run build` — passed; 63 routes generated and Proxy compiled.
+   - `git diff --check` — passed.
+   - `rg -n "backdrop-blur|backdrop-filter|backdropFilter" app components styles` — 0 matches.
+

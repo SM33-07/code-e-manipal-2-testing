@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect } from "react"
 import { Bell, Clock, AlertCircle, Info, X } from "lucide-react"
 import { BrandLogo } from "@/components/BrandLogo"
+import { getPortalNavigation, publicNavigation } from "@/lib/navigation/portal"
 
 import {
   Navbar as ResizableNavbar,
@@ -28,7 +29,7 @@ const mockNotifications = [
   { id: 3, type: "info", icon: Info, title: "Welcome", text: "Welcome to Code-E-Manipal! Hack away.", time: "2h ago" },
 ]
 
-export default function Navbar({ className }: { className?: string }) {
+export default function Navbar({ className, portal = false }: { className?: string; portal?: boolean }) {
   const { role, logout, user, isAuthenticated } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
@@ -184,34 +185,9 @@ export default function Navbar({ className }: { className?: string }) {
 
   if (pathname === "/login") return null
 
-  // Generate dynamic links strictly based on authentication and user role
-  const navItems = []
-  if (!isAuthenticated) {
-    navItems.push({ name: "Home", link: "/" })
-    navItems.push({ name: "Problem Statements", link: "/problem-statements" })
-    navItems.push({ name: "Timeline", link: "/timeline" })
-    navItems.push({ name: "Past Editions", link: "/gallery" })
-    navItems.push({ name: "FAQ", link: "/faq" })
-    navItems.push({ name: "Register", link: "/register" })
-  } else if (role === "admin") {
-    navItems.push({ name: "Operations Center", link: "/admin" })
-    navItems.push({ name: "Participant Dashboard", link: "/dashboard" })
-    navItems.push({ name: "Problem Statements", link: "/problem-statements" })
-    navItems.push({ name: "Past Editions", link: "/gallery" })
-  } else if (role === "judge") {
-    navItems.push({ name: "Workspace", link: "/judge" })
-    navItems.push({ name: "Problem Statements", link: "/problem-statements" })
-    navItems.push({ name: "Timeline", link: "/timeline" })
-    navItems.push({ name: "Guidelines", link: "/guidelines" })
-    navItems.push({ name: "Past Editions", link: "/gallery" })
-  } else {
-    navItems.push({ name: "Dashboard", link: "/dashboard" })
-    navItems.push({ name: "Problem Statements", link: "/problem-statements" })
-    navItems.push({ name: "Submit", link: "/submit" })
-    navItems.push({ name: "Timeline", link: "/timeline" })
-    navItems.push({ name: "Past Editions", link: "/gallery" })
-    navItems.push({ name: "FAQ", link: "/faq" })
-  }
+  // A public visit always receives public navigation, even when an existing
+  // session is present. The portal shell explicitly opts into role-aware links.
+  const navItems = portal ? getPortalNavigation(role) : publicNavigation
 
   const isSubmissionForm = pathname?.startsWith("/submit") || pathname?.startsWith("/SubmissionForm")
 
@@ -228,14 +204,14 @@ export default function Navbar({ className }: { className?: string }) {
         {/* Desktop Actions */}
         <div className="flex items-center gap-3 flex-shrink-0 z-20">
           {/* Role Badge */}
-          {role && (
+          {portal && role && (
             <span className="hidden xl:inline-block text-xs px-2.5 py-0.5 rounded-full bg-secondary/15 border border-secondary/30 text-secondary font-medium capitalize">
               {role}
             </span>
           )}
 
           {/* Hackathon Timer */}
-          {timerConfig && (
+          {portal && timerConfig && (
             <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/60 border border-border text-xs font-mono font-bold text-secondary">
               <span className={timeLeftStr !== "Not Started" && timeLeftStr !== "Closed" ? "animate-pulse" : ""}>⏳</span>
               <span>{timeLeftStr}</span>
@@ -243,7 +219,7 @@ export default function Navbar({ className }: { className?: string }) {
           )}
 
           {/* Results Publishing Countdown Pill */}
-          {resultsCountdownStr && (
+          {portal && resultsCountdownStr && (
             <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-jaipur-primary/20 border border-jaipur-primary/40 text-xs font-mono font-bold text-jaipur-gold animate-pulse shadow-sm">
               <span>🏆 Results: {resultsCountdownStr}</span>
             </div>
@@ -253,7 +229,7 @@ export default function Navbar({ className }: { className?: string }) {
           <ThemeToggle />
 
           {/* Notifications Dropdown */}
-          <div className="relative">
+          {portal && <div className="relative">
             <button
               onClick={() => {
                 setNotifsOpen(!notifsOpen);
@@ -315,10 +291,10 @@ export default function Navbar({ className }: { className?: string }) {
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </div>}
 
           {/* User Auth / Enter Console CTA */}
-          {!isAuthenticated ? (
+          {!portal || !isAuthenticated ? (
             <Link
               href="/login"
               className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-sm hover:opacity-95 transition-opacity"
@@ -350,6 +326,13 @@ export default function Navbar({ className }: { className?: string }) {
                     <div className="px-4 py-3 border-b border-border text-xs text-muted-foreground truncate">
                       {user?.email}
                     </div>
+                    <Link
+                      href="/account"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-4 py-3 text-sm font-medium text-foreground hover:bg-accent transition-colors"
+                    >
+                      Account
+                    </Link>
                     <button
                       type="button"
                       onClick={handleLogout}
@@ -370,7 +353,7 @@ export default function Navbar({ className }: { className?: string }) {
         <MobileNavHeader>
           <BrandLogo size="sm" />
           <div className="flex items-center gap-2.5">
-            {timerConfig && (
+            {portal && timerConfig && (
               <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-accent/60 border border-border text-[10px] font-mono font-bold text-secondary">
                 <span className={timeLeftStr !== "Not Started" && timeLeftStr !== "Closed" ? "animate-pulse" : ""}>⏳</span>
                 <span>{timeLeftStr}</span>
@@ -401,7 +384,7 @@ export default function Navbar({ className }: { className?: string }) {
           ))}
           
           <div className="flex w-full flex-col gap-3 pt-4 border-t border-border items-center">
-            {isAuthenticated ? (
+            {portal && isAuthenticated ? (
               <>
                 {role && (
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-secondary/15 border border-secondary/30 text-secondary font-medium capitalize">
@@ -413,6 +396,13 @@ export default function Navbar({ className }: { className?: string }) {
                     {user.email}
                   </span>
                 )}
+                <Link
+                  href="/account"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="w-full py-2.5 rounded-lg border border-border text-center text-sm font-semibold text-foreground hover:bg-accent transition-colors"
+                >
+                  Account
+                </Link>
                 <button
                   type="button"
                   onClick={handleLogout}

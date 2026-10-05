@@ -36,9 +36,7 @@ export default function LoginPage() {
       const authResult = await login(cleanIdentifier, password);
       const userRole = authResult?.role || "participant";
 
-      if (userRole === "admin") {
-        router.push("/admin");
-      } else if (userRole === "judge") {
+      if (userRole === "judge") {
         router.push("/judge");
       } else {
         router.push("/dashboard");

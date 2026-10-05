@@ -39,7 +39,8 @@ export async function proxy(req: NextRequest) {
     pathname.startsWith('/submission-result') ||
     pathname.startsWith('/judge') ||
     pathname.startsWith('/judging') ||
-    pathname.startsWith('/admin');
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/account');
 
   // If public route and not login, fast bypass
   if (!isProtectedRoute && !isLoginRoute) {
@@ -83,11 +84,19 @@ export async function proxy(req: NextRequest) {
 
   // Role resolution for authenticated users
   if (user) {
-    const role = user.user_metadata?.role || 'participant';
+    // The profile table is the authoritative role source. Metadata is not used
+    // for authorization decisions because it can lag behind an administrative
+    // role change.
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+    const role = profile?.role || 'participant';
 
     // Prevent authenticated users from staying on /login
     if (isLoginRoute) {
-      if (role === 'admin') return NextResponse.redirect(new URL('/admin', req.url));
+      if (role === 'admin') return NextResponse.redirect(new URL('/dashboard', req.url));
       if (role === 'judge') return NextResponse.redirect(new URL('/judge', req.url));
       return NextResponse.redirect(new URL('/dashboard', req.url));
     }

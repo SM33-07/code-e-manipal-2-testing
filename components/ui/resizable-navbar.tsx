@@ -93,8 +93,8 @@ export const NavBody = ({ children, className, visible, isSubmissionForm }: NavB
       className={cn(
         "relative z-[60] mx-auto hidden lg:flex w-[calc(100%-2rem)] flex-row items-center justify-between transition-all duration-300 pointer-events-auto",
         visible
-          ? "max-w-6xl rounded-full bg-card/95 backdrop-blur-md text-card-foreground px-6 py-2 border border-secondary/40 shadow-xl"
-          : "max-w-7xl rounded-2xl bg-card/95 backdrop-blur-md text-card-foreground px-5 py-2.5 border border-border shadow-md",
+          ? "max-w-6xl rounded-full bg-card text-card-foreground px-6 py-2 border border-secondary/40 shadow-xl"
+          : "max-w-7xl rounded-2xl bg-card text-card-foreground px-5 py-2.5 border border-border shadow-md",
         className,
       )}
     >

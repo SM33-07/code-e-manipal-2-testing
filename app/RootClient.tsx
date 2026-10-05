@@ -120,10 +120,22 @@ import LoaderAnimation from "@/components/LoaderAnimation"
 
 function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const { isAuthenticated } = useAuth()
   const isLogin = pathname === "/login"
   const isRegister = pathname === "/register"
+  const isProtectedPortalRoute = ["/dashboard", "/team", "/submit", "/SubmissionForm", "/submission-result", "/judge", "/judging", "/admin", "/account"]
+    .some((route) => pathname === route || pathname.startsWith(`${route}/`))
+  // These pages intentionally serve public information too. Once a session is
+  // known, they participate in the portal shell instead of losing account and
+  // navigation access.
+  const isSharedPortalRoute = ["/timeline", "/problem-statements", "/gallery", "/results"].includes(pathname)
+  const isPortalRoute = isProtectedPortalRoute || (isAuthenticated && isSharedPortalRoute)
 
   const [hasBanner, setHasBanner] = useState(false)
+
+  useEffect(() => {
+    if (!isPortalRoute) setHasBanner(false)
+  }, [isPortalRoute])
 
   if (isLogin || isRegister) {
     return <>{children}</>
@@ -134,11 +146,11 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <HeritageBackground />
-      <AnnouncementBanner onActiveChange={setHasBanner} />
+      {isPortalRoute && <AnnouncementBanner onActiveChange={setHasBanner} />}
       
       <div style={{ paddingTop: hasBanner ? "40px" : "0px" }}>
         <Suspense fallback={null}>
-          <Navbar className={hasBanner ? "top-[40px]" : "top-0"} />
+          <Navbar portal={isPortalRoute} className={hasBanner ? "top-[40px]" : "top-0"} />
         </Suspense>
         <div className={`relative z-10 min-h-screen ${isFullBleedRoute ? "pt-20" : "pt-24 pb-12"}`}>
           {children}
