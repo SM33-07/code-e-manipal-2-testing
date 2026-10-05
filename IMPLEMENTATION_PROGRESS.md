@@ -395,11 +395,47 @@ Executed the final visual and navigation correction pass based on live browser i
    - Restored high-contrast, fully opaque metric cards, search/filter bars, table headers, table rows, and modals in both Light and Dark modes.
    - Ensured zero backdrop-blur / glassmorphic overlays across all admin user views.
 
-3. **Validation & Quality Gates:**
+4. **Validation & Quality Gates:**
    - `npx tsc --noEmit` — 0 errors.
    - `npm run build` — 60/60 routes compiled successfully with Turbopack.
    - `git diff --check` — 0 errors.
    - `grep_search "backdrop-blur|backdrop-filter|backdropFilter"` — 0 matches in code (`app`, `components`, `styles`).
 
+## Stage P — Phase 4 Jaipur Heritage Visual System, Background Strategy & Page-Level Surface Correction
 
+1. **Jaipur Heritage × Modern Technical Console Visual Direction:**
+   - Aligned light theme palette in `styles/theme.css` with authoritative tokens: Canvas `#F7F4EF` (warm ivory), Card `#FFFDF9`, Primary Jaipur Pink `#B95745`, Secondary Pink `#C97878`, Terracotta `#A64B3E`, Antique Brass `#B08A45`, Foreground `#141210`, Muted Foreground `#5C5349`, Border `#D0BEA7`. Eliminated brown/sepia washes over UI surfaces.
+   - Verified dark theme palette in `styles/theme.css`: Deep Espresso (`#17110E`), Warm Charcoal (`#211713`), Muted Terracotta (`#A85346`), Jaipur Pink (`#C97878`), Antique Brass (`#B88A45`), Warm Ivory text (`#E9DDC8`), ensuring no purple-first shift.
 
+2. **Authoritative Background Image Assignments & Layering:**
+   - Updated `lib/heritage/routeConfig.ts` to assign exact Section 7 photography:
+     - `/`: Light `01-hawa-mahal-landscape.webp`, Dark `08-pink-city-night.webp`
+     - `/login`: Light `14-city-palace-ornate-hall.webp`, Dark `03-sheesh-mahal-corridor.webp`
+     - `/dashboard`: Light `03-city-palace-courtyard.webp`, Dark `04-nahargarh-sunset-city.webp`
+     - `/submit`: Light `14-city-palace-ornate-hall.webp`, Dark `03-sheesh-mahal-corridor.webp`
+     - `/timeline`: Light `10-samrat-yantra.webp`, Dark `01-jantar-mantar-arch.webp`
+     - `/problem-statements`: Light `09-jantar-mantar-gate.webp`, Dark `01-jantar-mantar-arch.webp`
+     - `/gallery`: Light `02-patrika-gate.webp`, Dark `07-hawa-mahal-lit-night.webp`
+     - `/results`: Light `04-city-palace-exterior.webp`, Dark `10-nahargarh-dome-city.webp`
+     - `/judge`: Light `15-city-palace-hall-arches.webp`, Dark `01-jantar-mantar-arch.webp`
+     - `/admin`: Light `04-city-palace-exterior.webp`, Dark `09-albert-hall-night.webp`
+     - `/admin/event`: Light `11-zodiac-circle.webp`, Dark `01-jantar-mantar-arch.webp`
+     - `/admin/results`: Light `15-city-palace-hall-arches.webp`, Dark `09-albert-hall-night.webp`
+   - Dense admin operational routes (`/admin/users`, `/admin/teams`, `/admin/submissions`, `/admin/judging`, `/admin/report`, `/admin/analytics`) strictly configured with `mode: "none"` to preserve clean, uncompromised data-table legibility.
+   - Refined `components/HeritageBackground.tsx` atmospheric veil overlay to use non-sepia warm ivory (`rgba(247, 244, 239)`) in light mode and deep espresso (`rgba(23, 17, 14)`) in dark mode.
+   - Removed giant opaque page rectangle covering photography in `app/admin/layout.tsx` by setting the layout container to transparent, allowing the background photography to appear subtly in configured routes while dense pages show the solid body canvas.
+   - Unified `/login` background architecture by routing through `HeritageBackground` in `app/RootClient.tsx` and removing redundant `.login-background` CSS class from `styles/index.css` and `app/login/page.tsx`.
+
+3. **Page-Level Surface & Timeline Architecture:**
+   - Ensured all cards, forms, tables, and dialogs remain 100% opaque (`bg-card`).
+   - Validated Timeline styling: Antique Brass and Terracotta rail accents, Jaipur Pink nodes for current states, subdued sandstone/brass for completed states, and opaque ivory/espresso cards.
+   - Verified `/admin/users` in Light Mode: crisp typography, high-contrast badges, readable search and filter dropdowns, and solid table surfaces.
+   - Confirmed canonical Resizable Navbar architecture is preserved with opaque `bg-card` curved floating surface and 0 backdrop blur.
+   - Confirmed `components/LoaderAnimation.tsx` remains completely untouched.
+
+4. **Validation & Quality Gates:**
+   - `npx tsc --noEmit` — 0 errors.
+   - `npm run build` — 60/60 routes compiled successfully with Turbopack.
+   - `git diff --check` — 0 formatting/whitespace errors.
+   - Backdrop blur scan: `backdrop-blur|backdrop-filter|backdropFilter` — 0 matches in code (`app`, `components`, `styles`).
+   - Runtime asset scan: 0 references to `light-old` or `dark-old`.

@@ -2,42 +2,42 @@
 
 :root {
   --font-size: 16px;
-  /* Light Theme: Warm Ivory, Sandstone, Terracotta, Jaipur Pink, Antique Brass, Ink */
-  --background: #F4EBDD;
-  --foreground: #24211D;
+  /* Light Theme: Warm Ivory Canvas, Sandstone, Terracotta, Jaipur Pink, Antique Brass, Technical Sapphire & Emerald */
+  --background: #F7F4EF;
+  --foreground: #141210;
   --card: #FFFDF9;
-  --card-foreground: #24211D;
+  --card-foreground: #141210;
   --surface: #FFFDF9;
   --surface-elevated: #FFFFFF;
-  --surface-muted: #E5D0B2;
-  --surface-inset: #E5D0B2;
+  --surface-muted: #EFE5D7;
+  --surface-inset: #EFE5D7;
   --popover: #FFFDF9;
-  --popover-foreground: #24211D;
+  --popover-foreground: #141210;
   --primary: #B95745;
   --primary-foreground: #FFFFFF;
   --secondary: #B08A45;
   --secondary-foreground: #FFFFFF;
-  --muted: #E5D0B2;
+  --muted: #EFE5D7;
   --muted-foreground: #5C5349;
-  --accent: #E5D0B2;
-  --accent-foreground: #24211D;
+  --accent: #EFE5D7;
+  --accent-foreground: #141210;
   --destructive: #AE3E3C;
   --destructive-foreground: #FFFFFF;
   --success: #17664F;
   --warning: #C18A32;
   --border: #D0BEA7;
-  --border-subtle: #EFE5D7;
+  --border-subtle: #E8DDCE;
   --input: #FFFDF9;
   --input-background: #FFFDF9;
   --switch-background: #cbced4;
   --ring: #B95745;
   --radius: 0.625rem;
   --sidebar: #FFFDF9;
-  --sidebar-foreground: #24211D;
+  --sidebar-foreground: #141210;
   --sidebar-primary: #B95745;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #E5D0B2;
-  --sidebar-accent-foreground: #24211D;
+  --sidebar-accent: #EFE5D7;
+  --sidebar-accent-foreground: #141210;
   --sidebar-border: #D0BEA7;
   --sidebar-ring: #B95745;
   --font-weight-medium: 500;
@@ -52,12 +52,12 @@
   --jaipur-gold-light: #D2AC68;
   --jaipur-card: #FFFDF9;
   --jaipur-pink: #C97878;
-  --jaipur-terracotta: #B95745;
+  --jaipur-terracotta: #A64B3E;
   --royal-blue: #174A86;
-  --sapphire: #0F3570;
+  --sapphire: #174A86;
   --emerald: #17664F;
-  --ochre: #C18A32;
-  --ink: #24211D;
+  --ochre: #B08A45;
+  --ink: #141210;
 }
 
 .dark {

@@ -72,7 +72,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-[calc(100vh-5rem)] bg-background text-foreground flex flex-col">
+    <div className="min-h-[calc(100vh-5rem)] bg-transparent text-foreground flex flex-col">
       {/* Mobile Operations Sub-bar beneath global Navbar */}
       <div className="md:hidden sticky top-16 z-30 bg-card border-b border-border px-4 py-2.5 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">

@@ -138,7 +138,12 @@ function Shell({ children }: { children: React.ReactNode }) {
   }, [isPortalRoute])
 
   if (isLogin || isRegister) {
-    return <>{children}</>
+    return (
+      <>
+        <HeritageBackground />
+        {children}
+      </>
+    )
   }
 
   const isFullBleedRoute = pathname.startsWith("/admin") || pathname.startsWith("/judge") || pathname.startsWith("/judging")

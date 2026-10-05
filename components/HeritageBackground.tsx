@@ -72,17 +72,17 @@ export function HeritageBackground() {
         />
       </div>
 
-      {/* Atmospheric Veil Overlay (Pure Opaque Gradient, Zero Glassmorphism) */}
+      {/* Atmospheric Veil Overlay (Pure Non-Sepia Gradient, Zero Glassmorphism) */}
       <div
         className="absolute inset-0 transition-colors duration-500"
         style={{
           background: isDark
             ? routeConfig.mode === "hero"
-              ? "linear-gradient(180deg, rgba(23, 17, 14, 0.45) 0%, rgba(23, 17, 14, 0.72) 45%, rgba(23, 17, 14, 0.90) 100%)"
-              : "linear-gradient(180deg, rgba(23, 17, 14, 0.65) 0%, rgba(23, 17, 14, 0.85) 50%, rgba(23, 17, 14, 0.96) 100%)"
+              ? "linear-gradient(180deg, rgba(23, 17, 14, 0.35) 0%, rgba(23, 17, 14, 0.65) 45%, rgba(23, 17, 14, 0.88) 100%)"
+              : "linear-gradient(180deg, rgba(23, 17, 14, 0.55) 0%, rgba(23, 17, 14, 0.80) 50%, rgba(23, 17, 14, 0.94) 100%)"
             : routeConfig.mode === "hero"
-            ? "linear-gradient(180deg, rgba(244, 235, 221, 0.35) 0%, rgba(244, 235, 221, 0.60) 45%, rgba(244, 235, 221, 0.85) 100%)"
-            : "linear-gradient(180deg, rgba(244, 235, 221, 0.55) 0%, rgba(244, 235, 221, 0.75) 50%, rgba(244, 235, 221, 0.92) 100%)",
+            ? "linear-gradient(180deg, rgba(247, 244, 239, 0.25) 0%, rgba(247, 244, 239, 0.55) 45%, rgba(247, 244, 239, 0.82) 100%)"
+            : "linear-gradient(180deg, rgba(247, 244, 239, 0.45) 0%, rgba(247, 244, 239, 0.70) 50%, rgba(247, 244, 239, 0.88) 100%)",
         }}
       />
     </div>

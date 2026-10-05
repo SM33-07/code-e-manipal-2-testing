@@ -49,10 +49,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-background">
-      {/* Heritage Photographic Atmosphere with directional vignette veil */}
-      <div className="absolute inset-0 login-background opacity-85 dark:opacity-45 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background/35 via-background/65 to-background/95 dark:from-background/60 dark:via-background/85 dark:to-background/95 pointer-events-none" />
+    <div className="relative w-screen h-screen overflow-hidden bg-transparent">
+      {/* Subtle directional vignette veil for right-docked login card contrast */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/30 to-background/85 dark:via-background/50 dark:to-background/95 pointer-events-none" />
 
       {/* Top Bar with Brand & Theme Toggle */}
       <div className="absolute top-0 inset-x-0 z-20 flex items-center justify-between px-6 py-4">

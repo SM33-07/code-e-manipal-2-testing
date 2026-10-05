@@ -81,18 +81,6 @@
   animation: shake 0.4s ease;
 }
 
-.login-background {
-  background-image: url("/images/heritage/light/14-city-palace-ornate-hall.webp");
-  background-size: cover;
-  background-position: center center;
-}
-
-.dark .login-background {
-  background-image: url("/images/heritage/dark/03-sheesh-mahal-corridor.webp");
-  background-size: cover;
-  background-position: center center;
-}
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
