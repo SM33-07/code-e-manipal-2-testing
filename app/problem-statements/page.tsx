@@ -25,6 +25,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
 
 interface ProblemStatement {
   id: string;
@@ -360,9 +361,9 @@ export default function ProblemStatementsPage() {
             {PUBLISHED_PROBLEMS.map((prob) => {
               const Icon = prob.icon;
               return (
-                <div
+                <SpotlightCard
                   key={prob.id}
-                  className="rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-sm space-y-5 hover:border-primary/40 transition-colors"
+                  className="p-6 sm:p-8 space-y-5"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border">
                     <div className="flex items-center gap-3">
@@ -422,7 +423,7 @@ export default function ProblemStatementsPage() {
                       View Scoring Rubrics →
                     </Link>
                   </div>
-                </div>
+                </SpotlightCard>
               );
             })}
           </div>
@@ -499,9 +500,9 @@ export default function ProblemStatementsPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {PREPARATION_STEPS.map(({ step, title, detail, href, action }) => (
-                <div
+                <SpotlightCard
                   key={step}
-                  className="rounded-xl border border-border bg-card p-4 flex flex-col justify-between"
+                  className="rounded-xl p-4 flex flex-col justify-between"
                 >
                   <div>
                     <span className="text-xs font-mono font-bold text-secondary">{step}</span>
@@ -517,7 +518,7 @@ export default function ProblemStatementsPage() {
                       <ArrowRight size={12} />
                     </Link>
                   </div>
-                </div>
+                </SpotlightCard>
               ))}
             </div>
           </section>

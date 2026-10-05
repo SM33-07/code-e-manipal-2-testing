@@ -439,3 +439,76 @@ Executed the final visual and navigation correction pass based on live browser i
    - `git diff --check` — 0 formatting/whitespace errors.
    - Backdrop blur scan: `backdrop-blur|backdrop-filter|backdropFilter` — 0 matches in code (`app`, `components`, `styles`).
    - Runtime asset scan: 0 references to `light-old` or `dark-old`.
+
+## Stage Q — Phase 5 Selective Component Integration + Final Frontend Polish
+
+1. **Selective Components Integrated & Architecture:**
+   - `components/ui/SpotlightCard.tsx`:
+     - Built an accessible, high-performance card wrapper with mouse-tracked radial spotlight.
+     - Styled with Jaipur Pink (`#B95745`) and Antique Brass (`#B08A45`) highlight gradients.
+     - Fully opaque solid surface with zero glassmorphism and zero backdrop-filter.
+     - Integrated `prefers-reduced-motion` detection (disables mouse tracking on reduced motion) and `focus-within` keyboard indicator.
+     - Deployed selectively to:
+       - Public Home (`app/page.tsx`): Metric highlights, 4 Challenge Track cards, Mission Infrastructure feature cards.
+       - Public Problem Statements (`app/problem-statements/page.tsx`): Problem track cards and Pre-Hack Preparation Checklist cards.
+       - Public Gallery (`app/gallery/page.tsx`): Hero Retrospective archive container.
+       - Public FAQ (`app/faq/page.tsx`): FAQ header and Help Desk support banner.
+       - Portal Dashboard (`components/dashboard/ParticipantDashboard.tsx`): Workspace overview banner and 4 Primary Status Cards (Current Phase, Portal State, Active Roster, Submission Freeze).
+       - Portal Submit (`app/submit/page.tsx`): Stat overview cards.
+       - Public Results (`app/results/page.tsx`): 2nd and 3rd place Runner-up podium cards.
+   - `components/ui/BorderGlow.tsx`:
+     - Built a restrained animated conic gradient border wrapper using Jaipur Pink, Terracotta, and Antique Brass.
+     - Preserves 100% opaque underlying card surface.
+     - Reduced-motion fallback replaces animation with a crisp static accent border.
+     - Deployed strictly to major CTAs and live states:
+       - Public Home (`app/page.tsx`): Final registration callout banner.
+       - Portal Submission Form (`components/SubmissionForm.tsx`): Active submission action block.
+       - Public Results (`app/results/page.tsx`): Grand Champion 1st place podium card.
+   - `components/ui/SpecularButton.tsx`:
+     - Implemented Level 4 CTA treatment using lightweight CSS directional highlight sheen and Antique Brass / Jaipur Pink bevel styling.
+     - Zero WebGL / OGL dependencies and zero backdrop-filter.
+     - Fully accessible keyboard focus-visible indicator and hover dynamics.
+     - Deployed strictly to high-value actions:
+       - Public Home (`app/page.tsx`): Hero "Enter Portal Console" CTA and final registration CTA.
+       - Public Login (`app/login/page.tsx`): "Access Console" authentication button.
+       - Portal Dashboard (`components/dashboard/ParticipantDashboard.tsx`): "Proceed to Final Submission" primary CTA.
+   - `components/ui/ClickSpark.tsx`:
+     - High-efficiency canvas particle burst (6–8 particles) on pointer down using Jaipur Pink and Antique Brass sparks.
+     - Optimized performance: requestAnimationFrame runs strictly while sparks are alive and stops immediately when idle.
+     - Zero execution and zero canvas listeners under `prefers-reduced-motion`.
+     - Deployed strictly to public hero CTAs on `app/page.tsx`. Omitted entirely from dense portal and admin workflows.
+   - `components/ui/OptionWheel.tsx`:
+     - Interactive dial and accessible tablist for the 4 official challenge tracks (`ai-systems`, `fintech`, `resilient-infra`, `open-innovation`).
+     - Fully keyboard-accessible (arrow keys navigate tracks, Enter/Space selects, ARIA tab/tablist/tabpanel semantics).
+     - Does NOT hijack normal page scrolling; touch and pointer interaction is strictly scoped to the dial container.
+     - Deployed to Public Home (`app/page.tsx`) alongside accessible static track cards.
+   - 21st.dev Sign-In Presentation (`app/login/page.tsx`):
+     - Modernized visual structure with refined inputs, quick identifier hints (`TEAM-###`, `JUDGE-##`, `ADMIN`), and `SpecularButton`.
+     - 100% preserved authoritative authentication logic, session handling, CSRF, and redirect behaviors.
+   - FAQ Component Polish (`app/faq/page.tsx`):
+     - Integrated `SpotlightCard` for header and support banner.
+     - Preserved full keyboard accessibility (`aria-expanded`, focus rings) and authentic event FAQ content.
+
+2. **Components Intentionally Skipped or Constrained:**
+   - OGL/WebGL Specular Button: Skipped WebGL/shaders in favor of lightweight CSS to ensure cross-device performance and zero canvas overhead.
+   - Continuous ClickSpark: Replaced with lazy RAF spark engine that terminates when idle; excluded from admin and judge consoles.
+   - Staggered Menu: Skipped replacing existing responsive mobile navigation on portal/admin routes; preserved canonical Navbar.
+   - Animated Glow Card (Social Media Style): Skipped social feed semantics (avatars/handles/timestamps) as unsuitable for a technical hackathon portal.
+   - Logo Loop / Fake Sponsors: Skipped automated logo ticker and placeholder SVGs; implemented authentic static Academic & Organizing Partners block (Manipal University Jaipur, LearnIT, E-Cell MUJ).
+
+3. **Performance & Motion Optimizations:**
+   - RAF engines strictly bounded and idle-stopped.
+   - Native CSS keyframe animations for border glow (`@keyframes borderGlow`) without DOM thrashing.
+   - `prefers-reduced-motion` universally respected across all interactive elements.
+
+4. **Zero-Tolerance Invariant Checks:**
+   - Backdrop-filter check: `rg -n "backdrop-blur|backdrop-filter|backdropFilter" app components styles` → 0 matches.
+   - Legacy asset check: `rg -n "light-old|dark-old" app components styles lib` → 0 active references.
+   - Historical loader: `components/LoaderAnimation.tsx` remains frozen and untouched.
+   - Canonical Navbar: Structure, scroll transitions, and routes preserved without duplicate navbars.
+
+5. **Static & Build Verification:**
+   - `npx tsc --noEmit`: 0 errors.
+   - `npm run build`: 60/60 routes compiled successfully with Turbopack.
+   - `git diff --check`: 0 formatting/whitespace errors.
+

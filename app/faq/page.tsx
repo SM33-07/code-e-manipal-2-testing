@@ -16,6 +16,7 @@ import {
   ExternalLink,
   Sparkles,
 } from "lucide-react";
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
 
 interface FAQItem {
   id: string;
@@ -184,8 +185,7 @@ export default function FAQPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-8 py-4 sm:py-8 px-4 sm:px-6">
       {/* Header */}
-      <header className="rounded-2xl border border-border bg-card p-6 sm:p-10 shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+      <SpotlightCard className="rounded-2xl border border-border bg-card p-6 sm:p-10 shadow-sm relative overflow-hidden">
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/15 px-3 py-1 text-xs font-bold text-secondary">
             <HelpCircle size={14} />
@@ -214,7 +214,7 @@ export default function FAQPage() {
             />
           </div>
         </div>
-      </header>
+      </SpotlightCard>
 
       {/* Category Pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
@@ -310,7 +310,7 @@ export default function FAQPage() {
       </div>
 
       {/* Support Banner */}
-      <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+      <SpotlightCard className="rounded-2xl border border-border bg-card p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
         <div>
           <h3 className="text-base font-bold text-foreground">Still have questions?</h3>
           <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-xl">
@@ -332,7 +332,7 @@ export default function FAQPage() {
             Event Schedule
           </Link>
         </div>
-      </div>
+      </SpotlightCard>
     </div>
   );
 }

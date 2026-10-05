@@ -9,6 +9,8 @@ import { useAuth } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BrandLogo } from "@/components/BrandLogo";
 
+import { SpecularButton } from "@/components/ui/SpecularButton";
+
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
@@ -102,11 +104,11 @@ export default function LoginPage() {
                   autoComplete="username"
                   autoCapitalize="none"
                   spellCheck={false}
-                  placeholder="e.g. TEAM-001"
+                  placeholder="e.g. TEAM-001 or judge identifier"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value.toLowerCase())}
                   required
-                  className="w-full h-11 pl-10 pr-4 text-sm bg-input border border-border rounded-lg text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors"
+                  className="w-full h-11 pl-10 pr-4 text-sm bg-input border border-border rounded-xl text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
             </div>
@@ -125,7 +127,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full h-11 pl-10 pr-11 text-sm bg-input border border-border rounded-lg text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors"
+                  className="w-full h-11 pl-10 pr-11 text-sm bg-input border border-border rounded-xl text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                 />
                 <button
                   type="button"
@@ -139,8 +141,13 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Remember me & Forgot */}
-            <div className="flex items-center justify-between text-xs pt-1">
+            {/* Helper pill */}
+            <div className="p-2.5 rounded-xl bg-accent/40 border border-border text-[11px] text-muted-foreground leading-snug">
+              Credentials provisioned by Organizing Committee: Team Leaders use team ID, Judges use assigned judge badge ID.
+            </div>
+
+            {/* Remember me & Venue Help Desk */}
+            <div className="flex items-center justify-between text-xs pt-0.5">
               <label className="flex items-center gap-2 cursor-pointer select-none text-muted-foreground hover:text-foreground">
                 <input
                   type="checkbox"
@@ -150,20 +157,27 @@ export default function LoginPage() {
                 />
                 <span>Remember session</span>
               </label>
-              <span className="text-muted-foreground hover:text-secondary transition-colors cursor-pointer font-medium">
-                Forgot password?
-              </span>
+              <Link
+                href="/faq"
+                className="text-muted-foreground hover:text-secondary transition-colors font-medium"
+              >
+                Need help?
+              </Link>
             </div>
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-2 w-full h-11 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm cursor-pointer"
-            >
-              <span>{loading ? "Authenticating..." : "Access Console"}</span>
-              {!loading && <ArrowRight size={16} />}
-            </button>
+            <div className="mt-2 w-full">
+              <SpecularButton
+                type="submit"
+                disabled={loading}
+                variant="primary"
+                size="md"
+                className="w-full h-11"
+              >
+                <span>{loading ? "Authenticating..." : "Access Console"}</span>
+                {!loading && <ArrowRight size={16} />}
+              </SpecularButton>
+            </div>
           </form>
 
           {/* Divider */}

@@ -15,6 +15,8 @@ import {
   Loader2,
   AlertCircle
 } from "lucide-react";
+import { BorderGlow } from "@/components/ui/BorderGlow";
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
 
 interface RankedResult {
   id: string;
@@ -215,7 +217,7 @@ export default function ResultsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
                 {/* 2nd Place */}
-                <div className="order-2 md:order-1 rounded-2xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between">
+                <SpotlightCard className="order-2 md:order-1 p-6 flex flex-col justify-between">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-500/10 text-slate-700 dark:text-slate-300 border border-slate-400/30 text-xs font-bold">
@@ -232,33 +234,37 @@ export default function ResultsPage() {
                     <span className="text-muted-foreground">Category: {topThree[1].category || "General"}</span>
                     <span className="font-mono font-bold text-foreground text-sm">{topThree[1].computed.total_score} pts</span>
                   </div>
-                </div>
+                </SpotlightCard>
 
-                {/* 1st Place */}
-                <div className="order-1 md:order-2 rounded-2xl border-2 border-secondary bg-card p-6 sm:p-7 shadow-md flex flex-col justify-between relative">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground text-[10px] font-black uppercase tracking-widest px-3 py-0.5 rounded-full shadow-sm">
-                    Grand Champion
-                  </div>
-                  <div className="space-y-3 pt-1">
-                    <div className="flex items-center justify-between">
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/20 text-secondary border border-secondary/30 text-xs font-bold">
-                        <Trophy size={14} />
-                        <span>Winner</span>
+                {/* 1st Place (Grand Champion) */}
+                <div className="order-1 md:order-2">
+                  <BorderGlow active={true}>
+                    <div className="p-6 sm:p-7 flex flex-col justify-between relative bg-card">
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground text-[10px] font-black uppercase tracking-widest px-3 py-0.5 rounded-full shadow-sm">
+                        Grand Champion
                       </div>
-                      <span className="text-xs font-mono font-bold text-secondary">RANK #1</span>
+                      <div className="space-y-3 pt-1">
+                        <div className="flex items-center justify-between">
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/20 text-secondary border border-secondary/30 text-xs font-bold">
+                            <Trophy size={14} />
+                            <span>Winner</span>
+                          </div>
+                          <span className="text-xs font-mono font-bold text-secondary">RANK #1</span>
+                        </div>
+                        <h3 className="text-xl font-black text-foreground">{topThree[0].title}</h3>
+                        <p className="text-xs text-primary font-bold uppercase tracking-wider">{topThree[0].team_name}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">{topThree[0].summary}</p>
+                      </div>
+                      <div className="mt-5 pt-4 border-t border-border flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Category: {topThree[0].category || "General"}</span>
+                        <span className="font-mono font-black text-primary text-base">{topThree[0].computed.total_score} pts</span>
+                      </div>
                     </div>
-                    <h3 className="text-xl font-black text-foreground">{topThree[0].title}</h3>
-                    <p className="text-xs text-primary font-bold uppercase tracking-wider">{topThree[0].team_name}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">{topThree[0].summary}</p>
-                  </div>
-                  <div className="mt-5 pt-4 border-t border-border flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Category: {topThree[0].category || "General"}</span>
-                    <span className="font-mono font-black text-primary text-base">{topThree[0].computed.total_score} pts</span>
-                  </div>
+                  </BorderGlow>
                 </div>
 
                 {/* 3rd Place */}
-                <div className="order-3 rounded-2xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between">
+                <SpotlightCard className="order-3 p-6 flex flex-col justify-between">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-600/10 text-amber-700 dark:text-amber-400 border border-amber-600/30 text-xs font-bold">
@@ -275,7 +281,7 @@ export default function ResultsPage() {
                     <span className="text-muted-foreground">Category: {topThree[2].category || "General"}</span>
                     <span className="font-mono font-bold text-foreground text-sm">{topThree[2].computed.total_score} pts</span>
                   </div>
-                </div>
+                </SpotlightCard>
               </div>
             </section>
           )}

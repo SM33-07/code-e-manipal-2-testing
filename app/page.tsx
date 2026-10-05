@@ -17,6 +17,12 @@ import {
   CheckCircle2
 } from "lucide-react";
 
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { BorderGlow } from "@/components/ui/BorderGlow";
+import { SpecularButton } from "@/components/ui/SpecularButton";
+import { ClickSpark } from "@/components/ui/ClickSpark";
+import { OptionWheel } from "@/components/ui/OptionWheel";
+
 export default function HomePage() {
   const { role, isAuthenticated, loading } = useAuth();
 
@@ -90,26 +96,28 @@ export default function HomePage() {
             {loading ? (
               <div className="h-11 w-44 rounded-xl bg-accent animate-pulse" />
             ) : isAuthenticated ? (
-              <Link
-                href={getWorkspaceHref()}
-                className="px-6 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-md hover:bg-primary/90 transition-all flex items-center gap-2 group cursor-pointer"
-              >
-                <span>Access {role === "admin" ? "Operations" : role === "judge" ? "Evaluation" : "Workspace"}</span>
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
+              <ClickSpark>
+                <Link href={getWorkspaceHref()}>
+                  <SpecularButton variant="primary" size="md">
+                    <span>Access {role === "admin" ? "Operations" : role === "judge" ? "Evaluation" : "Workspace"}</span>
+                    <ArrowRight size={16} />
+                  </SpecularButton>
+                </Link>
+              </ClickSpark>
             ) : (
-              <Link
-                href="/login"
-                className="px-6 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-md hover:bg-primary/90 transition-all flex items-center gap-2 group cursor-pointer"
-              >
-                <span>Enter Hackathon Console</span>
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
+              <ClickSpark>
+                <Link href="/login">
+                  <SpecularButton variant="primary" size="md">
+                    <span>Enter Hackathon Console</span>
+                    <ArrowRight size={16} />
+                  </SpecularButton>
+                </Link>
+              </ClickSpark>
             )}
 
             <Link
               href="/timeline"
-              className="px-5 py-3 rounded-xl border border-border bg-card text-foreground text-sm font-semibold hover:bg-accent transition-colors flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl border border-border bg-card text-foreground text-sm font-semibold hover:bg-accent hover:border-secondary/40 transition-all flex items-center gap-2"
             >
               <Calendar size={15} className="text-secondary" />
               <span>Event Timeline</span>
@@ -117,7 +125,7 @@ export default function HomePage() {
 
             <Link
               href="/problem-statements"
-              className="px-5 py-3 rounded-xl border border-border bg-card text-foreground text-sm font-semibold hover:bg-accent transition-colors flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl border border-border bg-card text-foreground text-sm font-semibold hover:bg-accent hover:border-primary/40 transition-all flex items-center gap-2"
             >
               <Code2 size={15} className="text-primary" />
               <span>Problem Statements</span>
@@ -145,9 +153,9 @@ export default function HomePage() {
       {/* ── SYSTEM HIGHLIGHTS / METRICS ── */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {highlights.map((item, idx) => (
-          <div
+          <SpotlightCard
             key={idx}
-            className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm flex flex-col justify-between"
+            className="p-5 sm:p-6 flex flex-col justify-between"
           >
             <span className="text-[11px] font-bold uppercase tracking-wider text-secondary font-mono">
               {item.label}
@@ -158,12 +166,12 @@ export default function HomePage() {
               </div>
               <div className="text-xs text-muted-foreground mt-0.5">{item.sub}</div>
             </div>
-            <div className="h-1 w-8 rounded-full bg-primary/40" />
-          </div>
+            <div className="h-1 w-8 rounded-full bg-primary/50" />
+          </SpotlightCard>
         ))}
       </section>
 
-      {/* ── TECHNICAL TRACKS ── */}
+      {/* ── TECHNICAL TRACKS & OPTION WHEEL EXPLORER ── */}
       <section className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
@@ -184,11 +192,15 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Interactive Track Dial (Option Wheel) */}
+        <OptionWheel />
+
+        {/* Full Track Accessible Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
           {tracks.map((t) => (
-            <div
+            <SpotlightCard
               key={t.id}
-              className="rounded-2xl border border-border bg-card p-6 sm:p-7 shadow-sm flex flex-col justify-between hover:border-secondary/50 transition-colors group"
+              className="p-6 sm:p-7 flex flex-col justify-between group"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -210,7 +222,7 @@ export default function HomePage() {
                   <ArrowRight size={12} />
                 </span>
               </div>
-            </div>
+            </SpotlightCard>
           ))}
         </div>
       </section>
@@ -231,7 +243,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-          <div className="rounded-2xl border border-border bg-accent/15 p-5 space-y-2">
+          <SpotlightCard className="p-5 space-y-2 bg-accent/20">
             <div className="p-2 rounded-xl bg-card border border-border w-fit text-primary">
               <Terminal size={18} />
             </div>
@@ -239,9 +251,9 @@ export default function HomePage() {
             <p className="text-xs text-muted-foreground leading-relaxed">
               Submission states transition through strict verification locks with tamper-proof timestamps and audit logs.
             </p>
-          </div>
+          </SpotlightCard>
 
-          <div className="rounded-2xl border border-border bg-accent/15 p-5 space-y-2">
+          <SpotlightCard className="p-5 space-y-2 bg-accent/20">
             <div className="p-2 rounded-xl bg-card border border-border w-fit text-secondary">
               <Shield size={18} />
             </div>
@@ -249,9 +261,9 @@ export default function HomePage() {
             <p className="text-xs text-muted-foreground leading-relaxed">
               Dual-blind jury review matrices prevent bias. Scores remain cryptographically sealed until official ceremony release.
             </p>
-          </div>
+          </SpotlightCard>
 
-          <div className="rounded-2xl border border-border bg-accent/15 p-5 space-y-2">
+          <SpotlightCard className="p-5 space-y-2 bg-accent/20">
             <div className="p-2 rounded-xl bg-card border border-border w-fit text-foreground">
               <Trophy size={18} />
             </div>
@@ -259,37 +271,69 @@ export default function HomePage() {
             <p className="text-xs text-muted-foreground leading-relaxed">
               Real-time phase transitions, synchronized countdown clocks, and live broadcast announcements for all squads.
             </p>
+          </SpotlightCard>
+        </div>
+      </section>
+
+      {/* ── ORGANIZING INSTITUTIONS & ENTITIES ── */}
+      <section className="rounded-2xl border border-border bg-card/60 p-6 sm:p-8 text-center space-y-4">
+        <div className="text-xs uppercase tracking-widest font-bold text-muted-foreground">
+          Flagship National Event Organized By
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 pt-2">
+          <div className="flex flex-col items-center">
+            <span className="text-base sm:text-lg font-black tracking-tight text-foreground font-mono">
+              MANIPAL UNIVERSITY JAIPUR
+            </span>
+            <span className="text-[11px] text-muted-foreground mt-0.5">Host Campus &amp; Academic Leadership</span>
+          </div>
+          <div className="h-6 w-px bg-border hidden sm:block" />
+          <div className="flex flex-col items-center">
+            <span className="text-base sm:text-lg font-black tracking-tight text-primary font-mono">
+              LearnIT &bull; SCA
+            </span>
+            <span className="text-[11px] text-muted-foreground mt-0.5">School of Computer Applications</span>
+          </div>
+          <div className="h-6 w-px bg-border hidden sm:block" />
+          <div className="flex flex-col items-center">
+            <span className="text-base sm:text-lg font-black tracking-tight text-secondary font-mono">
+              E-CELL MUJ
+            </span>
+            <span className="text-[11px] text-muted-foreground mt-0.5">Entrepreneurship Cell Partnership</span>
           </div>
         </div>
       </section>
 
       {/* ── FOOTER CALLOUT ── */}
-      <section className="rounded-3xl border border-secondary/40 bg-card p-6 sm:p-10 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
-        <div className="space-y-2 max-w-xl">
-          <h3 className="text-xl sm:text-2xl font-black text-foreground">
-            Ready to Begin the Engineering Sprint?
-          </h3>
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            Sign in with your registered team credentials or explore the full hackathon timeline and problem statements.
-          </p>
-        </div>
+      <BorderGlow>
+        <section className="p-6 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+          <div className="space-y-2 max-w-xl">
+            <h3 className="text-xl sm:text-2xl font-black text-foreground">
+              Ready to Begin the Engineering Sprint?
+            </h3>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              Sign in with your registered team credentials or explore the full hackathon timeline and problem statements.
+            </p>
+          </div>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <Link
-            href="/gallery"
-            className="px-4 py-2.5 rounded-xl border border-border bg-card text-xs font-semibold text-foreground hover:bg-accent transition-colors"
-          >
-            Past Editions
-          </Link>
-          <Link
-            href="/login"
-            className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-1.5"
-          >
-            <span>Enter Console</span>
-            <ArrowRight size={14} />
-          </Link>
-        </div>
-      </section>
+          <div className="flex items-center gap-3 shrink-0">
+            <Link
+              href="/gallery"
+              className="px-4 py-2.5 rounded-xl border border-border bg-card text-xs font-semibold text-foreground hover:bg-accent transition-colors"
+            >
+              Past Editions
+            </Link>
+            <ClickSpark>
+              <Link href="/login">
+                <SpecularButton size="sm" variant="primary">
+                  <span>Enter Console</span>
+                  <ArrowRight size={14} />
+                </SpecularButton>
+              </Link>
+            </ClickSpark>
+          </div>
+        </section>
+      </BorderGlow>
     </div>
   );
 }

@@ -46,6 +46,8 @@ const CATEGORY_FILTERS = [
   "Other",
 ];
 
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
+
 // ─── Stat Card Component ──────────────────────────────────────────────────────
 function StatCard({
   value,
@@ -61,7 +63,7 @@ function StatCard({
   badge?: string;
 }) {
   return (
-    <div className="relative p-5 rounded-2xl bg-card border border-border shadow-sm flex-1 min-w-[200px] text-left transition-all hover:-translate-y-0.5 hover:shadow-md">
+    <SpotlightCard className="p-5 flex-1 min-w-[200px] text-left transition-all hover:-translate-y-0.5">
       {badge && (
         <div className="absolute top-3.5 right-3.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
           ↗ {badge}
@@ -78,7 +80,7 @@ function StatCard({
           {subtitle}
         </div>
       )}
-    </div>
+    </SpotlightCard>
   );
 }
 

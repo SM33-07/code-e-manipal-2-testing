@@ -31,6 +31,8 @@ import {
   Images,
 } from "lucide-react";
 import { toast } from "sonner";
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { SpecularButton } from "@/components/ui/SpecularButton";
 
 interface Member {
   userId: string;
@@ -279,7 +281,7 @@ export function ParticipantDashboard() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8 pb-16">
       {/* ── 1. Team Identity & Workspace Header ── */}
-      <div className="rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-sm relative overflow-hidden">
+      <SpotlightCard className="rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-sm relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2.5">
@@ -338,12 +340,11 @@ export function ParticipantDashboard() {
             )}
 
             {hasTeam ? (
-              <Link
-                href="/submit"
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-xs sm:text-sm shadow-md hover:bg-primary/90 transition-all cursor-pointer"
-              >
-                <span>{isFinalized ? "View Submission" : hasSubmission ? "Continue Submission" : "Start Submission"}</span>
-                <ArrowRight size={15} />
+              <Link href="/submit">
+                <SpecularButton variant="primary" size="md">
+                  <span>{isFinalized ? "View Submission" : hasSubmission ? "Continue Submission" : "Start Submission"}</span>
+                  <ArrowRight size={15} />
+                </SpecularButton>
               </Link>
             ) : (
               <div className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-muted text-muted-foreground font-semibold text-xs sm:text-sm border border-border">
@@ -372,7 +373,7 @@ export function ParticipantDashboard() {
             <span className="truncate">{announcement.content}</span>
           </div>
         )}
-      </div>
+      </SpotlightCard>
 
       {/* ── Onboarding / Team Formation (When no team registered) ── */}
       {!hasTeam && (
@@ -472,7 +473,7 @@ export function ParticipantDashboard() {
       {/* ── 2. Primary Status Row: Event Phase & Submission Status ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {/* Phase Card */}
-        <div className="p-5 rounded-2xl border border-border bg-card shadow-sm flex flex-col justify-between">
+        <SpotlightCard className="p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between text-muted-foreground mb-2">
             <span className="text-xs font-bold uppercase tracking-wider">Event Phase</span>
             <Clock size={16} className="text-secondary" />
@@ -486,10 +487,10 @@ export function ParticipantDashboard() {
               <span>36-Hour Continuous Sprint</span>
             </div>
           </div>
-        </div>
+        </SpotlightCard>
 
         {/* Submission Status Card */}
-        <div className="p-5 rounded-2xl border border-border bg-card shadow-sm flex flex-col justify-between">
+        <SpotlightCard className="p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between text-muted-foreground mb-2">
             <span className="text-xs font-bold uppercase tracking-wider">Project State</span>
             <FileCheck size={16} className="text-secondary" />
@@ -512,10 +513,10 @@ export function ParticipantDashboard() {
                 : "Awaiting initial write-up"}
             </div>
           </div>
-        </div>
+        </SpotlightCard>
 
         {/* Team Capacity Meter */}
-        <div className="p-5 rounded-2xl border border-border bg-card shadow-sm flex flex-col justify-between">
+        <SpotlightCard className="p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between text-muted-foreground mb-2">
             <span className="text-xs font-bold uppercase tracking-wider">Roster Capacity</span>
             <Users size={16} className="text-secondary" />
@@ -532,10 +533,10 @@ export function ParticipantDashboard() {
               />
             </div>
           </div>
-        </div>
+        </SpotlightCard>
 
         {/* Next Hard Checkpoint */}
-        <div className="p-5 rounded-2xl border border-border bg-card shadow-sm flex flex-col justify-between">
+        <SpotlightCard className="p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between text-muted-foreground mb-2">
             <span className="text-xs font-bold uppercase tracking-wider">Code Freeze</span>
             <Flame size={16} className="text-primary" />
@@ -548,7 +549,7 @@ export function ParticipantDashboard() {
               Submission window closes sharp
             </div>
           </div>
-        </div>
+        </SpotlightCard>
       </div>
 
       {/* ── 3. Central Two-Column Grid: Team Roster & Project Submission ── */}
