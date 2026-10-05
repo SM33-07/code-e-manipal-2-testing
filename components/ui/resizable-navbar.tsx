@@ -253,7 +253,7 @@ export const NavbarLogo = () => {
       <img
         src="/logo.png"
         alt="Code-e-Manipal 2.0"
-        className="h-9 w-auto object-contain"
+        className="h-9 w-auto object-contain bg-transparent"
       />
     </Link>
   );
