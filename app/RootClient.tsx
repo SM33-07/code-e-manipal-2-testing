@@ -165,13 +165,20 @@ export default function RootClient({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     try {
-      const alreadyBooted = sessionStorage.getItem("cem_portal_booted")
-      if (alreadyBooted) {
-        setShowLoader(false)
-        return
+      const navEntry = window.performance?.getEntriesByType?.("navigation")?.[0] as PerformanceNavigationTiming | undefined
+      const isReload = navEntry?.type === "reload"
+
+      if (isReload) {
+        sessionStorage.removeItem("cem_portal_booted")
+      } else {
+        const alreadyBooted = sessionStorage.getItem("cem_portal_booted")
+        if (alreadyBooted) {
+          setShowLoader(false)
+          return
+        }
       }
     } catch {
-      // sessionStorage unavailable
+      // sessionStorage or performance unavailable
     }
 
     // Deterministic safety fallback
@@ -180,7 +187,7 @@ export default function RootClient({ children }: { children: React.ReactNode }) 
         sessionStorage.setItem("cem_portal_booted", "1")
       } catch {}
       setShowLoader(false)
-    }, 1500)
+    }, 3500)
 
     return () => clearTimeout(safety)
   }, [])

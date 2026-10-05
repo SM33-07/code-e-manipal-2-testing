@@ -353,3 +353,33 @@ Executed the final visual and navigation correction pass based on live browser i
    - `git diff --check` — passed.
    - `rg -n "backdrop-blur|backdrop-filter|backdropFilter" app components styles` — 0 matches.
 
+## Stage N — Phase 3 Original Code-e-Manipal Loader Restoration
+
+1. **Loader Identification & Forensic Verification (`c9afb79` / `da32ab0` / `04e39f3`):**
+   - Located and identified the actual previous approved Code-e-Manipal loader implementation from Git history (PR #14 `c9afb79`).
+   - Restored full visual fidelity in `components/LoaderAnimation.tsx` without inventing a generic replacement spinner or modernizing it.
+
+2. **Visual & Design System Restoration (`components/LoaderAnimation.tsx`):**
+   - Restored MUJ Campus Building golden wireframe backdrop (`/MUJ-BUILD.webp` mix-blend-screen opacity 0.35).
+   - Restored pulsating glow aura, circular logo container with rotating dashed inner ring, and 24-point dot ring (`/logo.png`).
+   - Restored animated circuit lines extending from logo with rotating line angles and glowing endpoint node dots.
+   - Restored bird silhouettes animation and floating golden particle background.
+   - Restored HUD frame corner SVGs (`#F6C453`) and top/right dotted borders.
+   - Restored double-border loading card with inner bright core and leading glow orb progress bar (`#C9A227`, `#F6C453`, `#FFE066`).
+   - Restored micro HUD element (`SYS.INIT.2026`) and card side circuit extensions.
+   - Restored footer logo with rotating ring and official tagline (`Empowering Minds. Building the Future.`).
+   - Restored gold title typography (`LearnIT`, `Manipal University Jaipur`, `CODE-ए-MANIPAL`) and diamond accent sequence.
+
+3. **Lifecycle, Ergonomics & Accessibility Integration (`app/RootClient.tsx`, `components/LoaderAnimation.tsx`):**
+   - Restored smooth progress ticker (~1.3s progression to 100%) with 200ms exit pause and 800ms fade/scale exit animation.
+   - Restored `SKIP INTRO` interaction and added Escape key event listener for instant dismissal.
+   - Added immediate bypass when `prefers-reduced-motion: reduce` is active.
+   - Added hard 3.5s/4.0s failsafe timers in both `RootClient.tsx` and `LoaderAnimation.tsx` to ensure application usability is never blocked.
+   - Preserved `sessionStorage.getItem("cem_portal_booted")` lifecycle so initial page load and explicit hard reloads display the intro while client-side route navigation remains seamless.
+
+4. **Validation & Quality Gates:**
+   - `npx tsc --noEmit` — 0 errors.
+   - `npm run build` — 63/63 routes compiled successfully.
+   - `git diff --check` — passed with 0 formatting/whitespace issues.
+
+
