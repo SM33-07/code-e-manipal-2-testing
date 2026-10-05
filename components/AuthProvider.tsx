@@ -105,12 +105,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = async () => {
-    await supabase.auth.signOut()
-    setUser(null)
-    setRole("participant")
-  }
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch {
+      // Continue even if network fails
+    }
+    await supabase.auth.signOut();
+    setUser(null);
+    setRole("participant");
+  };
 
-  return <AuthContext.Provider value={{ user, role, loading, login, logout, isAuthenticated: !!user }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, role, loading, login, logout, isAuthenticated: !!user }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

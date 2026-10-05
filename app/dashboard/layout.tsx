@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 export default function DashboardLayout({
   children,
@@ -8,10 +9,12 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen text-foreground">
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
-      </main>
-    </div>
+    <ProtectedRoute>
+      <div className="min-h-screen text-foreground">
+        <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {children}
+        </main>
+      </div>
+    </ProtectedRoute>
   );
 }

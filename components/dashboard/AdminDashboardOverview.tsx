@@ -156,7 +156,7 @@ export function AdminDashboardOverview() {
 
         <div className="flex items-center gap-3 shrink-0">
           <Link
-            href="/admin/event-control"
+            href="/admin/event"
             className="px-3.5 py-1.5 rounded-lg border border-border bg-card hover:bg-accent text-xs font-semibold text-foreground transition-colors"
           >
             Phase Controls
@@ -262,7 +262,7 @@ export function AdminDashboardOverview() {
           </Link>
 
           <Link
-            href="/admin/event-control"
+            href="/admin/event"
             className="p-5 rounded-2xl border border-border bg-card hover:border-secondary/50 hover:shadow-md transition-all group flex flex-col justify-between"
           >
             <div>
@@ -300,7 +300,7 @@ export function AdminDashboardOverview() {
           </Link>
 
           <Link
-            href="/admin/registrations"
+            href="/admin/teams"
             className="p-5 rounded-2xl border border-border bg-card hover:border-border-subtle hover:shadow-md transition-all group flex flex-col justify-between"
           >
             <div>

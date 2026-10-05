@@ -8,9 +8,9 @@ import { Users, FileText, Scale, Trophy, Image } from "lucide-react"
 type Phase = "Registration" | "Submission" | "Judging" | "Results" | "Gallery"
 
 const phases = [
-  { name: "Registration", icon: Users, color: "from-blue-500 to-cyan-500", route: "/team" },
-  { name: "Submission", icon: FileText, color: "from-cyan-500 to-teal-500", route: "/SubmissionForm" },
-  { name: "Judging", icon: Scale, color: "from-teal-500 to-green-500", route: "/judging" },
+  { name: "Registration", icon: Users, color: "from-blue-500 to-cyan-500", route: "/dashboard" },
+  { name: "Submission", icon: FileText, color: "from-cyan-500 to-teal-500", route: "/submit" },
+  { name: "Judging", icon: Scale, color: "from-teal-500 to-green-500", route: "/judge" },
   { name: "Results", icon: Trophy, color: "from-green-500 to-yellow-500", route: "/admin/results" },
   { name: "Gallery", icon: Image, color: "from-yellow-500 to-orange-500", route: "/gallery" },
 ]

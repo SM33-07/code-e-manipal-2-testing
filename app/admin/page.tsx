@@ -249,14 +249,14 @@ export default function AdminPage() {
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
-            onClick={() => router.push("/admin/event-control")}
+            onClick={() => router.push("/admin/event")}
             className="px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
           >
             Event Control
           </button>
           <button
             type="button"
-            onClick={() => router.push("/admin/registrations")}
+            onClick={() => router.push("/admin/teams")}
             className="px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-accent text-xs font-semibold text-foreground transition-colors cursor-pointer"
           >
             Teams

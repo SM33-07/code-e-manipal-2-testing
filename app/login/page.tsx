@@ -32,13 +32,22 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
-      const cleanIdentifier = identifier.trim().toLowerCase();
-      await login(cleanIdentifier, password);
-      router.push("/dashboard");
+      const cleanIdentifier = identifier.trim();
+      const authResult = await login(cleanIdentifier, password);
+      const userRole = authResult?.role || "participant";
+
+      if (userRole === "admin") {
+        router.push("/admin");
+      } else if (userRole === "judge") {
+        router.push("/judge");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       triggerError(err?.message || "Login failed. Please verify your ID and password.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

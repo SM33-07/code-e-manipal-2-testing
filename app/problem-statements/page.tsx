@@ -291,7 +291,7 @@ export default function ProblemStatementsPage() {
               </div>
             )}
             <Link
-              href="/admin/event-control"
+              href="/admin/event"
               className="px-3.5 py-2 rounded-xl border border-border bg-card text-xs font-semibold text-foreground hover:bg-accent transition-colors"
             >
               Event Control

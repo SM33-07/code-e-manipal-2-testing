@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -26,7 +26,7 @@ import { useAuth } from "@/components/AuthProvider";
 
 const sideNav = [
   { label: "Operations Center", icon: LayoutDashboard, href: "/admin" },
-  { label: "Event Control",     icon: Radio,           href: "/admin/event-control" },
+  { label: "Event Control",     icon: Radio,           href: "/admin/event" },
   { label: "Problem Statements",icon: FileQuestion,    href: "/problem-statements" },
   { label: "Teams & Roster",    icon: Users,           href: "/admin/teams" },
   { label: "Submissions",       icon: FileCode,        href: "/admin/submissions" },
@@ -43,8 +43,14 @@ const sideNav = [
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout, user } = useAuth();
+  const { logout, user, role, loading, isAuthenticated } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (!loading && (!isAuthenticated || role !== "admin")) {
+      router.push(isAuthenticated ? "/dashboard" : "/login");
+    }
+  }, [loading, isAuthenticated, role, router]);
 
   const handleLogout = async () => {
     try {
@@ -63,6 +69,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const currentSection = sideNav.find(
     (item) => pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href))
   )?.label || "Operations Center";
+
+  if (loading || !isAuthenticated || role !== "admin") {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center text-muted-foreground text-sm">
+        Verifying administrator credentials...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-5rem)] bg-background text-foreground flex flex-col">

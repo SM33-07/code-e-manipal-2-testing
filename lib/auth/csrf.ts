@@ -34,8 +34,8 @@ function getApprovedOrigins(): Set<string> {
   origins.add('https://www.codeemanipal.in');
   origins.add('https://portal.codeemanipal.in');
 
-  // From environment (e.g., Vercel preview deployments)
-  const envOrigin = process.env.NEXT_PUBLIC_APP_URL;
+  // From environment (e.g., Vercel preview deployments, custom app URLs)
+  const envOrigin = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL;
   if (envOrigin) {
     try {
       const url = new URL(envOrigin);
@@ -45,14 +45,36 @@ function getApprovedOrigins(): Set<string> {
     }
   }
 
-  // Development origins
-  if (process.env.NODE_ENV === 'development') {
-    origins.add('http://localhost:3000');
-    origins.add('http://localhost:3001');
-    origins.add('http://127.0.0.1:3000');
-  }
+  // Localhost / loopback origins (supported for local development, testing, and production builds)
+  origins.add('http://localhost:3000');
+  origins.add('http://localhost:3001');
+  origins.add('http://localhost:3002');
+  origins.add('http://127.0.0.1:3000');
+  origins.add('http://127.0.0.1:3001');
+  origins.add('http://127.0.0.1:3002');
 
   return origins;
+}
+
+/**
+ * Check if the request's origin matches the server host (Same-Origin).
+ */
+function isSameOrigin(req: NextRequest, requestOrigin: string): boolean {
+  if (req.nextUrl.origin && requestOrigin === req.nextUrl.origin) {
+    return true;
+  }
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
+  const proto = req.headers.get('x-forwarded-proto') || req.nextUrl.protocol.replace(':', '') || 'http';
+  if (host) {
+    if (
+      requestOrigin === `${proto}://${host}` ||
+      requestOrigin === `http://${host}` ||
+      requestOrigin === `https://${host}`
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /** Cached allowlist (computed once per cold start) */
@@ -141,7 +163,12 @@ export function validateCsrf(req: NextRequest): NextResponse | null {
     return Errors.FORBIDDEN() as NextResponse;
   }
 
-  if (!approvedOrigins().has(requestOrigin)) {
+  const isAllowed =
+    isSameOrigin(req, requestOrigin) ||
+    approvedOrigins().has(requestOrigin) ||
+    /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(requestOrigin);
+
+  if (!isAllowed) {
     logger.warn('CSRF: Origin not in approved allowlist', {
       method: req.method,
       url: req.nextUrl.pathname,

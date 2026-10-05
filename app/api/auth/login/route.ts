@@ -28,6 +28,8 @@ import { logger } from '@/lib/utils/logger';
 import { Errors, successResponse } from '@/lib/utils/response';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
 
+import { query } from '@/lib/db';
+
 /** Generic error message for enumeration resistance (ADR-007) */
 const GENERIC_AUTH_ERROR = 'Invalid identifier or password.';
 
@@ -62,20 +64,36 @@ export async function POST(req: NextRequest) {
       syntheticEmail = identityKey;
     } else {
       const normalized = normalizeIdentifier(trimmedInput);
-      if (!normalized) {
-        // Don't reveal that the format is invalid — generic error
+      identityKey = normalized ? normalized.canonical : trimmedInput.toUpperCase();
+
+      // Look up authoritative email from public.profiles for this identifier
+      let profileEmail: string | null = null;
+      try {
+        const { rows } = await query(
+          'SELECT email FROM public.profiles WHERE UPPER(identifier) = UPPER($1) LIMIT 1',
+          [identityKey]
+        );
+        if (rows.length > 0 && rows[0].email) {
+          profileEmail = rows[0].email;
+        }
+      } catch (dbErr) {
+        logger.warn('Failed to query profile for identifier', { identityKey, error: String(dbErr) });
+      }
+
+      if (profileEmail) {
+        syntheticEmail = profileEmail;
+      } else if (normalized) {
+        syntheticEmail = identifierToEmail(identityKey);
+      } else {
         logger.debug('Login attempt with invalid identifier format', {
           rawIdentifier: rawIdentifier.substring(0, 20),
         });
-        // Still apply a small delay to prevent format enumeration
         await serverSleep(200);
         return NextResponse.json(
           { error: GENERIC_AUTH_ERROR },
           { status: 401 }
         );
       }
-      identityKey = normalized.canonical;
-      syntheticEmail = identifierToEmail(identityKey);
     }
 
     // ── Step 2: Layer 2 — Coarse endpoint rate limit ──

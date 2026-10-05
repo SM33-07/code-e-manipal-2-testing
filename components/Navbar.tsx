@@ -29,7 +29,7 @@ const mockNotifications = [
 ]
 
 export default function Navbar({ className }: { className?: string }) {
-  const { role, logout, user } = useAuth()
+  const { role, logout, user, isAuthenticated } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -184,27 +184,36 @@ export default function Navbar({ className }: { className?: string }) {
 
   if (pathname === "/login") return null
 
-  // Generate dynamic links strictly based on user role
+  // Generate dynamic links strictly based on authentication and user role
   const navItems = []
-  if (role === "admin") {
-    navItems.push({ name: "Dashboard", link: "/dashboard" })
+  if (!isAuthenticated) {
+    navItems.push({ name: "Home", link: "/" })
+    navItems.push({ name: "Problem Statements", link: "/problem-statements" })
+    navItems.push({ name: "Timeline", link: "/timeline" })
+    navItems.push({ name: "Past Editions", link: "/gallery" })
+    navItems.push({ name: "FAQ", link: "/faq" })
+    navItems.push({ name: "Register", link: "/register" })
+  } else if (role === "admin") {
     navItems.push({ name: "Operations Center", link: "/admin" })
-    navItems.push({ name: "Gallery", link: "/gallery" })
+    navItems.push({ name: "Participant Dashboard", link: "/dashboard" })
+    navItems.push({ name: "Problem Statements", link: "/problem-statements" })
+    navItems.push({ name: "Past Editions", link: "/gallery" })
   } else if (role === "judge") {
-    navItems.push({ name: "Dashboard", link: "/dashboard" })
-    navItems.push({ name: "Evaluation", link: "/judge" })
+    navItems.push({ name: "Workspace", link: "/judge" })
+    navItems.push({ name: "Problem Statements", link: "/problem-statements" })
+    navItems.push({ name: "Timeline", link: "/timeline" })
     navItems.push({ name: "Guidelines", link: "/guidelines" })
-    navItems.push({ name: "Gallery", link: "/gallery" })
+    navItems.push({ name: "Past Editions", link: "/gallery" })
   } else {
     navItems.push({ name: "Dashboard", link: "/dashboard" })
-    navItems.push({ name: "Timeline", link: "/timeline" })
     navItems.push({ name: "Problem Statements", link: "/problem-statements" })
     navItems.push({ name: "Submit", link: "/submit" })
-    navItems.push({ name: "Gallery", link: "/gallery" })
+    navItems.push({ name: "Timeline", link: "/timeline" })
+    navItems.push({ name: "Past Editions", link: "/gallery" })
     navItems.push({ name: "FAQ", link: "/faq" })
   }
 
-  const isSubmissionForm = pathname?.startsWith("/SubmissionForm")
+  const isSubmissionForm = pathname?.startsWith("/submit") || pathname?.startsWith("/SubmissionForm")
 
   return (
     <ResizableNavbar isSubmissionForm={isSubmissionForm} className={className}>
@@ -308,42 +317,51 @@ export default function Navbar({ className }: { className?: string }) {
             </AnimatePresence>
           </div>
 
-          {/* User Avatar Menu */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => {
-                setMenuOpen(!menuOpen);
-                if (notifsOpen) setNotifsOpen(false);
-              }}
-              className="w-8 h-8 rounded-full bg-jaipur-secondary text-jaipur-primary flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-jaipur-gold/30 focus:outline-none cursor-pointer"
+          {/* User Auth / Enter Console CTA */}
+          {!isAuthenticated ? (
+            <Link
+              href="/login"
+              className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-sm hover:opacity-95 transition-opacity"
             >
-              {user?.email?.charAt(0).toUpperCase()}
-            </button>
+              Enter Console
+            </Link>
+          ) : (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(!menuOpen);
+                  if (notifsOpen) setNotifsOpen(false);
+                }}
+                className="w-8 h-8 rounded-full bg-secondary/15 text-secondary border border-secondary/30 flex items-center justify-center font-bold text-sm shadow-sm focus:outline-none cursor-pointer"
+              >
+                {user?.email?.charAt(0).toUpperCase() || "U"}
+              </button>
 
-            <AnimatePresence>
-              {menuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  style={{ backgroundColor: "var(--background)", transform: "translateZ(0)" }}
-                  className="absolute right-0 mt-3 w-48 border border-jaipur-gold/30 rounded-xl shadow-xl overflow-hidden z-50 isolate"
-                >
-                  <div className="px-4 py-3 border-b border-jaipur-gold/20 text-xs text-muted-foreground truncate">
-                    {user?.email}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-3 text-sm text-jaipur-primary font-medium hover:bg-jaipur-primary/10 transition-colors cursor-pointer"
+              <AnimatePresence>
+                {menuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    style={{ backgroundColor: "var(--background)", transform: "translateZ(0)" }}
+                    className="absolute right-0 mt-3 w-48 border border-border bg-card rounded-xl shadow-xl overflow-hidden z-50 isolate"
                   >
-                    Logout
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                    <div className="px-4 py-3 border-b border-border text-xs text-muted-foreground truncate">
+                      {user?.email}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-3 text-sm text-destructive font-medium hover:bg-destructive/10 transition-colors cursor-pointer"
+                    >
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       </NavBody>
 
@@ -383,23 +401,35 @@ export default function Navbar({ className }: { className?: string }) {
           ))}
           
           <div className="flex w-full flex-col gap-3 pt-4 border-t border-border items-center">
-            {role && (
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-secondary/15 border border-secondary/30 text-secondary font-medium capitalize">
-                Role: {role}
-              </span>
+            {isAuthenticated ? (
+              <>
+                {role && (
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-secondary/15 border border-secondary/30 text-secondary font-medium capitalize">
+                    Role: {role}
+                  </span>
+                )}
+                {user?.email && (
+                  <span className="text-xs text-muted-foreground truncate max-w-full">
+                    {user.email}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full py-2.5 rounded-lg bg-destructive/10 border border-destructive/30 hover:bg-destructive/20 text-destructive font-semibold text-sm transition duration-200 cursor-pointer"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMobileNavOpen(false)}
+                className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm transition duration-200 text-center"
+              >
+                Enter Hackathon Console
+              </Link>
             )}
-            {user?.email && (
-              <span className="text-xs text-muted-foreground truncate max-w-full">
-                {user.email}
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-full py-2.5 rounded-lg bg-destructive/10 border border-destructive/30 hover:bg-destructive/20 text-destructive font-semibold text-sm transition duration-200 cursor-pointer"
-            >
-              Logout
-            </button>
           </div>
         </MobileNavMenu>
       </MobileNav>
