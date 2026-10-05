@@ -238,7 +238,7 @@ export default function AdminPage() {
             <span className="text-xs font-mono text-muted-foreground">LIVE EVENT OPERATIONS</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
-            Admin Operations Center
+            Event Operations Control Center
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Unified command for judge assignments, evaluation tracking, user roles, and system workflows.

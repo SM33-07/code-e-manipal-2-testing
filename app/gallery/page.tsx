@@ -26,17 +26,17 @@ export default function Gallery() {
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold tracking-wider uppercase mb-4">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/15 border border-secondary/30 text-secondary text-xs font-semibold tracking-wider uppercase mb-4">
                 <Sparkles className="w-3.5 h-3.5 text-secondary" />
-                Innovation Archive & Showcase
+                Hackathon Retrospective &amp; Archives
               </div>
 
               <h1 className="text-3xl sm:text-5xl font-black text-foreground tracking-tight m-0 mb-3">
-                Project Gallery & Archive
+                Previous Editions Gallery
               </h1>
 
               <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed m-0">
-                Explore groundbreaking systems, interactive prototypes, and architecture case studies built during Code-e-Manipal 2.0.
+                A visual and technical record of previous editions of Code-e-Manipal. Celebrating the teams, prototypes, mentorship sessions, and grand finale moments from Manipal University Jaipur.
               </p>
 
               {/* Stats */}
@@ -47,7 +47,7 @@ export default function Gallery() {
                     8+
                   </div>
                   <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground mt-1">
-                    Projects Submitted
+                    Past Projects Archived
                   </div>
                 </div>
 
@@ -57,7 +57,7 @@ export default function Gallery() {
                     25+
                   </div>
                   <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground mt-1">
-                    Participants
+                    Alumni Participants
                   </div>
                 </div>
 
@@ -67,7 +67,7 @@ export default function Gallery() {
                     30+
                   </div>
                   <div className="text-xs uppercase tracking-wider font-semibold text-muted-foreground mt-1">
-                    Technologies
+                    Tech Stacks Explored
                   </div>
                 </div>
               </div>

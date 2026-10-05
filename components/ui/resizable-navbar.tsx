@@ -59,7 +59,7 @@ export const Navbar = ({ children, className, isSubmissionForm }: NavbarProps) =
   const [visible, setVisible] = useState<boolean>(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 60) {
+    if (latest > 50) {
       setVisible(true);
     } else {
       setVisible(false);
@@ -70,8 +70,8 @@ export const Navbar = ({ children, className, isSubmissionForm }: NavbarProps) =
     <div
       ref={ref}
       className={cn(
-        "fixed inset-x-0 top-0 z-50 w-full flex flex-col items-center transition-all duration-200",
-        visible ? "py-2 bg-background/95 border-b border-border shadow-sm" : "py-3 bg-transparent",
+        "fixed inset-x-0 top-0 z-50 w-full flex flex-col items-center transition-all duration-300 pointer-events-none",
+        visible ? "py-2 sm:py-3" : "py-3 sm:py-4",
         className
       )}
     >
@@ -91,8 +91,10 @@ export const NavBody = ({ children, className, visible, isSubmissionForm }: NavB
   return (
     <div
       className={cn(
-        "relative z-[60] mx-auto hidden w-[calc(100%-2rem)] max-w-7xl flex-row items-center justify-between rounded-xl bg-card text-card-foreground px-5 py-2.5 lg:flex transition-all duration-200 border border-border shadow-sm",
-        visible && "border-secondary/50 shadow-md",
+        "relative z-[60] mx-auto hidden w-[calc(100%-2rem)] flex-row items-center justify-between transition-all duration-300 pointer-events-auto",
+        visible
+          ? "max-w-6xl rounded-full bg-card text-card-foreground px-6 py-2 border border-secondary/40 shadow-xl"
+          : "max-w-7xl rounded-2xl bg-transparent text-foreground px-5 py-2.5 border border-transparent shadow-none",
         className,
       )}
     >
@@ -179,8 +181,8 @@ export const MobileNav = ({ children, className, visible, isSubmissionForm }: Mo
   return (
     <div
       className={cn(
-        "relative z-[60] mx-auto flex w-[calc(100%-1.5rem)] flex-row items-center justify-between rounded-xl bg-card text-card-foreground px-4 py-2.5 lg:hidden transition-all duration-200 border border-border shadow-sm",
-        visible && "border-secondary/50 shadow-md",
+        "relative z-[60] mx-auto flex w-[calc(100%-1.5rem)] flex-row items-center justify-between rounded-2xl bg-card text-card-foreground px-4 py-2 lg:hidden transition-all duration-300 border border-border shadow-md pointer-events-auto",
+        visible && "border-secondary/40 shadow-xl",
         className,
       )}
     >

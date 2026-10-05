@@ -288,7 +288,7 @@ export default function FAQPage() {
                 </button>
 
                 {isExpanded && (
-                  <div className="px-4 sm:px-5 pb-5 pt-1 border-t border-border/50 bg-background/30 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  <div className="px-4 sm:px-5 pb-5 pt-1 border-t border-border/50 bg-muted/40 text-xs sm:text-sm text-muted-foreground leading-relaxed">
                     <p>{faq.answer}</p>
                     {faq.linkHref && faq.linkText && (
                       <div className="mt-3 pt-3 border-t border-border/40">

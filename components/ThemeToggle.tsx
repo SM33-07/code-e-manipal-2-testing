@@ -16,7 +16,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   if (!mounted) {
     return (
       <div
-        className={`w-[102px] h-8 rounded-lg border border-border bg-card/50 ${className}`}
+        className={`w-[102px] h-8 rounded-lg border border-border bg-card ${className}`}
         aria-hidden="true"
       />
     );
@@ -32,7 +32,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
     <div
       role="group"
       aria-label="Theme selector"
-      className={`relative inline-flex items-center p-0.5 rounded-lg border border-border bg-card/90 text-foreground shadow-sm h-8 select-none ${className}`}
+      className={`relative inline-flex items-center p-0.5 rounded-lg border border-border bg-card text-foreground shadow-sm h-8 select-none ${className}`}
     >
       {options.map((option) => {
         const Icon = option.icon;

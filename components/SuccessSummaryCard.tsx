@@ -51,7 +51,7 @@ export function SuccessSummaryCard({ topThree, onGoToLeaderboard }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-[200] flex items-start justify-center p-4 pt-28 overflow-y-auto backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/75 z-[200] flex items-start justify-center p-4 pt-28 overflow-y-auto">
       <Card className="max-w-md w-full border border-border bg-card rounded-2xl shadow-2xl relative">
         <CardHeader className="text-center pb-2">
           <div className="mx-auto w-12 h-12 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-3">

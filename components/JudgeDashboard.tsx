@@ -9,9 +9,7 @@ import { LogOut, Award, FileText, CheckSquare } from "lucide-react";
 
 import { SubmissionList, JudgeSubmission } from "./SubmissionList";
 import { JudgingInterface } from "./JudgingInterface";
-import { Leaderboard } from "./Leaderboard";
 import { Confetti } from "./ui/Confetti";
-import { SuccessSummaryCard } from "./SuccessSummaryCard";
 import { JudgeHeader } from "./judge/JudgeHeader";
 import { Score } from "@/types/judging";
 import { calculateWeightedScore } from "@/utils/scoring";
@@ -36,7 +34,7 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
-  // Dismiss Celebration overlay state
+  // Celebration state
   const [dismissedCelebration, setDismissedCelebration] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("submissions");
 
@@ -92,13 +90,6 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
   const pendingCount = allCount - gradedCount;
   const progressPercent = allCount > 0 ? (gradedCount / allCount) * 100 : 0;
   const isAllGraded = allCount > 0 && gradedCount === allCount;
-
-  // Auto-switch to leaderboard tab when all are graded
-  useEffect(() => {
-    if (isAllGraded) {
-      setActiveTab("leaderboard");
-    }
-  }, [isAllGraded]);
 
   const filteredSubmissions = useMemo(() => {
     return submissions.filter((s) => {
@@ -227,47 +218,82 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
 
   return (
     <div className="text-foreground flex flex-col pb-16">
-
       {/* Celebration overlay */}
       {showCelebration && (
-        <>
+        <div className="fixed inset-0 bg-black/75 z-[200] flex items-center justify-center p-4">
           <Confetti />
-          <SuccessSummaryCard
-            topThree={topThreeRanked}
-            onClose={() => setDismissedCelebration(true)}
-            onGoToLeaderboard={() => {
-              setDismissedCelebration(true);
-              setActiveTab("leaderboard");
-            }}
-          />
-        </>
+          <div className="max-w-md w-full border border-border bg-card p-6 sm:p-8 rounded-2xl shadow-2xl text-center">
+            <div className="mx-auto w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-4">
+              <CheckSquare className="w-8 h-8" />
+            </div>
+            <h3 className="text-2xl font-bold text-foreground mb-2">
+              All Evaluations Complete!
+            </h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-6 leading-relaxed">
+              You have successfully reviewed and scored all {allCount} assigned projects. You can continue reviewing or adjusting your score notes below until the evaluation phase concludes.
+            </p>
+            <Button
+              onClick={() => setDismissedCelebration(true)}
+              className="w-full bg-primary text-primary-foreground font-bold text-sm py-2.5 rounded-xl shadow-md"
+            >
+              Continue In Workspace
+            </Button>
+          </div>
+        </div>
       )}
 
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+        {/* Workspace Title & Context Header */}
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
+                <Award className="w-3.5 h-3.5" />
+                Jury Evaluation Console
+              </span>
+              <span className="text-xs text-muted-foreground">&bull;</span>
+              <span className="text-xs font-mono text-muted-foreground">{judgeName}</span>
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight m-0">
+              MY EVALUATION WORKSPACE
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1 mb-0">
+              Score your assigned hackathon submissions across the 4 official rubric dimensions.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={loadAssignments}
+              className="px-3.5 py-2 rounded-xl border border-border bg-card text-foreground hover:bg-muted text-xs font-semibold transition-colors cursor-pointer"
+            >
+              Refresh Queue
+            </button>
+          </div>
+        </div>
 
         {/* Workspace tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="bg-card flex flex-row gap-1 h-auto p-1 mb-6 border border-border rounded-xl justify-start">
             <TabsTrigger
               value="submissions"
-              disabled={isAllGraded}
-              className="px-5 py-2 rounded-lg text-sm font-semibold transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground"
+              className="px-5 py-2 rounded-lg text-sm font-semibold transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground cursor-pointer"
             >
               <Award className="w-4 h-4 mr-2" />
-              Submissions {isAllGraded && "(Completed)"}
+              Assigned Submissions ({gradedCount}/{allCount})
             </TabsTrigger>
             <TabsTrigger
-              value="leaderboard"
-              className="px-5 py-2 rounded-lg text-sm font-semibold transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground"
+              value="guidance"
+              className="px-5 py-2 rounded-lg text-sm font-semibold transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground hover:text-foreground cursor-pointer"
             >
               <FileText className="w-4 h-4 mr-2" />
-              Leaderboard
+              Judging Guidance & Rubric
             </TabsTrigger>
           </TabsList>
 
           {/* Submissions Tab Workspace */}
           <TabsContent value="submissions" className="mt-0 outline-none">
-            
             {/* Quick overview stats banner */}
             <div className="p-6 border border-border rounded-2xl mb-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-card shadow-sm">
               <div className="flex items-center gap-3.5">
@@ -379,9 +405,57 @@ export function JudgeDashboard({ judgeId, judgeName, onLogout }: Props) {
             )}
           </TabsContent>
 
-          {/* Leaderboard Tab */}
-          <TabsContent value="leaderboard" className="mt-0 outline-none">
-            <Leaderboard submissions={submissions} scores={allScores} />
+          {/* Judging Guidance & Rubric Tab */}
+          <TabsContent value="guidance" className="mt-0 outline-none">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+                <div className="text-xs font-bold text-secondary uppercase tracking-wider mb-2">
+                  Criterion 01 • Weight: 30%
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  Technical Architecture & Execution
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  Evaluate system complexity, code quality, repo cleanliness, reproducibility, and architectural soundness. Assess whether the solution leverages modern engineering practices, scalable design patterns, and robust error handling.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+                <div className="text-xs font-bold text-secondary uppercase tracking-wider mb-2">
+                  Criterion 02 • Weight: 30%
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  Innovation & Originality
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  Evaluate novelty of the approach, creative problem solving, and technological ambition. Does this project offer an innovative perspective or breakthrough mechanism compared to existing off-the-shelf software?
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+                <div className="text-xs font-bold text-secondary uppercase tracking-wider mb-2">
+                  Criterion 03 • Weight: 20%
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  Practical Impact & Real-World Utility
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  Assess real-world viability, addressable problem significance, and operational feasibility. Does this solution provide genuine value to target users, businesses, or public infrastructure?
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+                <div className="text-xs font-bold text-secondary uppercase tracking-wider mb-2">
+                  Criterion 04 • Weight: 20%
+                </div>
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  Presentation & Documentation
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  Review the quality of technical documentation, README setup instructions, live prototype walkthrough, and clarity of the team's demonstration.
+                </p>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

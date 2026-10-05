@@ -446,7 +446,7 @@ export default function JudgeEvaluatePage({
       </div>
 
       {/* 4. Sticky Bottom Action Bar (Specially Designed for Mobile 360px - 430px) */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border p-3 sm:p-4 shadow-2xl">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-card border-t border-border p-3 sm:p-4 shadow-2xl">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
           {/* Total Calculated Score Indicator */}
           <div className="flex items-center gap-2.5">

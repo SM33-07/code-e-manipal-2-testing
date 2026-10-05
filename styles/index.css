@@ -1,46 +1,4 @@
-.route-background,
-.route-background-veil {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-}
-
-.route-background {
-  z-index: 0;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  transform: scale(1.01);
-}
-
-.route-landing { background-image: url("/images/heritage/light/landing.webp"); }
-.route-dashboard { background-image: url("/images/heritage/light/dashboard.webp"); }
-.route-timeline { background-image: url("/images/heritage/light/jaipur-atmosphere.webp"); }
-.route-team { background-image: url("/images/heritage/light/albert-hall.webp"); }
-.route-submit { background-image: url("/images/heritage/light/submit-jantar-mantar.webp"); }
-.route-gallery { background-image: url("/images/heritage/light/gallery.webp"); }
-.route-judging { background-image: url("/images/heritage/light/workflow-symmetric.webp"); }
-.route-admin { background-image: url("/images/heritage/light/admin-dashboard.webp"); }
-.route-results { background-image: url("/images/heritage/light/public-results-pink-city.webp"); }
-
-.dark .route-landing { background-image: url("/images/heritage/dark/architectural-atmosphere.webp"); }
-.dark .route-dashboard { background-image: url("/images/heritage/dark/dashboard.webp"); }
-.dark .route-timeline { background-image: url("/images/heritage/dark/architectural-atmosphere.webp"); }
-.dark .route-team { background-image: url("/images/heritage/dark/team-architectural-detail.webp"); }
-.dark .route-submit { background-image: url("/images/heritage/dark/workflow-teal.webp"); }
-.dark .route-gallery { background-image: url("/images/heritage/dark/architectural-atmosphere.webp"); }
-.dark .route-judging { background-image: url("/images/heritage/dark/judge-teal-lanterns.webp"); }
-.dark .route-admin { background-image: url("/images/heritage/dark/admin-dashboard.webp"); }
-.dark .route-results { background-image: url("/images/heritage/dark/results-jal-mahal.webp"); }
-
-.route-background-veil {
-  z-index: 1;
-  background: linear-gradient(180deg, rgba(247, 244, 239, 0.35) 0%, rgba(247, 244, 239, 0.58) 45%, rgba(247, 244, 239, 0.80) 100%);
-}
-
-.dark .route-background-veil {
-  background: linear-gradient(180deg, rgba(18, 10, 18, 0.65) 0%, rgba(18, 10, 18, 0.82) 45%, rgba(18, 10, 18, 0.94) 100%);
-}
+/* CODE-e-MANIPAL 2.0 — Architectural Styles & Utilities */
 
 /* Subtle Jali Architectural Pattern */
 .bg-jali-pattern {
@@ -124,13 +82,15 @@
 }
 
 .login-background {
-  background-image: url("/images/heritage/light/login.webp");
+  background-image: url("/images/heritage/light/14-city-palace-ornate-hall.webp");
   background-size: cover;
-  background-position: center;
+  background-position: center center;
 }
 
 .dark .login-background {
-  background-image: url("/images/heritage/dark/login.webp");
+  background-image: url("/images/heritage/dark/03-sheesh-mahal-corridor.webp");
+  background-size: cover;
+  background-position: center center;
 }
 
 @media (prefers-reduced-motion: reduce) {

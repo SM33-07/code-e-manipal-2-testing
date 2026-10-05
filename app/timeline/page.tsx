@@ -214,6 +214,7 @@ export default function TimelinePage() {
         {items.map((item) => {
           const isCompleted = item.status === "completed";
           const isCurrent = item.status === "current";
+          const isUpcoming = item.status === "upcoming";
           const isLocked = item.status === "locked";
 
           return (
@@ -221,9 +222,11 @@ export default function TimelinePage() {
               key={item.id}
               className={`rounded-2xl border bg-card p-4 sm:p-5 shadow-sm transition-all ${
                 isCurrent
-                  ? "border-primary/60 ring-2 ring-primary/20 bg-card"
+                  ? "border-primary ring-2 ring-primary/20 bg-card"
                   : isCompleted
-                  ? "border-border/80 opacity-90"
+                  ? "border-border/70 opacity-80"
+                  : isLocked
+                  ? "border-dashed border-border/80 opacity-75"
                   : "border-border hover:border-secondary/40"
               }`}
             >
@@ -234,23 +237,30 @@ export default function TimelinePage() {
                   </span>
 
                   {isCurrent && (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/25">
-                      <Flame size={12} />
-                      <span>ACTIVE NOW</span>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-primary/15 px-2.5 py-0.5 rounded-full border border-primary/30">
+                      <Flame size={12} className="animate-pulse" />
+                      <span>CURRENT</span>
                     </span>
                   )}
 
                   {isCompleted && (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                      <CheckCircle2 size={11} />
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-md border border-border">
+                      <CheckCircle2 size={11} className="text-secondary" />
                       <span>Completed</span>
                     </span>
                   )}
 
+                  {isUpcoming && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-secondary bg-secondary/10 px-2 py-0.5 rounded-md border border-secondary/25">
+                      <Clock size={11} />
+                      <span>Upcoming</span>
+                    </span>
+                  )}
+
                   {isLocked && (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground bg-accent/40 px-2 py-0.5 rounded-md border border-border">
                       <Lock size={11} />
-                      <span>Hard Deadline</span>
+                      <span>Locked</span>
                     </span>
                   )}
                 </div>

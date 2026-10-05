@@ -5,21 +5,9 @@ import { Suspense, useState, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { usePathname } from "next/navigation"
 
-const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false })
+import { HeritageBackground } from "@/components/HeritageBackground"
 
-function getBackgroundClass(pathname: string) {
-  if (pathname === "/") return "route-landing"
-  if (pathname.startsWith("/SubmissionForm") || pathname.startsWith("/submit")) return "route-submit"
-  if (pathname.startsWith("/submission-result")) return "route-results"
-  if (pathname.startsWith("/project") || pathname.startsWith("/gallery")) return "route-gallery"
-  if (pathname.startsWith("/judging") || pathname.startsWith("/judge")) return "route-judging"
-  if (pathname.startsWith("/admin/results")) return "route-results"
-  if (pathname.startsWith("/admin")) return "route-admin"
-  if (pathname.startsWith("/dashboard")) return "route-dashboard"
-  if (pathname.startsWith("/timeline")) return "route-timeline"
-  if (pathname.startsWith("/problem-statements") || pathname.startsWith("/guidelines") || pathname.startsWith("/faq")) return "route-dashboard"
-  return "route-team"
-}
+const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false })
 
 interface Announcement {
   id: string;
@@ -141,16 +129,11 @@ function Shell({ children }: { children: React.ReactNode }) {
     return <>{children}</>
   }
 
-  const backgroundClass = getBackgroundClass(pathname)
   const isFullBleedRoute = pathname.startsWith("/admin") || pathname.startsWith("/judge") || pathname.startsWith("/judging")
 
   return (
     <>
-      <div
-        className={`route-background ${backgroundClass}`}
-        aria-hidden="true"
-      />
-      <div className="route-background-veil" aria-hidden="true" />
+      <HeritageBackground />
       <AnnouncementBanner onActiveChange={setHasBanner} />
       
       <div style={{ paddingTop: hasBanner ? "40px" : "0px" }}>

@@ -17,19 +17,27 @@ import {
   Menu,
   FileCode,
   Gavel,
+  Megaphone,
+  Sparkles,
+  ShieldCheck,
+  FileQuestion,
 } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 
 const sideNav = [
   { label: "Operations Center", icon: LayoutDashboard, href: "/admin" },
   { label: "Event Control",     icon: Radio,           href: "/admin/event-control" },
+  { label: "Problem Statements",icon: FileQuestion,    href: "/problem-statements" },
   { label: "Teams & Roster",    icon: Users,           href: "/admin/teams" },
   { label: "Submissions",       icon: FileCode,        href: "/admin/submissions" },
   { label: "Judging Operations",icon: Gavel,           href: "/admin/judging" },
-  { label: "Users & Access",    icon: ShieldAlert,     href: "/admin/users" },
+  { label: "Announcements",     icon: Megaphone,       href: "/admin/announcements" },
   { label: "Results & Awards",  icon: Trophy,          href: "/admin/results" },
+  { label: "Grand Ceremony",    icon: Sparkles,        href: "/admin/ceremony" },
+  { label: "Audit & Security",  icon: ShieldCheck,     href: "/admin/audit" },
   { label: "Report & Export",   icon: FileText,        href: "/admin/report" },
   { label: "Live Analytics",    icon: BarChart3,       href: "/admin/analytics" },
+  { label: "Users & Access",    icon: ShieldAlert,     href: "/admin/users" },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -59,7 +67,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-[calc(100vh-5rem)] bg-background text-foreground flex flex-col">
       {/* Mobile Operations Sub-bar beneath global Navbar */}
-      <div className="md:hidden sticky top-16 z-30 bg-card/95 backdrop-blur-md border-b border-border px-4 py-2.5 flex items-center justify-between shadow-sm">
+      <div className="md:hidden sticky top-16 z-30 bg-card border-b border-border px-4 py-2.5 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
           <ShieldAlert size={16} className="text-secondary" />
           <span className="text-xs font-bold tracking-wide uppercase text-foreground truncate">

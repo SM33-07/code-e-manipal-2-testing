@@ -342,7 +342,7 @@ export default function AdminSubmissionsPage() {
             <div className="space-y-3 text-xs sm:text-sm">
               <div>
                 <span className="font-semibold text-foreground">Project Description:</span>
-                <p className="mt-1 text-muted-foreground leading-relaxed bg-background/60 p-3 rounded-xl border border-border">
+                <p className="mt-1 text-muted-foreground leading-relaxed bg-muted/50 p-3 rounded-xl border border-border">
                   {detailTarget.description}
                 </p>
               </div>

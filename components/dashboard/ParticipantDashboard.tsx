@@ -122,6 +122,10 @@ export function ParticipantDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
 
+  const [newTeamName, setNewTeamName] = useState("");
+  const [joinCode, setJoinCode] = useState("");
+  const [submittingTeam, setSubmittingTeam] = useState(false);
+
   const fetchSummary = useCallback(async (isManualRefresh = false) => {
     if (isManualRefresh) setRefreshing(true);
     try {
@@ -165,6 +169,60 @@ export function ParticipantDashboard() {
     setTimeout(() => setCopiedCode(false), 2500);
   };
 
+  const handleCreateTeam = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTeamName.trim()) {
+      toast.error("Please enter a team name.");
+      return;
+    }
+    setSubmittingTeam(true);
+    try {
+      const res = await fetch("/api/teams", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "create", name: newTeamName.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "Failed to create team.");
+      }
+      toast.success("Team created successfully! You are the Team Leader.");
+      setNewTeamName("");
+      await fetchSummary(true);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create team.");
+    } finally {
+      setSubmittingTeam(false);
+    }
+  };
+
+  const handleJoinTeam = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!joinCode.trim()) {
+      toast.error("Please enter an invite code.");
+      return;
+    }
+    setSubmittingTeam(true);
+    try {
+      const res = await fetch("/api/teams", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "join", invite_code: joinCode.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "Failed to join team.");
+      }
+      toast.success("Successfully joined the squad!");
+      setJoinCode("");
+      await fetchSummary(true);
+    } catch (err: any) {
+      toast.error(err.message || "Invalid invite code or squad is full.");
+    } finally {
+      setSubmittingTeam(false);
+    }
+  };
+
   if (loading && !data) {
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 text-center animate-pulse space-y-4">
@@ -196,6 +254,7 @@ export function ParticipantDashboard() {
   }
 
   const team = data?.team;
+  const hasTeam = !!team?.id;
   const submission = data?.submission;
   const event = data?.event;
   const announcement = data?.announcement;
@@ -226,10 +285,10 @@ export function ParticipantDashboard() {
             <div className="flex flex-wrap items-center gap-2.5">
               <span className="px-3 py-1 rounded-full bg-primary/10 border border-primary/25 text-primary text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <Shield size={13} />
-                Team Leader Workspace
+                {hasTeam ? "Team Leader Workspace" : "Participant Workspace"}
               </span>
               <span className="px-2.5 py-0.5 rounded-full bg-secondary/15 border border-secondary/30 text-secondary text-xs font-mono font-bold">
-                {team?.id ? `ID: ${team.id.slice(0, 8)}` : displayIdentifier}
+                {hasTeam ? `ID: ${team.id.slice(0, 8)}` : displayIdentifier}
               </span>
               <span className="px-2.5 py-0.5 rounded-full bg-success/15 text-success border border-success/30 text-xs font-semibold flex items-center gap-1">
                 <Unlock size={12} /> Active Account
@@ -237,21 +296,27 @@ export function ParticipantDashboard() {
             </div>
 
             <h1 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight">
-              {team?.name || `${displayName}'s Squad`}
+              {hasTeam ? team.name : `Welcome, ${displayName}`}
             </h1>
 
             <div className="text-xs sm:text-sm text-muted-foreground flex flex-wrap items-center gap-2">
-              <span>Domain Track: <strong className="text-foreground">{team?.track || "AI & Intelligent Systems"}</strong></span>
-              <span>&bull;</span>
-              <span>Leader: <strong className="text-foreground">{team?.leaderName || displayName}</strong></span>
-              <span>&bull;</span>
-              <span>Roster: <strong className="text-foreground">{membersList.length}/4 Members</strong></span>
+              {hasTeam ? (
+                <>
+                  <span>Domain Track: <strong className="text-foreground">{team?.track || "AI & Intelligent Systems"}</strong></span>
+                  <span>&bull;</span>
+                  <span>Leader: <strong className="text-foreground">{team?.leaderName || displayName}</strong></span>
+                  <span>&bull;</span>
+                  <span>Roster: <strong className="text-foreground">{membersList.length}/4 Members</strong></span>
+                </>
+              ) : (
+                <span>Form or join a team to activate your project workspace and unlock submission controls.</span>
+              )}
             </div>
           </div>
 
           {/* Quick Actions & Invite Code Box */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            {team?.inviteCode && (
+            {hasTeam && team?.inviteCode && (
               <div className="px-4 py-2.5 rounded-2xl bg-accent/50 border border-border flex items-center justify-between gap-3">
                 <div>
                   <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -272,13 +337,20 @@ export function ParticipantDashboard() {
               </div>
             )}
 
-            <Link
-              href="/submit"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-xs sm:text-sm shadow-md hover:bg-primary/90 transition-all cursor-pointer"
-            >
-              <span>{isFinalized ? "View Submission" : hasSubmission ? "Continue Submission" : "Start Submission"}</span>
-              <ArrowRight size={15} />
-            </Link>
+            {hasTeam ? (
+              <Link
+                href="/submit"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-xs sm:text-sm shadow-md hover:bg-primary/90 transition-all cursor-pointer"
+              >
+                <span>{isFinalized ? "View Submission" : hasSubmission ? "Continue Submission" : "Start Submission"}</span>
+                <ArrowRight size={15} />
+              </Link>
+            ) : (
+              <div className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-muted text-muted-foreground font-semibold text-xs sm:text-sm border border-border">
+                <Lock size={14} />
+                <span>Team Required to Submit</span>
+              </div>
+            )}
 
             <button
               type="button"
@@ -301,6 +373,101 @@ export function ParticipantDashboard() {
           </div>
         )}
       </div>
+
+      {/* ── Onboarding / Team Formation (When no team registered) ── */}
+      {!hasTeam && (
+        <div id="team-formation" className="rounded-3xl border border-secondary/40 bg-card p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-border">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-2 text-xs font-bold text-secondary uppercase tracking-wider">
+                <Users size={14} />
+                <span>Squad Formation Required</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-foreground">
+                Register Your Hackathon Team
+              </h2>
+            </div>
+            <div className="text-xs text-muted-foreground max-w-sm">
+              <strong className="text-foreground">Submission Availability:</strong> Project repositories and final evaluations require a registered squad of 1–4 builders.
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Create Team Form */}
+            <form onSubmit={handleCreateTeam} className="rounded-2xl border border-border bg-accent/20 p-5 space-y-4 flex flex-col justify-between">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-foreground">CREATE A TEAM</h3>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-secondary">Becomes Leader</span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Start a new squad, receive a shareable invite code, and invite up to 3 teammates.
+                </p>
+                <div className="pt-2">
+                  <label htmlFor="team-name-input" className="block text-xs font-bold text-foreground mb-1">
+                    Team / Squad Name
+                  </label>
+                  <input
+                    id="team-name-input"
+                    type="text"
+                    placeholder="e.g. Jaipur Matrix"
+                    value={newTeamName}
+                    onChange={(e) => setNewTeamName(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-card text-foreground text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary"
+                    disabled={submittingTeam}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submittingTeam || !newTeamName.trim()}
+                className="w-full py-2.5 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-sm hover:bg-primary/90 transition-colors disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Create Squad</span>
+                <ArrowRight size={13} />
+              </button>
+            </form>
+
+            {/* Join Team Form */}
+            <form onSubmit={handleJoinTeam} className="rounded-2xl border border-border bg-accent/20 p-5 space-y-4 flex flex-col justify-between">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-foreground">JOIN EXISTING TEAM</h3>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Teammate Entry</span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Have an invite code from your squad leader? Enter it here to join their roster.
+                </p>
+                <div className="pt-2">
+                  <label htmlFor="invite-code-input" className="block text-xs font-bold text-foreground mb-1">
+                    Squad Invite Code
+                  </label>
+                  <input
+                    id="invite-code-input"
+                    type="text"
+                    placeholder="e.g. A9B2X7"
+                    value={joinCode}
+                    onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-card text-foreground text-xs font-mono font-bold tracking-wider uppercase focus:outline-none focus:ring-1 focus:ring-secondary"
+                    disabled={submittingTeam}
+                    maxLength={20}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submittingTeam || !joinCode.trim()}
+                className="w-full py-2.5 px-4 rounded-xl bg-secondary text-secondary-foreground text-xs font-bold shadow-sm hover:bg-secondary/90 transition-colors disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Join Squad</span>
+                <ArrowRight size={13} />
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ── 2. Primary Status Row: Event Phase & Submission Status ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
@@ -513,6 +680,23 @@ export function ParticipantDashboard() {
                   )}
                 </div>
               </div>
+            ) : !hasTeam ? (
+              <div className="p-6 rounded-2xl bg-accent/20 border border-dashed border-secondary/40 text-center space-y-3">
+                <Users size={32} className="mx-auto text-secondary" />
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">Squad Registration Required</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5 max-w-sm mx-auto">
+                    Submissions are managed per registered squad. Create or join a team above to unlock your project repository and submission slot.
+                  </p>
+                </div>
+                <a
+                  href="#team-formation"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-secondary text-secondary-foreground text-xs font-semibold hover:bg-secondary/90 transition-colors shadow-sm"
+                >
+                  <span>Form or Join Squad</span>
+                  <ArrowRight size={13} />
+                </a>
+              </div>
             ) : (
               <div className="p-6 rounded-2xl bg-accent/20 border border-dashed border-border text-center space-y-3">
                 <FileText size={32} className="mx-auto text-muted-foreground opacity-50" />
@@ -534,13 +718,23 @@ export function ParticipantDashboard() {
           </div>
 
           <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
-            <Link
-              href="/submit"
-              className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
-            >
-              <span>{isFinalized ? "Inspect Full Write-up" : "Open Submission Form"}</span>
-              <ArrowRight size={12} />
-            </Link>
+            {hasTeam ? (
+              <Link
+                href="/submit"
+                className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+              >
+                <span>{isFinalized ? "Inspect Full Write-up" : "Open Submission Form"}</span>
+                <ArrowRight size={12} />
+              </Link>
+            ) : (
+              <a
+                href="#team-formation"
+                className="text-xs font-bold text-secondary hover:underline flex items-center gap-1"
+              >
+                <span>Register Squad to Submit</span>
+                <ArrowRight size={12} />
+              </a>
+            )}
             <Link href="/guidelines" className="text-xs text-muted-foreground hover:text-foreground">
               Submission Specs →
             </Link>

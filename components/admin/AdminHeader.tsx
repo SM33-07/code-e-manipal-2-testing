@@ -27,7 +27,7 @@ export function AdminHeader({ mobileOpen, onToggleMobile }: AdminHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full h-16 border-b border-border bg-card/95 backdrop-blur-none text-foreground flex items-center justify-between px-4 md:px-8 shadow-sm transition-colors">
+    <header className="sticky top-0 z-40 w-full h-16 border-b border-border bg-card text-foreground flex items-center justify-between px-4 md:px-8 shadow-sm transition-colors">
       {/* Brand & Context */}
       <div className="flex items-center gap-3">
         <button

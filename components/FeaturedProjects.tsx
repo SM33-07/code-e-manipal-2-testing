@@ -22,9 +22,9 @@ export default function FeaturedProjects() {
     <section className="py-16 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold tracking-wider uppercase mb-3">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/15 border border-secondary/30 text-secondary text-xs font-semibold tracking-wider uppercase mb-3">
             <Trophy className="w-3.5 h-3.5 text-secondary" />
-            Hackathon Showcase
+            Previous Editions Retrospective
           </div>
 
           <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight m-0">
@@ -32,7 +32,7 @@ export default function FeaturedProjects() {
           </h2>
 
           <p className="text-sm text-muted-foreground max-w-xl mx-auto mt-2 mb-0 leading-relaxed">
-            The highest scoring technical innovations selected by our evaluation jury at Code-e-Manipal 2.0.
+            The highest scoring technical innovations selected by our evaluation juries across previous hackathons.
           </p>
         </div>
 
@@ -61,7 +61,7 @@ export default function FeaturedProjects() {
                       className="object-cover transition-transform duration-500 hover:scale-105"
                       sizes="(max-width: 768px) 100vw, 380px"
                     />
-                    <div className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold bg-background/90 text-foreground backdrop-blur-sm border border-border shadow-sm flex items-center gap-1.5">
+                    <div className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold bg-card text-card-foreground border border-border shadow-sm flex items-center gap-1.5">
                       {medal}
                     </div>
                     <div className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground shadow-sm">

@@ -355,7 +355,7 @@ export default function SubmissionPage() {
         {/* ── Hero Container ── */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-4 pb-8 text-center">
           {/* Approved Capsule Banner */}
-          <div className="inline-flex items-center gap-2.5 px-6 py-2 rounded-full bg-primary/15 border border-primary/30 text-primary dark:bg-[#661622] dark:text-[#FFF8E7] dark:border-[#D4AB65]/40 text-xs sm:text-sm font-bold tracking-wider uppercase mb-5 shadow-sm">
+          <div className="inline-flex items-center gap-2.5 px-6 py-2 rounded-full bg-primary/15 border border-primary/30 text-primary dark:bg-[#A85346]/25 dark:text-[#E9DDC8] dark:border-[#B88A45]/40 text-xs sm:text-sm font-bold tracking-wider uppercase mb-5 shadow-sm">
             <Sparkles className="w-4 h-4 text-secondary shrink-0" />
             Hackathon Submission Portal
             <Sparkles className="w-4 h-4 text-secondary shrink-0" />

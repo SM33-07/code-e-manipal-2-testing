@@ -91,7 +91,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
           transition={{ duration: 0.35, ease: "easeInOut" }}
           className="fixed inset-0 z-[99999] overflow-hidden flex flex-col items-center justify-between"
           style={{
-            background: "linear-gradient(180deg, #070308 0%, #120A12 50%, #070308 100%)",
+            background: "linear-gradient(180deg, #100B09 0%, #17110E 50%, #211713 100%)",
           }}
         >
           {/* Subtle Jali Background Texture */}
@@ -99,8 +99,8 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
             className="absolute inset-0 opacity-[0.06] pointer-events-none z-0"
             style={{
               backgroundImage: `
-                linear-gradient(rgba(212, 171, 101, 0.4) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(212, 171, 101, 0.4) 1px, transparent 1px)
+                linear-gradient(rgba(184, 138, 69, 0.4) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(184, 138, 69, 0.4) 1px, transparent 1px)
               `,
               backgroundSize: "48px 48px",
             }}
@@ -111,7 +111,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
             className="absolute inset-0 z-[2] pointer-events-none"
             style={{
               background:
-                "radial-gradient(ellipse at center, transparent 35%, rgba(7,3,8,0.7) 70%, rgba(7,3,8,0.95) 100%)",
+                "radial-gradient(ellipse at center, transparent 35%, rgba(16,11,9,0.7) 70%, rgba(16,11,9,0.95) 100%)",
             }}
           />
 
@@ -120,7 +120,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
             {particles.map((p, i) => (
               <motion.div
                 key={i}
-                className="absolute rounded-full bg-[#D4AB65]"
+                className="absolute rounded-full bg-[#B88A45]"
                 style={{
                   width: p.size + "px",
                   height: p.size + "px",
@@ -144,15 +144,15 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
           {/* HUD Frame Corners */}
           <div className="absolute top-3 left-3 sm:top-5 sm:left-5 z-[10] pointer-events-none w-10 h-10 sm:w-16 sm:h-16">
             <svg width="64" height="64" viewBox="0 0 64 64" fill="none" className="w-full h-full">
-              <path d="M 0 24 L 0 6 Q 0 0 6 0 L 24 0" stroke="#D4AB65" strokeWidth="1.5" opacity="0.6" />
-              <rect x="0" y="0" width="3" height="3" fill="#D46868" />
+              <path d="M 0 24 L 0 6 Q 0 0 6 0 L 24 0" stroke="#B88A45" strokeWidth="1.5" opacity="0.6" />
+              <rect x="0" y="0" width="3" height="3" fill="#B95745" />
             </svg>
           </div>
 
           <div className="absolute top-3 right-3 sm:top-5 sm:right-5 z-[10] pointer-events-none w-10 h-10 sm:w-16 sm:h-16">
             <svg width="64" height="64" viewBox="0 0 64 64" fill="none" className="w-full h-full">
-              <path d="M 64 24 L 64 6 Q 64 0 58 0 L 40 0" stroke="#D4AB65" strokeWidth="1.5" opacity="0.6" />
-              <rect x="61" y="0" width="3" height="3" fill="#D46868" />
+              <path d="M 64 24 L 64 6 Q 64 0 58 0 L 40 0" stroke="#B88A45" strokeWidth="1.5" opacity="0.6" />
+              <rect x="61" y="0" width="3" height="3" fill="#B95745" />
             </svg>
           </div>
 
@@ -160,7 +160,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
           <button
             type="button"
             onClick={handleSkip}
-            className="absolute top-4 right-6 sm:top-6 sm:right-10 z-[20] rounded-full border border-[#D4AB65]/40 bg-black/80 px-4 py-1.5 font-mono text-[10px] sm:text-xs text-[#D4AB65] tracking-wider transition-all duration-200 hover:bg-[#D4AB65] hover:text-black focus:outline-none cursor-pointer"
+            className="absolute top-4 right-6 sm:top-6 sm:right-10 z-[20] rounded-full border border-[#B88A45]/40 bg-[#17110E]/90 px-4 py-1.5 font-mono text-[10px] sm:text-xs text-[#B88A45] tracking-wider transition-all duration-200 hover:bg-[#B88A45] hover:text-[#17110E] focus:outline-none cursor-pointer"
           >
             SKIP INTRO (ESC)
           </button>
@@ -177,11 +177,11 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
               <div
                 className="absolute w-28 h-28 rounded-full"
                 style={{
-                  background: "radial-gradient(circle, rgba(212,171,101,0.2) 0%, transparent 70%)",
+                  background: "radial-gradient(circle, rgba(184,138,69,0.2) 0%, transparent 70%)",
                 }}
               />
 
-              <div className="relative z-10 w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-[#D4AB65]/50 shadow-[0_0_25px_rgba(212,171,101,0.2)] bg-[#120A12] flex items-center justify-center p-3">
+              <div className="relative z-10 w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-[#B88A45]/50 shadow-[0_0_25px_rgba(184,138,69,0.2)] bg-[#211713] flex items-center justify-center p-3">
                 <Image
                   src="/logo.png"
                   alt="Code-e-Manipal 2.0"
@@ -203,21 +203,21 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
               <h1
                 className="text-2xl sm:text-3xl font-extrabold tracking-widest text-transparent bg-clip-text"
                 style={{
-                  backgroundImage: "linear-gradient(180deg, #FFF5E1 0%, #D4AB65 100%)",
+                  backgroundImage: "linear-gradient(180deg, #F4EBDD 0%, #B88A45 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
               >
                 CODE-ए-MANIPAL 2.0
               </h1>
-              <p className="text-[10px] sm:text-xs tracking-[0.25em] font-medium uppercase text-[#D4AB65]/80 mt-1">
+              <p className="text-[10px] sm:text-xs tracking-[0.25em] font-medium uppercase text-[#B88A45]/90 mt-1">
                 Manipal University Jaipur
               </p>
             </motion.div>
 
             {/* PROGRESS CARD */}
             <motion.div
-              className="w-full mt-6 rounded-2xl border border-[#3E243D] bg-[#1D111E] p-5 shadow-2xl"
+              className="w-full mt-6 rounded-2xl border border-[#B88A45]/30 bg-[#211713] p-5 shadow-2xl"
               initial={{ y: 15, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.25 }}
@@ -226,23 +226,23 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
                 <span className="text-xs font-semibold text-neutral-300">
                   Initializing Workspace...
                 </span>
-                <span className="text-sm font-mono font-bold text-[#D4AB65]">
+                <span className="text-sm font-mono font-bold text-[#B88A45]">
                   {Math.min(Math.round(progress), 100)}%
                 </span>
               </div>
 
               {/* Progress Bar */}
-              <div className="h-2 w-full rounded-full bg-black/60 border border-[#D4AB65]/20 overflow-hidden relative">
+              <div className="h-2 w-full rounded-full bg-black/60 border border-[#B88A45]/20 overflow-hidden relative">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-[#D46868] via-[#D4AB65] to-[#BF5848] rounded-full"
+                  className="h-full bg-gradient-to-r from-[#B95745] via-[#B88A45] to-[#C97878] rounded-full"
                   style={{ width: `${Math.min(progress, 100)}%` }}
                   transition={{ duration: 0.1, ease: "easeOut" }}
                 />
               </div>
 
               <div className="flex justify-between items-center mt-3 text-[10px] text-muted-foreground font-mono">
-                <span className="text-[#D4AB65]/60">E-CELL &amp; LEARNIT</span>
-                <span className="text-[#D46868]/70">OCT 15-16, 2026</span>
+                <span className="text-[#B88A45]/80">E-CELL &amp; LEARNIT</span>
+                <span className="text-[#B95745]">OCT 15-16, 2026</span>
               </div>
             </motion.div>
           </div>

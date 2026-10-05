@@ -256,7 +256,7 @@ export default function ProblemStatementsPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-secondary">
-                  Admin Challenge Operations
+                  Admin Problem Statement Operations
                 </span>
                 <span
                   className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
@@ -287,7 +287,7 @@ export default function ProblemStatementsPage() {
             ) : (
               <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold border border-emerald-500/25">
                 <Check size={14} />
-                <span>Challenges Unlocked</span>
+                <span>Problem Statements Live</span>
               </div>
             )}
             <Link
@@ -309,23 +309,23 @@ export default function ProblemStatementsPage() {
           <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/15 px-3 py-1 text-xs font-bold text-secondary">
               {isPublished ? <Unlock size={13} /> : <Lock size={13} />}
-              <span>{isPublished ? "CHALLENGE VAULT UNLOCKED" : "CHALLENGE VAULT SEALED"}</span>
+              <span>{isPublished ? "PROBLEM STATEMENTS VAULT UNLOCKED" : "PROBLEM STATEMENTS VAULT SEALED"}</span>
             </div>
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
               Problem Statements
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
               {isPublished
-                ? "The official Code-e-Manipal 2.0 challenge briefs are live. Review project requirements, deliverables, and evaluation focus."
-                : "The challenge vault is still sealed. The missions unlock when the 36-hour hackathon begins."}
+                ? "The official Code-e-Manipal 2.0 problem statements are live. Review project requirements, deliverables, and evaluation focus."
+                : "The problem statements vault is still sealed. The missions unlock when the 36-hour hackathon begins."}
             </p>
           </div>
 
           {/* Status Box */}
-          <div className="shrink-0 rounded-2xl border border-border bg-background/80 p-5 text-center min-w-[220px] shadow-sm">
+          <div className="shrink-0 rounded-2xl border border-border bg-card p-5 text-center min-w-[220px] shadow-sm">
             <div className="flex items-center justify-center gap-2 text-xs font-bold text-secondary uppercase tracking-wider mb-1">
               <Clock size={14} />
-              <span>{isPublished ? "Challenge State" : "Release Window"}</span>
+              <span>{isPublished ? "Vault State" : "Release Window"}</span>
             </div>
             <div className="text-2xl font-black text-foreground">
               {isPublished ? "Active Hacking" : "Day 1 • 10:30 AM"}
@@ -345,14 +345,14 @@ export default function ProblemStatementsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-foreground">
-                Official Hackathon Challenges
+                Official Problem Statements
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
                 Select one problem statement aligning with your registered track.
               </p>
             </div>
             <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
-              4 Challenges Active
+              4 Problem Statements Active
             </span>
           </div>
 
@@ -501,7 +501,7 @@ export default function ProblemStatementsPage() {
               {PREPARATION_STEPS.map(({ step, title, detail, href, action }) => (
                 <div
                   key={step}
-                  className="rounded-xl border border-border bg-background/60 p-4 flex flex-col justify-between"
+                  className="rounded-xl border border-border bg-card p-4 flex flex-col justify-between"
                 >
                   <div>
                     <span className="text-xs font-mono font-bold text-secondary">{step}</span>

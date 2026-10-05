@@ -198,8 +198,7 @@ export default function Navbar({ className }: { className?: string }) {
   } else {
     navItems.push({ name: "Dashboard", link: "/dashboard" })
     navItems.push({ name: "Timeline", link: "/timeline" })
-    navItems.push({ name: "Challenges", link: "/problem-statements" })
-    navItems.push({ name: "Team", link: "/team" })
+    navItems.push({ name: "Problem Statements", link: "/problem-statements" })
     navItems.push({ name: "Submit", link: "/submit" })
     navItems.push({ name: "Gallery", link: "/gallery" })
     navItems.push({ name: "FAQ", link: "/faq" })
@@ -210,7 +209,7 @@ export default function Navbar({ className }: { className?: string }) {
   return (
     <ResizableNavbar isSubmissionForm={isSubmissionForm} className={className}>
       {/* ── Desktop Navigation ── */}
-      <NavBody className="bg-card border border-border shadow-sm">
+      <NavBody>
         {/* Logo */}
         <BrandLogo size="md" />
 
@@ -349,7 +348,7 @@ export default function Navbar({ className }: { className?: string }) {
       </NavBody>
 
       {/* ── Mobile Navigation ── */}
-      <MobileNav className="bg-card border-b border-border shadow-sm">
+      <MobileNav>
         <MobileNavHeader>
           <BrandLogo size="sm" />
           <div className="flex items-center gap-2.5">

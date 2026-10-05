@@ -18,54 +18,42 @@ export function BrandLogo({
   badge,
   className = "",
 }: BrandLogoProps) {
-  const iconDimensions = {
-    sm: { box: "w-8 h-8", img: 26 },
-    md: { box: "w-9 h-9", img: 30 },
-    lg: { box: "w-11 h-11", img: 38 },
-  }[size];
-
-  const titleSizes = {
-    sm: "text-sm",
-    md: "text-base",
-    lg: "text-lg",
+  const logoHeights = {
+    sm: "h-7 sm:h-8",
+    md: "h-8 sm:h-9",
+    lg: "h-10 sm:h-11",
   }[size];
 
   const content = (
-    <div className={`flex items-center gap-2.5 select-none ${className}`}>
-      {/* Official Brand Emblem Container (crisp contrast across light & dark themes) */}
-      <div
-        className={`${iconDimensions.box} rounded-lg bg-[#FFFDF9] dark:bg-[#FAF7F2] border border-border shadow-xs p-1 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105`}
-      >
-        <Image
-          src="/logo.png"
-          alt="Code-e-Manipal 2.0"
-          width={iconDimensions.img}
-          height={iconDimensions.img}
-          className="object-contain w-full h-full"
-          priority
-        />
+    <div className={`flex items-center gap-3 select-none ${className}`}>
+      {/* Official Brand Lockup (full aspect ratio, zero distortion, spread out and visible) */}
+      <div className="relative flex items-center shrink-0">
+        <div className={`flex items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-[1.02]`}>
+          <Image
+            src="/logo-2.0-full.png"
+            alt="Code-e-Manipal 2.0"
+            width={130}
+            height={50}
+            className={`${logoHeights} w-auto object-contain dark:bg-[#FAF7F2]/95 dark:px-2 dark:py-1 dark:rounded-lg dark:shadow-xs`}
+            priority
+          />
+        </div>
       </div>
 
-      <div className="flex flex-col justify-center leading-tight">
-        <div className="flex items-center gap-1.5">
-          <span className={`font-bold tracking-tight text-foreground font-sans ${titleSizes}`}>
-            Code-e-Manipal
-          </span>
-          <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
-            2.0
-          </span>
+      {(badge || subtitle) && (
+        <div className="hidden sm:flex flex-col justify-center leading-tight">
           {badge && (
-            <span className="hidden sm:inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/30 uppercase tracking-wider">
+            <span className="inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/30 uppercase tracking-wider self-start">
               {badge}
             </span>
           )}
+          {subtitle && (
+            <span className="text-[10px] text-muted-foreground tracking-wide truncate max-w-[200px] mt-0.5">
+              {subtitle}
+            </span>
+          )}
         </div>
-        {subtitle && (
-          <span className="text-[10px] text-muted-foreground tracking-wide truncate max-w-[220px]">
-            {subtitle}
-          </span>
-        )}
-      </div>
+      )}
     </div>
   );
 
