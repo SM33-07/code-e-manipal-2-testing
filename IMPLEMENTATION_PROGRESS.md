@@ -552,4 +552,42 @@ Executed the final visual and navigation correction pass based on live browser i
    - Backdrop-filter scan: 0 matches.
    - Legacy asset scan: 0 matches.
 
+## Stage S — Sub-Phase B: Functional Feature Verification & Targeted Operational Repair
+
+### 1. Feature Inventory & Execution Matrix
+| Feature | Route | Role | UI Action / API | Status | Persistence & Verification |
+|---|---|---|---|---|---|
+| **Admin Judging Oversight** | `/admin/judging` | `admin` | `GET /api/admin/assignments` | **PASS** | Evaluated assignments return embedded review objects, scores, and version badges. |
+| **Judge Score Correction** | `/admin/judging` | `admin` | `POST /api/admin/reviews/[id]/reopen` | **PASS (REPAIRED)** | Added rubric inputs to correction modal; verified DB update, version increment (v2→v3), immutable `review_history` archive, and `audit_logs`. |
+| **Concurrency Lock** | `/admin/judging` | `admin` | `POST /api/admin/reviews/[id]/reopen` | **PASS** | Stale `expected_version` returns `409 Conflict`. |
+| **Judging Phase Gate** | `/admin/judging` | `admin` | `POST /api/admin/reviews/[id]/reopen` | **PASS** | Attempting score correction while `event_phase === 'NOT_STARTED'` returns `403 Forbidden` (`PhaseFrozenError`). |
+| **Auto-Assign Judges** | `/admin/judging` | `admin` | `POST /api/admin/assignments` | **PASS (REPAIRED)** | Fixed frontend payload (`{ action: 'auto_assign' }`) and supported `{ auto: true }` in API route. |
+| **Submission Reopen** | `/admin/submissions` | `admin` | `POST /api/admin/submissions/[id]/reopen` | **PASS** | Blocked with `403` during `JUDGING` phase; min 10 char justification enforced with `400`. |
+| **Team Administration** | `/admin/teams` | `admin` | `GET /api/admin/teams`, `PATCH /api/admin/teams` | **PASS** | Single team freeze toggle verified in DB `teams.submission_frozen` and reverted. |
+| **Event State Transition** | `/admin/event` | `admin` | `PATCH /api/admin/event-config/transition` | **PASS** | Illegal backward jump (`JUDGING` -> `NOT_STARTED`) strictly rejected with `400 Bad Request`. |
+| **Emergency State Override** | `/admin/event` | `admin` | `POST /api/admin/event-config/override-state` | **PASS** | Overrode to `JUDGING` for review testing, then cleanly restored to `NOT_STARTED` with audit logs. |
+| **Judge Evaluation** | `/judge/evaluate/[id]` | `judge` | `POST /api/judging/reviews` | **PASS** | Judge evaluated assigned submission; rubric scores persisted in `judge_reviews` with total score calculated server-side (32). |
+| **Results Release Gate** | `/results` | `public` | `GET /api/results/public` | **PASS** | Returns `meta.published: false` and empty array while `results_release === 'DRAFT'`. |
+| **Session Hydration** | `/login`, `/account` | `admin`, `judge`, `participant` | `POST /api/auth/login`, `GET /api/auth/me` | **PASS** | GoTrue auth hydrated; `profiles.role` resolved accurately for all 3 staging accounts. |
+| **Role Authorization** | `/api/admin/*` | `judge`, `participant` | Direct API requests | **PASS** | Participant and Judge tokens rejected with `403 Forbidden`. |
+
+### 2. Defect Root Causes & Targeted Repairs
+1. **Admin Judging UI Missing Rubric Fields:**
+   - *Root Cause:* The Audited Score Correction modal only accepted a text justification reason without rubric score inputs, and the table lacked one-click access to correct existing reviews.
+   - *Fix:* Added score inputs (Innovation, Technical, Presentation, Impact 1–10) in the modal and an action button ("Correct") on scored assignment rows.
+2. **Assignments Route Missing Review Details:**
+   - *Root Cause:* `GET /api/admin/assignments` fetched assignment rows without joining/subquerying completed review records, meaning admins could not see whether an assignment was evaluated or its version.
+   - *Fix:* Added subquery in `app/api/admin/assignments/route.ts` to return `review` object with `id`, `is_complete`, scores, `version`, and `feedback`.
+3. **Auto-Assign Payload Mismatch:**
+   - *Root Cause:* `app/admin/judging/page.tsx` called `/api/admin/assignments` with `{ auto: true }`, but the API route expected `{ action: 'auto_assign' }`.
+   - *Fix:* Updated client to send `{ action: 'auto_assign' }` and updated `app/api/admin/assignments/route.ts` to handle both formats.
+
+### 3. Static & Build Verification
+- `npx tsc --noEmit`: 0 errors.
+- `npm run build`: 60/60 routes compiled successfully.
+- `git diff --check`: 0 errors.
+- Invariant check `backdrop-blur|backdrop-filter|backdropFilter`: 0 matches.
+- Invariant check `light-old|dark-old`: 0 active runtime references.
+
+
 
