@@ -252,7 +252,7 @@ export default function HomePage() {
       </section>
 
       {/* ── ORGANIZING INSTITUTIONS & ENTITIES ── */}
-      <section className="rounded-2xl border border-border bg-card/60 p-6 sm:p-8 text-center space-y-4">
+      <section className="rounded-2xl border border-border bg-card p-6 sm:p-8 text-center space-y-4">
         <div className="text-xs uppercase tracking-widest font-bold text-muted-foreground">
           Flagship National Event Organized By
         </div>

@@ -94,7 +94,7 @@ export const NavBody = ({ children, className, visible, isSubmissionForm }: NavB
         "relative z-[60] mx-auto hidden lg:flex w-[calc(100%-2rem)] flex-row items-center justify-between transition-all duration-300 pointer-events-auto",
         visible
           ? "max-w-6xl xl:max-w-7xl rounded-full bg-card text-card-foreground px-5 xl:px-6 py-2 border border-secondary/40 shadow-xl"
-          : "max-w-7xl rounded-2xl bg-card text-card-foreground px-5 py-2.5 border border-border shadow-md",
+          : "max-w-7xl rounded-2xl bg-transparent text-foreground px-5 py-2.5 border border-transparent shadow-none",
         className,
       )}
     >
@@ -183,8 +183,8 @@ export const MobileNav = ({ children, className, visible, isSubmissionForm }: Mo
   return (
     <div
       className={cn(
-        "relative z-[60] mx-auto flex w-[calc(100%-1.5rem)] flex-row items-center justify-between rounded-2xl bg-card text-card-foreground px-4 py-2 lg:hidden transition-all duration-300 border border-border shadow-md pointer-events-auto",
-        visible && "border-secondary/40 shadow-xl",
+        "relative z-[60] mx-auto flex w-[calc(100%-1.5rem)] flex-row items-center justify-between rounded-2xl bg-transparent text-foreground px-4 py-2 lg:hidden transition-all duration-300 border border-transparent shadow-none pointer-events-auto",
+        visible && "bg-card text-card-foreground border-secondary/40 shadow-xl",
         className,
       )}
     >

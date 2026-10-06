@@ -22,7 +22,6 @@ export async function proxy(req: NextRequest) {
     pathname === '/gallery' ||
     pathname === '/faq' ||
     pathname === '/contact' ||
-    pathname === '/register' ||
     pathname === '/enter' ||
     pathname === '/results' ||
     pathname.startsWith('/project/');

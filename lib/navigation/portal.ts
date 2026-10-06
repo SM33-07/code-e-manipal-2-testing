@@ -47,5 +47,4 @@ export const publicNavigation: NavigationItem[] = [
   { name: "Timeline", link: "/timeline" },
   { name: "Gallery", link: "/gallery" },
   { name: "FAQ", link: "/faq" },
-  { name: "Register", link: "/register" },
 ];

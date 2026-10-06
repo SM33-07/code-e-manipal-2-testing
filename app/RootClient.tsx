@@ -122,7 +122,6 @@ function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { isAuthenticated } = useAuth()
   const isLogin = pathname === "/login"
-  const isRegister = pathname === "/register"
   const isProtectedPortalRoute = ["/dashboard", "/team", "/submit", "/SubmissionForm", "/submission-result", "/judge", "/judging", "/admin", "/account"]
     .some((route) => pathname === route || pathname.startsWith(`${route}/`))
   // These pages intentionally serve public information too. Once a session is
@@ -137,7 +136,7 @@ function Shell({ children }: { children: React.ReactNode }) {
     if (!isPortalRoute) setHasBanner(false)
   }, [isPortalRoute])
 
-  if (isLogin || isRegister) {
+  if (isLogin) {
     return (
       <>
         <HeritageBackground />
