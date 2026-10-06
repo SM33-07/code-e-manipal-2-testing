@@ -291,10 +291,10 @@ export function TeamLeaderWorkspace() {
             <Users size={16} className="text-secondary" />
           </div>
           <div className="text-xl font-black font-mono text-foreground">
-            {teamInfo.members.length} <span className="text-xs font-normal text-muted-foreground">/ 4 Members</span>
+            {teamInfo.members.length} <span className="text-xs font-normal text-muted-foreground">/ 6 Members</span>
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">
-            {teamInfo.members.length >= 4 ? "Team is at full limit." : "Slots available for collaborators."}
+            {teamInfo.members.length >= 6 ? "Team is at full limit." : "Slots available for collaborators."}
           </p>
         </div>
 

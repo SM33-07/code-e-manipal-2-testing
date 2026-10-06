@@ -1,49 +1,36 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Cpu, ShieldCheck, Coins, Building2, ArrowRight, Sparkles } from "lucide-react";
+import {
+  Cpu,
+  HeartPulse,
+  Coins,
+  ShieldCheck,
+  Sparkles,
+  Layers,
+  Gamepad2,
+  Building2,
+  Lightbulb,
+  ArrowRight,
+} from "lucide-react";
 import { cn } from "./utils";
+import { DETAILED_TRACKS, TrackMetadata } from "@/lib/event/eventConstants";
 
-export interface TrackOption {
-  id: string;
-  tag: string;
-  title: string;
-  desc: string;
-  focus: string;
-}
+export type TrackOption = TrackMetadata;
 
-export const EVENT_TRACKS: TrackOption[] = [
-  {
-    id: "ai-systems",
-    tag: "TRACK 01",
-    title: "Autonomous AI & Intelligent Agents",
-    desc: "Agentic workflows, fine-tuned domain models, multimodal intelligence, and edge-native neural inference.",
-    focus: "LLMs, Reasoning Chains, Edge Inference, Healthcare & Vernacular AI",
-  },
-  {
-    id: "fintech",
-    tag: "TRACK 02",
-    title: "Decentralized Protocols & FinTech",
-    desc: "Zero-knowledge verification, algorithmic settlement rails, sovereign identity, and high-throughput financial state machines.",
-    focus: "ZK Proofs, Account Abstraction, Decentralized Settlement, DID",
-  },
-  {
-    id: "resilient-infra",
-    tag: "TRACK 03",
-    title: "Resilient Infrastructure & Cyber Defense",
-    desc: "Distributed systems, fault-tolerant orchestration, cryptographic consensus, and autonomous vulnerability triage.",
-    focus: "Fault Tolerance, Distributed State, Threat Intelligence, Consensus",
-  },
-  {
-    id: "open-innovation",
-    tag: "TRACK 04",
-    title: "Smart Cities & Architectural Systems",
-    desc: "Sensory grid optimization, urban telemetry pipelines, civic resilience, and civic technology for smart governance.",
-    focus: "IoT Telemetry, Urban Grid Systems, Clean Energy, Heritage & Civic Tech",
-  },
+export const EVENT_TRACKS: TrackOption[] = DETAILED_TRACKS;
+
+const TRACK_ICONS = [
+  Cpu,          // AI/ML
+  HeartPulse,   // HealthTech
+  Coins,        // FinTech/EdTech
+  ShieldCheck,  // Cybersecurity
+  Sparkles,     // Generative AI & LLMs
+  Layers,       // Multi-Agent Systems
+  Gamepad2,     // Gaming & Immersive Tech
+  Building2,    // Smart City and Infrastructure
+  Lightbulb,    // Open Innovation
 ];
-
-const TRACK_ICONS = [Cpu, Coins, ShieldCheck, Building2];
 
 interface OptionWheelProps {
   className?: string;

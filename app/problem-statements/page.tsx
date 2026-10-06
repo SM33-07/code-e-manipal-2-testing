@@ -23,6 +23,9 @@ import {
   Loader2,
   Check,
   AlertTriangle,
+  Layers,
+  Gamepad2,
+  Building2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
@@ -58,7 +61,7 @@ const PUBLISHED_PROBLEMS: ProblemStatement[] = [
       "Public GitHub repository with documentation and reproducible setup",
       "Live interactive demonstration with sample patient triage cases",
     ],
-    evaluationFocus: "Technical Execution (30%) & Practical Impact (20%) in rural clinics",
+    evaluationFocus: "Technical Execution & Practical Impact in rural clinics",
   },
   {
     id: "ps-w3-02",
@@ -77,7 +80,7 @@ const PUBLISHED_PROBLEMS: ProblemStatement[] = [
       "Mobile-friendly consumer verification interface (QR scanner / NFC check)",
       "Comprehensive test coverage and public GitHub repository",
     ],
-    evaluationFocus: "Cryptographic Architecture (30%) & Innovation / Originality (30%)",
+    evaluationFocus: "Cryptographic Architecture & Innovation / Originality",
   },
   {
     id: "ps-fin-03",
@@ -96,7 +99,7 @@ const PUBLISHED_PROBLEMS: ProblemStatement[] = [
       "Simulation harness with synthesized fraud scenarios and synthetic transaction load",
       "Public code repository with architectural block diagram",
     ],
-    evaluationFocus: "Architecture & Latency Performance (30%) & Real-World Utility (20%)",
+    evaluationFocus: "Architecture & Latency Performance & Real-World Utility",
   },
   {
     id: "ps-open-04",
@@ -115,45 +118,90 @@ const PUBLISHED_PROBLEMS: ProblemStatement[] = [
       "Carbon abatement / diesel displacement metric calculator",
       "Clean open-source repository with clear setup instructions",
     ],
-    evaluationFocus: "Algorithmic Elegance (30%) & Sustainability Impact (20%)",
+    evaluationFocus: "Algorithmic Elegance & Sustainability Impact",
   },
 ];
 
 const TRACK_PREVIEWS = [
   {
-    id: "ai",
-    title: "AI & Intelligent Systems",
+    id: "ai-ml",
+    title: "AI/ML",
     icon: Cpu,
     tag: "Track 01",
     description:
-      "Autonomous agents, multi-modal LLM workflows, edge intelligence, computer vision, and real-time inference architectures.",
+      "Predictive modeling, deep learning architectures, computer vision, vernacular intelligence, and edge-native model deployments.",
     status: "Drops on Day 1, 10:30 AM",
   },
   {
-    id: "web3",
-    title: "Web3 & Decentralized Tech",
-    icon: Coins,
+    id: "healthtech",
+    title: "HealthTech",
+    icon: HeartPulse,
     tag: "Track 02",
     description:
-      "Zero-knowledge primitives, verifiable state machines, account abstraction, on-chain governance, and decentralized data rails.",
+      "Clinical workflow optimization, remote diagnostics, biomedical telemetry, and privacy-preserving patient health records.",
     status: "Drops on Day 1, 10:30 AM",
   },
   {
-    id: "fintech-health",
-    title: "FinTech & Healthcare Innovation",
-    icon: HeartPulse,
+    id: "fintech-edtech",
+    title: "FinTech/EdTech",
+    icon: Coins,
     tag: "Track 03",
     description:
-      "Financial inclusion rails, fraud mitigation systems, predictive triage, interoperable health records, and clinical workflows.",
+      "High-throughput financial state machines, algorithmic fraud triage, adaptive pedagogies, and accessible education pipelines.",
     status: "Drops on Day 1, 10:30 AM",
   },
   {
-    id: "open",
-    title: "Open Innovation & Sustainability",
-    icon: Lightbulb,
+    id: "cybersecurity",
+    title: "Cybersecurity",
+    icon: ShieldCheck,
     tag: "Track 04",
     description:
-      "Novel software engineering breakthroughs, green compute, supply chain transparency, urban tech, and student-driven ideas.",
+      "Resilient infrastructure, cryptographic consensus, threat intelligence orchestration, and automated vulnerability remediation.",
+    status: "Drops on Day 1, 10:30 AM",
+  },
+  {
+    id: "genai-llms",
+    title: "Generative AI & LLMs",
+    icon: Sparkles,
+    tag: "Track 05",
+    description:
+      "Fine-tuned domain LLMs, retrieval-augmented generation (RAG), multimodal foundation models, and reasoning engines.",
+    status: "Drops on Day 1, 10:30 AM",
+  },
+  {
+    id: "multi-agent",
+    title: "Multi-Agent Systems",
+    icon: Layers,
+    tag: "Track 06",
+    description:
+      "Autonomous agent collaboration, distributed task delegation, negotiation frameworks, and emergent swarm intelligence.",
+    status: "Drops on Day 1, 10:30 AM",
+  },
+  {
+    id: "gaming-immersive",
+    title: "Gaming & Immersive Tech",
+    icon: Gamepad2,
+    tag: "Track 07",
+    description:
+      "Real-time graphics, physics simulation, procedural generation, spatial compute, AR/VR experiences, and game engines.",
+    status: "Drops on Day 1, 10:30 AM",
+  },
+  {
+    id: "smart-city",
+    title: "Smart City and Infrastructure",
+    icon: Building2,
+    tag: "Track 08",
+    description:
+      "Sensory grid optimization, urban telemetry pipelines, civic resilience, intelligent transit, and sustainable microgrids.",
+    status: "Drops on Day 1, 10:30 AM",
+  },
+  {
+    id: "open-innovation",
+    title: "Open Innovation",
+    icon: Lightbulb,
+    tag: "Track 09",
+    description:
+      "Unbounded problem definition for bold cross-disciplinary breakthroughs, novel engineering systems, and student-driven ideas.",
     status: "Drops on Day 1, 10:30 AM",
   },
 ];
@@ -162,14 +210,14 @@ const PREPARATION_STEPS = [
   {
     step: "01",
     title: "Confirm Team Roster",
-    detail: "Verify all 2-4 members in your Team Workspace before the roster freeze.",
+    detail: "Verify all 1-6 members in your Team Workspace before the roster freeze.",
     href: "/dashboard",
     action: "View Workspace",
   },
   {
     step: "02",
     title: "Review Evaluation Rubric",
-    detail: "Understand the 4 weighted criteria (Innovation 30%, Technical 30%, Demo 20%, Impact 20%).",
+    detail: "Understand the core evaluation pillars (Technical Execution, Innovation, Real-World Feasibility, and Presentation Demo).",
     href: "/guidelines",
     action: "Read Rubric",
   },

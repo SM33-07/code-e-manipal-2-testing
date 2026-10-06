@@ -589,5 +589,36 @@ Executed the final visual and navigation correction pass based on live browser i
 - Invariant check `backdrop-blur|backdrop-filter|backdropFilter`: 0 matches.
 - Invariant check `light-old|dark-old`: 0 active runtime references.
 
+## Stage T — Official Unstop Event Data Reconciliation & Controlled Update
+
+### 1. Reconciled Parameters
+- **Team Size:** Officially updated to **1–6 members** across backend (`services/teamService.ts`), API handlers, UI rosters, and dashboards.
+  - 6th member accepted; 7th member rejected with `TEAM_FULL`.
+  - Solo (1-member) builders supported upon team creation.
+- **Official 9 Tracks:** Replaced 4 custom tracks and generic category dropdowns with official Unstop tracks:
+  1. `AI/ML`
+  2. `HealthTech`
+  3. `FinTech/EdTech`
+  4. `Cybersecurity`
+  5. `Generative AI & LLMs`
+  6. `Multi-Agent Systems`
+  7. `Gaming & Immersive Tech`
+  8. `Smart City and Infrastructure`
+  9. `Open Innovation`
+- **Prize Pool:** Reconciled to organizer-confirmed aggregate **₹4,00,000+** across landing page hero and event constants, preserving exact breakdown:
+  - Winner: ₹50,000 Cash + Certificate
+  - 1st Runner Up: ₹30,000 Cash + Certificate
+  - 2nd Runner Up: ₹20,000 Cash + Certificate
+  - Top 10 Teams: Certificate + ₹5,000+ worth of In-Kind Rewards + Exclusive Perks
+  - Additional Exclusive Perks / Benefits: Part of the advertised overall ₹4,00,000+ reward ecosystem (₹3,00,000 value).
+- **Timeline:** Added Round 1 Online Qualifier (MCQ on Unstop, 27 Sep – 11 Oct 2026, 10 questions, 10 min, no negative marking) and National Shortlist Announcement (11 Oct 2026).
+- **Registration & Fees:** Documented Unstop platform workflow, non-refundable fees (Round 1: ₹59 MUJ / ₹89 Non-MUJ; Round 2: ₹219 MUJ / ₹250 Non-MUJ), and campus facilities.
+- **Evaluation Pillars:** Public-facing statements updated to qualitative pillars (Technical Execution, Innovation, Real-World Feasibility, Demo) without publishing unverified 30/30/20/20 percentages.
+
+### 2. Static & Build Verification
+- `npx tsc --noEmit`: 0 errors.
+- `npm run build`: 60/60 routes compiled successfully.
+- Stale data audit: 0 stale 4-track names, 0 stale 2-4 team size strings, 0 stale ₹2,50,000 values.
+
 
 

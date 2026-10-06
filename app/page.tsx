@@ -22,6 +22,7 @@ import { BorderGlow } from "@/components/ui/BorderGlow";
 import { SpecularButton } from "@/components/ui/SpecularButton";
 import { ClickSpark } from "@/components/ui/ClickSpark";
 import { OptionWheel } from "@/components/ui/OptionWheel";
+import { DETAILED_TRACKS, PRIZE_STRUCTURE } from "@/lib/event/eventConstants";
 
 export default function HomePage() {
   const { role, isAuthenticated, loading } = useAuth();
@@ -32,36 +33,11 @@ export default function HomePage() {
     return "/dashboard";
   };
 
-  const tracks = [
-    {
-      id: "ai-systems",
-      title: "Autonomous AI & Intelligent Agents",
-      desc: "Agentic workflows, fine-tuned domain models, multimodal intelligence, and edge-native neural inference.",
-      tag: "TRACK 01"
-    },
-    {
-      id: "fintech",
-      title: "Decentralized Protocols & FinTech",
-      desc: "Zero-knowledge verification, algorithmic settlement rails, sovereign identity, and high-throughput financial state machines.",
-      tag: "TRACK 02"
-    },
-    {
-      id: "resilient-infra",
-      title: "Resilient Infrastructure & Cyber Defense",
-      desc: "Distributed systems, fault-tolerant orchestration, cryptographic consensus, and autonomous vulnerability triage.",
-      tag: "TRACK 03"
-    },
-    {
-      id: "open-innovation",
-      title: "Smart Cities & Architectural Systems",
-      desc: "Sensory grid optimization, urban telemetry pipelines, civic resilience, and civic technology for smart governance.",
-      tag: "TRACK 04"
-    }
-  ];
+  const tracks = DETAILED_TRACKS;
 
   const highlights = [
     { label: "Engineering Sprint", value: "36 Hours", sub: "Continuous Hacking" },
-    { label: "Grand Prize Pool", value: "₹2,50,000+", sub: "Audited Grants & Cash" },
+    { label: "Grand Prize Pool", value: PRIZE_STRUCTURE.advertisedTotal, sub: "Audited Grants & Cash" },
     { label: "National Shortlist", value: "100 Teams", sub: "Vetted Builders" },
     { label: "Adjudication", value: "Jury Audited", sub: "Multi-Criteria Matrix" }
   ];

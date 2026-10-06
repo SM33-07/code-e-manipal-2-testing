@@ -308,7 +308,7 @@ export function ParticipantDashboard() {
                   <span>&bull;</span>
                   <span>Leader: <strong className="text-foreground">{team?.leaderName || displayName}</strong></span>
                   <span>&bull;</span>
-                  <span>Roster: <strong className="text-foreground">{membersList.length}/4 Members</strong></span>
+                  <span>Roster: <strong className="text-foreground">{membersList.length}/6 Members</strong></span>
                 </>
               ) : (
                 <span>Form or join a team to activate your project workspace and unlock submission controls.</span>
@@ -524,12 +524,12 @@ export function ParticipantDashboard() {
           <div>
             <div className="flex items-baseline gap-1.5">
               <span className="text-2xl font-black text-foreground">{membersList.length}</span>
-              <span className="text-sm font-semibold text-muted-foreground">/ 4 members</span>
+              <span className="text-sm font-semibold text-muted-foreground">/ 6 members</span>
             </div>
             <div className="w-full bg-accent/60 h-2 rounded-full mt-2 overflow-hidden">
               <div
                 className="bg-primary h-full rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, (membersList.length / 4) * 100)}%` }}
+                style={{ width: `${Math.min(100, (membersList.length / 6) * 100)}%` }}
               />
             </div>
           </div>

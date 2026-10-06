@@ -30,22 +30,44 @@ const RAW_SCHEDULE: ScheduleItem[] = [
   // Online Phase
   {
     id: "onl-1",
-    time: "Prior to Event",
-    title: "Registration & Account Provisioning",
-    location: "Online Portal",
+    time: "27 Sep – 11 Oct 2026",
+    title: "Round 1: Online Assessment (MCQ on Unstop)",
+    location: "Unstop Platform",
     description:
-      "Team Leaders receive provisioned credentials, verify their team roster, and access the Code-e-Manipal 2.0 workspace.",
+      "10-question online qualifier covering Programming Fundamentals, Logical Reasoning, Computer Science Fundamentals, and Problem Solving / Output Prediction (10 mins, 10 marks, no negative marking). Registration and assessment window closes 11 October 2026, 11:59 PM IST.",
     phase: "online",
     type: "checkpoint",
     status: "completed",
   },
   {
     id: "onl-2",
+    time: "11 Oct 2026",
+    title: "National Shortlist Announcement",
+    location: "Unstop & Official Portal",
+    description:
+      "Announcement of qualifying teams selected for Round 2 Offline Finale at Manipal University Jaipur.",
+    phase: "online",
+    type: "checkpoint",
+    status: "completed",
+  },
+  {
+    id: "onl-3",
+    time: "Prior to Finale",
+    title: "Portal Provisioning & Workspace Activation",
+    location: "Online Portal",
+    description:
+      "Shortlisted Team Leaders receive credentials, verify rosters (1–6 members), and access the Code-e-Manipal 2.0 workspace.",
+    phase: "online",
+    type: "checkpoint",
+    status: "completed",
+  },
+  {
+    id: "onl-4",
     time: "Oct 14, 06:00 PM",
     title: "Pre-Hack Briefing & System Verification",
     location: "Online / Discord",
     description:
-      "Briefing on hackathon rules, submission guidelines, evaluation rubrics, and workspace readiness.",
+      "Briefing on hackathon rules, submission guidelines, evaluation criteria, and workspace readiness.",
     phase: "online",
     type: "checkpoint",
     status: "completed",

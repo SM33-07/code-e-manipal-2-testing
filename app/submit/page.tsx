@@ -35,15 +35,11 @@ const AnimatedCounter = dynamic(
   { ssr: false }
 );
 
+import { OFFICIAL_TRACKS } from "@/lib/event/eventConstants";
+
 const CATEGORY_FILTERS = [
   "All",
-  "AI/ML",
-  "Web Dev",
-  "Mobile",
-  "Blockchain",
-  "IoT",
-  "Cybersecurity",
-  "Other",
+  ...OFFICIAL_TRACKS,
 ];
 
 import { SpotlightCard } from "@/components/ui/SpotlightCard";

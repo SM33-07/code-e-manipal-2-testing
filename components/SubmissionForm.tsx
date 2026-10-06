@@ -8,6 +8,7 @@ import {
   Map, Lock, Plus, X, Cpu, GitBranch, Layers, Zap,
 } from "lucide-react";
 import { BorderGlow } from "@/components/ui/BorderGlow";
+import { OFFICIAL_TRACKS } from "@/lib/event/eventConstants";
 
 // ─── Submission Interface ─────────────────────────────────────────────────────
 export interface Submission {
@@ -46,7 +47,7 @@ const TECH_STACK_OPTIONS = [
   "GraphQL", "Rust", "Go", "Java", "C++",
 ];
 
-const CATEGORIES = ["AI/ML", "Web Dev", "Mobile", "Blockchain", "IoT", "Cybersecurity", "Other"];
+const CATEGORIES = [...OFFICIAL_TRACKS];
 
 // ─── Word Counter ─────────────────────────────────────────────────────────────
 function wordCount(text: string) {
