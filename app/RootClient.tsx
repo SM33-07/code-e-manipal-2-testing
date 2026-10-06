@@ -6,6 +6,7 @@ import dynamic from "next/dynamic"
 import { usePathname } from "next/navigation"
 
 import { HeritageBackground } from "@/components/HeritageBackground"
+import { SiteFooter } from "@/components/SiteFooter"
 
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false })
 
@@ -159,6 +160,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <div className={`relative z-10 min-h-screen ${isFullBleedRoute ? "pt-20" : "pt-24 pb-12"}`}>
           {children}
         </div>
+        {!isPortalRoute && <SiteFooter />}
       </div>
     </>
   )

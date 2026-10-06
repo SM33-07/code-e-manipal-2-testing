@@ -35,7 +35,9 @@ const PROBLEMS = [
 
 export default async function ProblemStatementsPage() {
   const config = await getEventConfigState();
-  const published = config.event_phase !== "NOT_STARTED";
+  // This gate is deliberately independent of the hackathon phase. The static
+  // challenge data below is never rendered into the server payload while false.
+  const published = config.problem_statements_published;
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-4 sm:px-6 sm:py-8">

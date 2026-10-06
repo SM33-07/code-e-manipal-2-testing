@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Images, Sparkles } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -38,7 +38,17 @@ export default function LoginPage() {
       const authResult = await login(cleanIdentifier, password);
       const userRole = authResult?.role || "participant";
 
-      if (userRole === "judge") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const requestedNextUrl = searchParams.get("next");
+      const nextUrl = requestedNextUrl?.startsWith("/")
+        ? new URL(requestedNextUrl, window.location.origin)
+        : null;
+
+      if (nextUrl?.origin === window.location.origin) {
+        router.push(`${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+      } else if (userRole === "admin") {
+        router.push("/admin");
+      } else if (userRole === "judge") {
         router.push("/judge");
       } else {
         router.push("/dashboard");
@@ -180,24 +190,6 @@ export default function LoginPage() {
             </div>
           </form>
 
-          {/* Divider */}
-          <div className="relative my-6 text-center">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <span className="relative bg-card px-3 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-              Public Portal
-            </span>
-          </div>
-
-          {/* Public Gallery Link */}
-          <Link
-            href="/gallery"
-            className="flex items-center justify-center gap-2 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors py-1"
-          >
-            <Images size={15} className="text-secondary" />
-            <span>Explore Public Project Gallery</span>
-          </Link>
         </div>
       </div>
     </div>

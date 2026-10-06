@@ -28,7 +28,6 @@ import {
   FileText,
   BookOpen,
   MessageSquare,
-  Images,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
@@ -814,7 +813,6 @@ export function ParticipantDashboard() {
                 { title: "Event Schedule", desc: "Detailed 36-hour timeline", href: "/timeline", icon: Calendar },
                 { title: "Participant FAQ", desc: "Support & common queries", href: "/faq", icon: HelpCircle },
                 { title: "Rules & Rubrics", desc: "Judging criteria specs", href: "/guidelines", icon: BookOpen },
-                { title: "Event Gallery", desc: "Previous editions archive", href: "/gallery", icon: Images },
               ].map((res, i) => {
                 const Icon = res.icon;
                 return (

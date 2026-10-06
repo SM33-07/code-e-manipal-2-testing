@@ -14,14 +14,19 @@ import {
   Layers,
   Code2,
   Trophy,
-  CheckCircle2
+  Award,
+  Medal,
+  type LucideIcon
 } from "lucide-react";
 
 import { SpotlightCard } from "@/components/ui/SpotlightCard";
-import { BorderGlow } from "@/components/ui/BorderGlow";
 import { SpecularButton } from "@/components/ui/SpecularButton";
 import { ClickSpark } from "@/components/ui/ClickSpark";
 import { OptionWheel } from "@/components/ui/OptionWheel";
+import { TextReveal } from "@/components/ui/TextReveal";
+import { FeatureCard } from "@/components/ui/FeatureCard";
+import { FinalCta } from "@/components/ui/FinalCta";
+import { SponsorPartners } from "@/components/ui/SponsorPartners";
 import { DETAILED_TRACKS, PRIZE_STRUCTURE } from "@/lib/event/eventConstants";
 
 export default function HomePage() {
@@ -38,15 +43,24 @@ export default function HomePage() {
   const highlights = [
     { label: "Engineering Sprint", value: "36 Hours", sub: "Continuous Hacking" },
     { label: "Grand Prize Pool", value: PRIZE_STRUCTURE.advertisedTotal, sub: "Audited Grants & Cash" },
-    { label: "National Shortlist", value: "100 Teams", sub: "Vetted Builders" },
+    { label: "National Shortlist", value: "200+ Teams", sub: "Vetted Builders" },
     { label: "Adjudication", value: "Jury Audited", sub: "Multi-Criteria Matrix" }
   ];
+  const prizeCards: { index: string; title: string; detail: string; icon: LucideIcon }[] = [
+    { index: "01", title: "Winner", detail: PRIZE_STRUCTURE.winner, icon: Trophy },
+    { index: "02", title: "1st Runner Up", detail: PRIZE_STRUCTURE.firstRunnerUp, icon: Medal },
+    { index: "03", title: "2nd Runner Up", detail: PRIZE_STRUCTURE.secondRunnerUp, icon: Medal },
+    { index: "TOP 10", title: "Top 10 Recognition", detail: PRIZE_STRUCTURE.top10, icon: Award },
+  ];
+
 
   return (
-    <div className="mx-auto max-w-6xl space-y-12 sm:space-y-16 py-8 sm:py-14 px-4 sm:px-6">
+    <div className="mx-auto max-w-7xl space-y-16 sm:space-y-24 py-8 sm:py-14 px-4 sm:px-6">
       {/* ── HERO BANNER ── */}
-      <section className="relative rounded-3xl border border-border bg-card p-6 sm:p-12 lg:p-16 shadow-md overflow-hidden text-center sm:text-left animate-entrance">
-        <div className="relative z-10 max-w-3xl space-y-6">
+      <section className="relative min-h-[540px] overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-xl sm:p-12 lg:p-16 animate-entrance">
+        <div className="pointer-events-none absolute right-0 top-0 hidden h-full w-[36%] border-l border-border lg:block" />
+        <div className="pointer-events-none absolute right-[10%] top-[18%] hidden font-mono text-[clamp(5rem,12vw,12rem)] font-black leading-none text-primary/[0.06] lg:block">2.0</div>
+        <div className="relative z-10 flex min-h-[420px] max-w-4xl flex-col justify-center space-y-6 text-center sm:text-left">
           {/* Technical Pill */}
           <div className="inline-flex items-center gap-2 rounded-full border border-secondary/35 bg-secondary/15 px-3.5 py-1 text-xs font-bold text-secondary">
             <span className="h-2 w-2 rounded-full bg-secondary animate-pulse" />
@@ -55,10 +69,10 @@ export default function HomePage() {
 
           {/* Main Headline */}
           <div className="space-y-3">
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-foreground leading-[1.08]">
+            <TextReveal as="h1" className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-foreground leading-[1.08]">
               CODE-E-MANIPAL <span className="text-primary font-mono">2.0</span>
-            </h1>
-            <p className="text-lg sm:text-2xl font-medium text-foreground/90 max-w-2xl">
+            </TextReveal>
+            <p className="max-w-2xl text-lg font-medium text-foreground/90 sm:text-2xl">
               Premier 36-Hour National Flagship Hackathon Console
             </p>
           </div>
@@ -127,11 +141,11 @@ export default function HomePage() {
       </section>
 
       {/* ── SYSTEM HIGHLIGHTS / METRICS ── */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-entrance-stagger-1">
+      <section className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border shadow-sm lg:grid-cols-4 animate-entrance-stagger-1">
         {highlights.map((item, idx) => (
           <SpotlightCard
             key={idx}
-            className="p-5 sm:p-6 flex flex-col justify-between"
+            className="rounded-none border-0 p-5 sm:p-7 flex flex-col justify-between shadow-none"
           >
             <span className="text-[11px] font-bold uppercase tracking-wider text-secondary font-mono">
               {item.label}
@@ -148,7 +162,7 @@ export default function HomePage() {
       </section>
 
       {/* ── TECHNICAL TRACKS & OPTION WHEEL EXPLORER ── */}
-      <section className="space-y-6 animate-entrance-stagger-2">
+      <section className="space-y-8 animate-entrance-stagger-2">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-secondary uppercase tracking-wider mb-1">
@@ -203,8 +217,23 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── PRIZE ARCHITECTURE ── */}
+      <section className="grid gap-6 lg:grid-cols-[0.9fr_1.6fr] lg:items-stretch">
+        <div className="rounded-3xl border border-border bg-surface-elevated p-7 shadow-sm sm:p-9">
+          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-secondary"><Award size={15} />Competition Recognition</div>
+          <TextReveal as="h2" className="mt-4 text-3xl font-black tracking-tight text-foreground sm:text-4xl">Built to reward serious work.</TextReveal>
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">A layered recognition structure for the projects that demonstrate technical depth, credible execution, and real-world impact.</p>
+          <Link href="/timeline" className="mt-8 inline-flex items-center gap-2 text-xs font-bold text-primary hover:text-primary/80">View ceremony schedule <ArrowRight size={14} /></Link>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {prizeCards.map(({ index, title, detail, icon: PrizeIcon }) => {
+            return <article key={title} className="group rounded-2xl border border-border bg-card p-5 shadow-sm transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-secondary/60 hover:shadow-md"><div className="flex items-start justify-between"><span className="font-mono text-[11px] font-bold text-secondary">{index}</span><PrizeIcon size={18} className="text-primary" /></div><h3 className="mt-7 text-lg font-bold text-foreground">{title}</h3><p className="mt-2 text-xs leading-relaxed text-muted-foreground">{detail}</p></article>;
+          })}
+        </div>
+      </section>
+
       {/* ── CONSOLE CAPABILITIES / SYSTEM ARCHITECTURE ── */}
-      <section className="rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-sm space-y-6 animate-entrance-stagger-3">
+      <section className="rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-sm space-y-8 animate-entrance-stagger-3">
         <div className="space-y-2">
           <div className="inline-flex items-center gap-1.5 text-xs font-bold text-primary uppercase tracking-wider">
             <Cpu size={14} />
@@ -219,97 +248,17 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-          <SpotlightCard className="p-5 space-y-2 bg-accent/20">
-            <div className="p-2 rounded-xl bg-card border border-border w-fit text-primary">
-              <Terminal size={18} />
-            </div>
-            <h3 className="text-sm font-bold text-foreground">Immutable Finalization</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Submission states transition through strict verification locks with tamper-proof timestamps and audit logs.
-            </p>
-          </SpotlightCard>
-
-          <SpotlightCard className="p-5 space-y-2 bg-accent/20">
-            <div className="p-2 rounded-xl bg-card border border-border w-fit text-secondary">
-              <Shield size={18} />
-            </div>
-            <h3 className="text-sm font-bold text-foreground">Blind Adjudication</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Dual-blind jury review matrices prevent bias. Scores remain cryptographically sealed until official ceremony release.
-            </p>
-          </SpotlightCard>
-
-          <SpotlightCard className="p-5 space-y-2 bg-accent/20">
-            <div className="p-2 rounded-xl bg-card border border-border w-fit text-foreground">
-              <Trophy size={18} />
-            </div>
-            <h3 className="text-sm font-bold text-foreground">Live Telemetry</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Real-time phase transitions, synchronized countdown clocks, and live broadcast announcements for all squads.
-            </p>
-          </SpotlightCard>
+          <FeatureCard index="01" icon={Terminal} title="Immutable Finalization" description="Submission states transition through strict verification locks with tamper-proof timestamps and audit logs." />
+          <FeatureCard index="02" icon={Shield} title="Blind Adjudication" description="Dual-blind jury review matrices prevent bias. Scores remain sealed until official ceremony release." />
+          <FeatureCard index="03" icon={Trophy} title="Live Telemetry" description="Real-time phase transitions, synchronized countdown clocks, and live broadcast announcements for all squads." />
         </div>
       </section>
 
-      {/* ── ORGANIZING INSTITUTIONS & ENTITIES ── */}
-      <section className="rounded-2xl border border-border bg-card p-6 sm:p-8 text-center space-y-4">
-        <div className="text-xs uppercase tracking-widest font-bold text-muted-foreground">
-          Flagship National Event Organized By
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 pt-2">
-          <div className="flex flex-col items-center">
-            <span className="text-base sm:text-lg font-black tracking-tight text-foreground font-mono">
-              MANIPAL UNIVERSITY JAIPUR
-            </span>
-            <span className="text-[11px] text-muted-foreground mt-0.5">Host Campus &amp; Academic Leadership</span>
-          </div>
-          <div className="h-6 w-px bg-border hidden sm:block" />
-          <div className="flex flex-col items-center">
-            <span className="text-base sm:text-lg font-black tracking-tight text-primary font-mono">
-              LearnIT &bull; SCA
-            </span>
-            <span className="text-[11px] text-muted-foreground mt-0.5">School of Computer Applications</span>
-          </div>
-          <div className="h-6 w-px bg-border hidden sm:block" />
-          <div className="flex flex-col items-center">
-            <span className="text-base sm:text-lg font-black tracking-tight text-secondary font-mono">
-              E-CELL MUJ
-            </span>
-            <span className="text-[11px] text-muted-foreground mt-0.5">Entrepreneurship Cell Partnership</span>
-          </div>
-        </div>
-      </section>
+      {/* OFFICIAL_PARTNERS default list used — logos served from /public/images/partners/ */}
+      <SponsorPartners />
 
       {/* ── FOOTER CALLOUT ── */}
-      <BorderGlow>
-        <section className="p-6 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
-          <div className="space-y-2 max-w-xl">
-            <h3 className="text-xl sm:text-2xl font-black text-foreground">
-              Ready to Begin the Engineering Sprint?
-            </h3>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              Sign in with your registered team credentials or explore the full hackathon timeline and problem statements.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0">
-            <Link
-              href="/gallery"
-              className="px-4 py-2.5 rounded-xl border border-border bg-card text-xs font-semibold text-foreground hover:bg-accent transition-colors"
-            >
-              Past Editions
-            </Link>
-            <ClickSpark>
-              <Link href="/login">
-                <SpecularButton size="sm" variant="primary">
-                  <span>Enter Console</span>
-                  <ArrowRight size={14} />
-                </SpecularButton>
-              </Link>
-            </ClickSpark>
-          </div>
-        </section>
-      </BorderGlow>
+      <FinalCta title="Ready to Begin the Engineering Sprint?" description="Sign in with your provisioned team credentials or review the event timeline before the challenge release." href="/login" action="Enter Console" />
     </div>
   );
 }

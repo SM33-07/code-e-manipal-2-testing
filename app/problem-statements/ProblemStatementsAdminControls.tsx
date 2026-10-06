@@ -16,10 +16,10 @@ export function ProblemStatementsAdminControls({ published }: { published: boole
   const publish = async () => {
     setPublishing(true);
     try {
-      const response = await fetch("/api/admin/event-config/transition", {
+      const response = await fetch("/api/admin/event-config/problem-statements", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ target_phase: "HACKING" }),
+        body: JSON.stringify({ published: true }),
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error?.message || "Unable to publish problem statements.");

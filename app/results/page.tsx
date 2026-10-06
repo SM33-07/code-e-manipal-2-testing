@@ -376,12 +376,6 @@ export default function ResultsPage() {
         >
           ← Return to Workspace
         </Link>
-        <Link
-          href="/gallery"
-          className="text-primary hover:text-primary/80 transition-colors font-semibold"
-        >
-          Explore Previous Editions Gallery →
-        </Link>
       </div>
     </div>
   );

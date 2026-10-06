@@ -130,7 +130,29 @@
   transform: translateY(-2px);
 }
 
-/* ── Canvas Background Depth (Light: warm ivory -> sandstone/rose, Dark: espresso -> charcoal/wine) ── */
+/* A small, reusable reveal for editorial headings. The content remains visible
+   without JavaScript and motion is disabled by the global reduced-motion rule. */
+.text-reveal {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 420ms ease-out, transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.text-reveal[data-reveal-ready="true"] {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.text-reveal.text-reveal--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-reveal { opacity: 1; transform: none; }
+}
+
+/* ── Canvas Background Depth (Light: warm ivory; Dark: charcoal with a restrained wine undertone) ── */
 body {
   background-color: var(--background);
   background-image:
@@ -142,8 +164,8 @@ body {
 .dark body {
   background-color: var(--background);
   background-image:
-    radial-gradient(ellipse at 10% 12%, rgba(168, 83, 70, 0.045) 0%, transparent 50%),
-    radial-gradient(ellipse at 90% 88%, rgba(184, 138, 69, 0.03) 0%, transparent 45%);
+    radial-gradient(ellipse at 12% 8%, rgba(185, 87, 69, 0.06) 0%, transparent 46%),
+    radial-gradient(ellipse at 88% 90%, rgba(176, 138, 69, 0.035) 0%, transparent 42%);
   background-attachment: fixed;
 }
 

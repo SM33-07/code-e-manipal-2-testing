@@ -33,13 +33,13 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
   // Memoize particle positions so they don't re-randomize on every render
   const particles = useMemo(
     () =>
-      Array.from({ length: 25 }).map(() => ({
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        size: Math.random() * 2.5 + 0.5,
-        duration: Math.random() * 6 + 4,
-        delay: Math.random() * 5,
-        yTravel: Math.random() * 80 + 30,
+      Array.from({ length: 25 }).map((_, i) => ({
+        left: (i * 37 + 11) % 100,
+        top: (i * 61 + 7) % 100,
+        size: ((i * 17) % 25) / 10 + 0.5,
+        duration: ((i * 13) % 60) / 10 + 4,
+        delay: ((i * 7) % 50) / 10,
+        yTravel: (i * 19) % 80 + 30,
       })),
     []
   );
@@ -109,7 +109,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 0.96, filter: "blur(6px)" }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
-          className="fixed inset-0 z-[99999] overflow-hidden flex flex-col items-center justify-between"
+          className="fixed inset-0 z-[99999] pointer-events-none overflow-hidden flex flex-col items-center justify-between"
           style={{ background: "linear-gradient(180deg, #050505 0%, #070a12 50%, #050505 100%)" }}
         >
           {/* ===== BACKGROUND LAYERS ===== */}
@@ -268,7 +268,7 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
           <button
             type="button"
             onClick={handleSkip}
-            className="absolute top-4 right-6 sm:top-6 sm:right-10 z-[20] rounded-full border border-[#F6C453]/30 bg-black/85 px-5 py-2 font-mono text-[10px] sm:text-xs text-[#F6C453] tracking-wider transition-all duration-300 hover:bg-[#F6C453] hover:text-black hover:shadow-[0_0_15px_rgba(246,196,83,0.4)] focus:outline-none cursor-pointer"
+            className="pointer-events-auto absolute top-4 right-6 sm:top-6 sm:right-10 z-[20] rounded-full border border-[#F6C453]/30 bg-black/85 px-5 py-2 font-mono text-[10px] sm:text-xs text-[#F6C453] tracking-wider transition-all duration-300 hover:bg-[#F6C453] hover:text-black hover:shadow-[0_0_15px_rgba(246,196,83,0.4)] focus:outline-none cursor-pointer"
           >
             SKIP INTRO
           </button>
@@ -362,8 +362,9 @@ export default function LoaderAnimation({ onComplete }: LoaderAnimationProps) {
                         key={`dot-${i}`}
                         className="absolute w-[2px] h-[2px] rounded-full bg-[#F6C453]/40"
                         style={{
-                          left: `calc(50% + ${Math.cos(rad) * r}% - 1px)`,
-                          top: `calc(50% + ${Math.sin(rad) * r}% - 1px)`,
+                          left: `${(50 + Math.cos(rad) * r).toFixed(2)}%`,
+                          top: `${(50 + Math.sin(rad) * r).toFixed(2)}%`,
+                          transform: "translate(-50%, -50%)",
                         }}
                       />
                     );

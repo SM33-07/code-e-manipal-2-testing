@@ -92,7 +92,7 @@ export function OptionWheel({ className, onSelectTrack }: OptionWheelProps) {
         role="tablist"
         aria-label="Problem Statement Tracks"
         onKeyDown={handleKeyDown}
-        className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 p-1.5 rounded-2xl bg-card border border-border shadow-xs"
+        className="grid grid-cols-3 md:grid-cols-9 items-stretch gap-1.5 rounded-2xl border border-border bg-card p-1.5 shadow-sm"
       >
         {EVENT_TRACKS.map((track, idx) => {
           const isSelected = idx === selectedIndex;
@@ -108,11 +108,11 @@ export function OptionWheel({ className, onSelectTrack }: OptionWheelProps) {
               onClick={() => handleSelect(idx)}
               type="button"
               className={cn(
-                "flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer select-none",
+                "min-w-0 px-2 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-[background-color,color,box-shadow,transform] duration-200 flex items-center justify-center gap-1.5 cursor-pointer select-none",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 isSelected
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                  ? "bg-primary text-primary-foreground shadow-sm ring-1 ring-primary/35"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent"
               )}
             >
               <Icon size={14} className={isSelected ? "text-primary-foreground" : "text-secondary"} />
