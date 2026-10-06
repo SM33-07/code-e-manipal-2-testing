@@ -44,6 +44,5 @@ next-env.d.ts
 
 # Scratch and audit/progress docs
 /scratch/
-/.manus/
 FRONTEND_UI_FORENSIC_AUDIT.md
-IMPLEMENTATION_PROGRESS.md
+IMPLEMENTATION_PROGRESS.md

@@ -26,10 +26,6 @@ const SubmissionCard = dynamic(
   () => import("@/components/SubmissionCard").then((m) => m.SubmissionCard),
   { ssr: false }
 );
-const TypewriterText = dynamic(
-  () => import("@/components/Typewriter").then((m) => m.TypewriterText),
-  { ssr: false }
-);
 const AnimatedCounter = dynamic(
   () => import("@/components/AnimatedCounter").then((m) => m.AnimatedCounter),
   { ssr: false }
@@ -52,7 +48,7 @@ function StatCard({
   subtitle = "",
   badge = "",
 }: {
-  value: number;
+  value: number | null;
   label: string;
   suffix?: string;
   subtitle?: string;
@@ -69,7 +65,7 @@ function StatCard({
         {label}
       </div>
       <div className="text-3xl font-extrabold text-foreground leading-tight mb-1">
-        <AnimatedCounter target={value} suffix={suffix} />
+        {value === null ? "—" : <AnimatedCounter target={value} suffix={suffix} />}
       </div>
       {subtitle && (
         <div className="text-xs text-muted-foreground">
@@ -240,7 +236,8 @@ export default function SubmissionPage() {
       const startTime = timerConfig?.hackathon_start_time
         ? new Date(timerConfig.hackathon_start_time).getTime()
         : null;
-      const durationHours = parseInt(timerConfig?.hackathon_duration_hours || "36", 10);
+      const configuredDuration = Number(timerConfig?.hackathon_duration_hours);
+      const durationHours = Number.isFinite(configuredDuration) ? configuredDuration : 0;
 
       if (!isStarted || !startTime) {
         setTimeRemainingHours(durationHours);
@@ -353,7 +350,7 @@ export default function SubmissionPage() {
       <div className="min-h-screen text-foreground relative z-10">
 
         {/* ── Hero Container ── */}
-        <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-4 pb-8 text-center">
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-8 text-left">
           {/* Approved Capsule Banner */}
           <div className="inline-flex items-center gap-2.5 px-6 py-2 rounded-full bg-primary/15 border border-primary/30 text-primary dark:bg-[#A85346]/25 dark:text-[#E9DDC8] dark:border-[#B88A45]/40 text-xs sm:text-sm font-bold tracking-wider uppercase mb-5 shadow-sm">
             <Sparkles className="w-4 h-4 text-secondary shrink-0" />
@@ -362,22 +359,13 @@ export default function SubmissionPage() {
           </div>
 
           {/* Heading */}
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4">
-            <span className="block text-foreground">Build the Future,</span>
-            <span className="block text-primary">
-              <TypewriterText
-                texts={[
-                  "Share Your Innovation",
-                  "Submit Your Vision",
-                  "Launch Your Prototype",
-                  "Showcase Your Architecture",
-                ]}
-              />
-            </span>
+          <h1 className="text-4xl sm:text-6xl font-black leading-[1.02] tracking-tight mb-4">
+            <span className="block text-foreground">Project submission</span>
+            <span className="block text-primary text-3xl sm:text-5xl">Document the build.</span>
           </h1>
 
-          <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto mb-8 leading-relaxed">
-            Join hundreds of developers building the next generation of technology. Submit your project, get discovered, and compete for glory in Code-e-Manipal 2.0.
+          <p className="text-sm sm:text-base text-muted-foreground max-w-xl mb-8 leading-relaxed">
+            Add your project details, repository, and demonstration links for the event team and judges.
           </p>
 
           {/* Stats */}
@@ -389,17 +377,16 @@ export default function SubmissionPage() {
               badge="Live"
             />
             <StatCard
-              value={categories.length || 6}
-              label="Active Tracks"
-              subtitle="tech categories"
-              badge="Open"
+              value={categories.length}
+              label="Submitted categories"
+              subtitle="across current projects"
             />
             <StatCard
-              value={timeRemainingHours || 36}
+              value={timerConfig?.hackathon_duration_hours ? timeRemainingHours : null}
               label="Time Remaining"
               suffix="h"
               subtitle={countdownSubtitle}
-              badge={countdownBadge}
+              badge={timerConfig?.hackathon_duration_hours ? countdownBadge : "Awaiting config"}
             />
           </div>
 

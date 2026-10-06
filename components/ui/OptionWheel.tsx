@@ -92,7 +92,7 @@ export function OptionWheel({ className, onSelectTrack }: OptionWheelProps) {
         role="tablist"
         aria-label="Problem Statement Tracks"
         onKeyDown={handleKeyDown}
-        className="grid grid-cols-3 md:grid-cols-9 items-stretch gap-1.5 rounded-2xl border border-border bg-card p-1.5 shadow-sm"
+        className="track-tablist grid grid-cols-3 md:grid-cols-9 items-stretch gap-1.5 rounded-2xl border border-border bg-card p-1.5 shadow-sm"
       >
         {EVENT_TRACKS.map((track, idx) => {
           const isSelected = idx === selectedIndex;
@@ -108,7 +108,7 @@ export function OptionWheel({ className, onSelectTrack }: OptionWheelProps) {
               onClick={() => handleSelect(idx)}
               type="button"
               className={cn(
-                "min-w-0 px-2 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-[background-color,color,box-shadow,transform] duration-200 flex items-center justify-center gap-1.5 cursor-pointer select-none",
+                "relative min-w-0 overflow-hidden px-2 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-[background-color,color,box-shadow,transform] duration-200 flex items-center justify-center gap-1.5 cursor-pointer select-none",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 isSelected
                   ? "bg-primary text-primary-foreground shadow-sm ring-1 ring-primary/35"
@@ -117,6 +117,7 @@ export function OptionWheel({ className, onSelectTrack }: OptionWheelProps) {
             >
               <Icon size={14} className={isSelected ? "text-primary-foreground" : "text-secondary"} />
               <span className="truncate">{track.tag}</span>
+              <span aria-hidden="true" className="track-tab-indicator" />
             </button>
           );
         })}
@@ -124,10 +125,11 @@ export function OptionWheel({ className, onSelectTrack }: OptionWheelProps) {
 
       {/* ── Active Track Highlight Surface (Opaque Card) ── */}
       <div
+        key={currentTrack.id}
         id={`track-panel-${currentTrack.id}`}
         role="tabpanel"
         aria-labelledby={`track-tab-${currentTrack.id}`}
-        className="rounded-3xl border border-secondary/40 bg-card p-6 sm:p-8 shadow-sm relative overflow-hidden transition-all duration-300"
+        className="track-detail-panel rounded-3xl border border-secondary/40 bg-card p-6 sm:p-8 shadow-sm relative overflow-hidden transition-all duration-300"
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">

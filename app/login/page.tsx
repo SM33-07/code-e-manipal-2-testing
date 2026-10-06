@@ -61,35 +61,35 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-transparent">
+    <div className="relative min-h-svh overflow-hidden bg-transparent">
       {/* Subtle directional vignette veil for right-docked login card contrast */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/30 to-background/85 dark:via-background/50 dark:to-background/95 pointer-events-none" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/15 via-background/55 to-background/90 dark:from-background/20 dark:via-background/65 dark:to-background/95" />
 
       {/* Top Bar with Brand & Theme Toggle */}
-      <div className="absolute top-0 inset-x-0 z-20 flex items-center justify-between px-6 py-4">
+      <div className="absolute top-0 inset-x-0 z-20 flex items-center justify-between px-4 py-4 sm:px-6">
         <BrandLogo size="md" subtitle="Technical Hackathon Console" />
         <ThemeToggle />
       </div>
 
       {/* Main Login Viewport */}
-      <div className="relative z-10 w-full h-full flex items-center justify-center px-4 lg:justify-end lg:px-20 pt-16">
+      <div className="relative z-10 flex min-h-svh w-full items-center justify-center px-4 py-24 sm:px-8 lg:justify-end lg:px-[10vw]">
         <div
           className={clsx(
-            "w-full max-w-[440px] bg-card text-card-foreground border border-border rounded-2xl p-8 sm:p-10 shadow-2xl transition-all duration-200 animate-entrance",
+            "w-full max-w-[440px] border border-border border-l-4 border-l-primary bg-surface-elevated text-card-foreground p-6 shadow-xl transition-all duration-200 animate-entrance sm:p-9",
             shake && "animate-shake"
           )}
         >
           {/* Header */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-secondary/15 border border-secondary/30 text-secondary mb-3">
-              <Sparkles size={12} />
-              <span>Technical Console Login</span>
+          <div className="mb-6 text-left">
+          <div className="mb-4 inline-flex items-center gap-2 border-b border-secondary/50 pb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-secondary">
+            <Sparkles size={13} />
+            <span>Code-e-Manipal · Secure portal</span>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
-              Welcome Back
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            Sign in to build.
             </h1>
-            <p className="text-xs text-muted-foreground mt-1.5 tracking-wide">
-              Sign in with your participant, judge, or admin identifier
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Use your provisioned participant, judge, or administrator credentials.
             </p>
           </div>
 

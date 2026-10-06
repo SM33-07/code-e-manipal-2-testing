@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import { cn } from "./utils";
 
 export function FeatureCard({ index, icon: Icon, title, description, meta, className }: { index?: string; icon?: LucideIcon; title: string; description: string; meta?: string; className?: string }) {
-  return <article className={cn("group rounded-2xl border border-border bg-card p-6 shadow-sm card-hover-lift", className)}>
+  return <article data-surface="card" data-depth={index === "01" ? "featured" : undefined} className={cn("surface-card group rounded-2xl border border-border bg-card p-6 shadow-sm card-hover-lift", className)}>
     <div className="flex items-start justify-between gap-4">
       {Icon && <span className="rounded-xl border border-primary/20 bg-primary/10 p-2.5 text-primary"><Icon size={19} /></span>}
       {index && <span className="font-mono text-xs font-bold tracking-wider text-secondary">{index}</span>}

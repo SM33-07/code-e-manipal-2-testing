@@ -47,6 +47,7 @@ export function HeritageBackground() {
   }
 
   const isHero = routeConfig.mode === "hero";
+  const isLanding = pathname === "/";
   const position = themeConfig.position || "center center";
   const opacity = themeConfig.opacity ?? (isDark ? 0.45 : 0.75);
 
@@ -65,9 +66,9 @@ export function HeritageBackground() {
           alt=""
           fill
           priority={isHero}
-          quality={85}
+          quality={75}
           sizes="100vw"
-          className="object-cover"
+          className={isLanding ? "hero-image-settle object-cover" : "object-cover"}
           style={{ objectPosition: position }}
         />
       </div>
@@ -77,12 +78,16 @@ export function HeritageBackground() {
         className="absolute inset-0 transition-colors duration-500"
         style={{
           background: isDark
-            ? routeConfig.mode === "hero"
+            ? isLanding
+              ? "linear-gradient(90deg, rgba(21, 22, 23, 0.78) 0%, rgba(30, 28, 29, 0.52) 44%, rgba(21, 22, 23, 0.04) 100%), linear-gradient(180deg, rgba(21, 22, 23, 0.10) 0%, rgba(21, 22, 23, 0.02) 58%, rgba(21, 22, 23, 0.46) 100%)"
+              : routeConfig.mode === "hero"
               ? "linear-gradient(180deg, rgba(21, 22, 23, 0.30) 0%, rgba(30, 28, 29, 0.66) 45%, rgba(21, 22, 23, 0.90) 100%)"
               : "linear-gradient(180deg, rgba(21, 22, 23, 0.56) 0%, rgba(30, 28, 29, 0.80) 50%, rgba(21, 22, 23, 0.95) 100%)"
+            : isLanding
+            ? "linear-gradient(90deg, rgba(244, 235, 221, 0.92) 0%, rgba(244, 235, 221, 0.70) 44%, rgba(244, 235, 221, 0.08) 100%), linear-gradient(180deg, rgba(244, 235, 221, 0.04) 0%, rgba(244, 235, 221, 0.02) 58%, rgba(244, 235, 221, 0.48) 100%)"
             : routeConfig.mode === "hero"
-            ? "linear-gradient(180deg, rgba(247, 244, 239, 0.22) 0%, rgba(242, 235, 225, 0.55) 45%, rgba(247, 244, 239, 0.84) 100%)"
-            : "linear-gradient(180deg, rgba(247, 244, 239, 0.42) 0%, rgba(242, 235, 225, 0.68) 50%, rgba(247, 244, 239, 0.90) 100%)",
+            ? "linear-gradient(180deg, rgba(244, 235, 221, 0.18) 0%, rgba(229, 208, 178, 0.48) 45%, rgba(244, 235, 221, 0.80) 100%)"
+            : "linear-gradient(180deg, rgba(244, 235, 221, 0.34) 0%, rgba(229, 208, 178, 0.60) 50%, rgba(244, 235, 221, 0.88) 100%)",
         }}
       />
     </div>

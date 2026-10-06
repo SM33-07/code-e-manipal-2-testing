@@ -43,6 +43,5 @@ export const publicNavigation: NavigationItem[] = [
   { name: "Home", link: "/" },
   { name: "Problem Statements", link: "/problem-statements" },
   { name: "Timeline", link: "/timeline" },
-  { name: "Gallery", link: "/gallery" },
   { name: "FAQ", link: "/faq" },
 ];

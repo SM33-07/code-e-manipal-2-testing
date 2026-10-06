@@ -90,14 +90,14 @@ export default function ResultsPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-8 py-6 sm:py-10 px-4 sm:px-6">
       {/* ── Ceremonial Header ── */}
-      <header className="rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-sm relative overflow-hidden text-center sm:text-left">
+      <header className="surface-panel relative overflow-hidden border-y border-border bg-surface-elevated/90 p-5 sm:p-9 text-left">
         <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/15 px-3.5 py-1 text-xs font-bold text-secondary">
+            <div className="inline-flex items-center gap-2 border-b border-secondary/50 pb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-secondary">
               {isPublished ? <Trophy size={14} className="text-secondary" /> : <Lock size={14} />}
               <span>{isPublished ? "OFFICIAL AWARDS ANNOUNCEMENT" : "RESULTS CEREMONY EMBARGO"}</span>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
+            <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-foreground">
               Official Results
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
@@ -108,7 +108,7 @@ export default function ResultsPage() {
           </div>
 
           {/* Status Badge Box */}
-          <div className="shrink-0 rounded-2xl border border-border bg-card p-5 text-center min-w-[220px] shadow-sm">
+          <div className="min-w-[220px] shrink-0 border-l-2 border-primary bg-background/70 p-4 text-left sm:text-center">
             <div className="flex items-center justify-center gap-2 text-xs font-bold text-secondary uppercase tracking-wider mb-1">
               <Calendar size={14} />
               <span>Release Status</span>

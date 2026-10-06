@@ -242,14 +242,15 @@ export default function TimelinePage() {
           return (
             <div
               key={item.id}
-              className={`rounded-2xl border bg-card p-4 sm:p-5 shadow-sm transition-all ${
+              data-timeline-status={item.status}
+              className={`timeline-event-card border-l-2 bg-surface-elevated p-4 sm:p-5 transition-colors ${
                 isCurrent
-                  ? "border-primary ring-2 ring-primary/20 bg-card"
+                  ? "border-primary"
                   : isCompleted
-                  ? "border-border/70 opacity-80"
+                  ? "border-secondary/60 opacity-80"
                   : isLocked
-                  ? "border-dashed border-border/80 opacity-75"
-                  : "border-border hover:border-secondary/40"
+                  ? "border-dashed border-border opacity-75"
+                  : "border-border hover:border-secondary"
               }`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
@@ -260,7 +261,7 @@ export default function TimelinePage() {
 
                   {isCurrent && (
                     <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-primary/15 px-2.5 py-0.5 rounded-full border border-primary/30">
-                      <Flame size={12} className="animate-pulse" />
+                      <Flame size={12} />
                       <span>CURRENT</span>
                     </span>
                   )}
@@ -343,14 +344,13 @@ export default function TimelinePage() {
   return (
     <div className="mx-auto max-w-5xl space-y-8 py-4 sm:py-8 px-4 sm:px-6">
       {/* Header */}
-      <header className="rounded-3xl border border-border bg-card p-6 sm:p-10 shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+      <header className="surface-panel relative overflow-hidden border-y border-border bg-surface-elevated/90 p-5 sm:p-9">
         <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/15 px-3 py-1 text-xs font-bold text-secondary">
+          <div className="inline-flex items-center gap-2 border-b border-secondary/50 pb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-secondary">
             <CalendarDays size={14} />
             <span>OFFICIAL 36-HOUR EVENT SCHEDULE</span>
           </div>
-          <h1 className="mt-3 text-2xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+          <h1 className="mt-4 text-4xl sm:text-6xl font-black tracking-tight text-foreground">
             Hackathon Timeline
           </h1>
           <p className="mt-2.5 max-w-2xl text-sm sm:text-base text-muted-foreground leading-relaxed">
@@ -391,7 +391,7 @@ export default function TimelinePage() {
               key={id}
               type="button"
               onClick={() => setActiveFilter(id)}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              className={`inline-flex min-h-11 items-center gap-2 border px-4 py-2 text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                 isActive
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-accent"
@@ -416,7 +416,7 @@ export default function TimelinePage() {
       <Timeline data={timelineData} />
 
       {/* Bottom CTA Card */}
-      <div className="rounded-2xl border border-border bg-card p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+      <div className="flex flex-col items-start justify-between gap-4 border-t border-border bg-surface-elevated px-4 py-5 sm:flex-row sm:items-center">
         <div>
           <h3 className="text-sm font-bold text-foreground">Next Hackathon Action</h3>
           <p className="text-xs text-muted-foreground mt-0.5">

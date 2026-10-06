@@ -21,10 +21,7 @@ export default function Gallery() {
       {/* Hero Section */}
       <section className="pt-6 pb-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
-          <SpotlightCard className="rounded-3xl p-8 sm:p-12 relative overflow-hidden">
-            {/* Subtle background ambient highlight */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
+          <SpotlightCard className="relative overflow-hidden border-y border-border bg-surface-elevated/90 p-6 sm:p-10">
 
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/15 border border-secondary/30 text-secondary text-xs font-semibold tracking-wider uppercase mb-4">

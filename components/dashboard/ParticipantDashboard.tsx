@@ -278,9 +278,9 @@ export function ParticipantDashboard() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8 pb-16 animate-entrance">
+    <div className="mx-auto max-w-7xl space-y-7 px-4 pb-16 animate-entrance sm:px-6">
       {/* ── 1. Team Identity & Workspace Header ── */}
-      <SpotlightCard className="rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-sm relative overflow-hidden">
+      <SpotlightCard className="relative overflow-hidden border-y border-border bg-surface-elevated p-5 sm:p-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2.5">
@@ -376,7 +376,7 @@ export function ParticipantDashboard() {
 
       {/* ── Onboarding / Team Formation (When no team registered) ── */}
       {!hasTeam && (
-        <div id="team-formation" className="rounded-3xl border border-secondary/40 bg-card p-6 sm:p-8 shadow-sm space-y-6">
+        <div id="team-formation" className="space-y-6 border-y border-secondary/40 bg-surface-elevated p-5 sm:p-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-border">
             <div className="space-y-1">
               <div className="inline-flex items-center gap-2 text-xs font-bold text-secondary uppercase tracking-wider">

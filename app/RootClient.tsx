@@ -1,12 +1,13 @@
 "use client";
 
 import { AuthProvider, useAuth } from "@/components/AuthProvider"
-import { Suspense, useState, useEffect } from "react"
+import { Suspense, useState, useEffect, useCallback } from "react"
 import dynamic from "next/dynamic"
 import { usePathname } from "next/navigation"
 
 import { HeritageBackground } from "@/components/HeritageBackground"
 import { SiteFooter } from "@/components/SiteFooter"
+import { ScrollReveal } from "@/components/ui/ScrollReveal"
 
 const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false })
 
@@ -123,6 +124,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { isAuthenticated } = useAuth()
   const isLogin = pathname === "/login"
+  const isLanding = pathname === "/"
   const isProtectedPortalRoute = ["/dashboard", "/team", "/submit", "/SubmissionForm", "/submission-result", "/judge", "/judging", "/admin", "/account"]
     .some((route) => pathname === route || pathname.startsWith(`${route}/`))
   // These pages intentionally serve public information too. Once a session is
@@ -155,12 +157,12 @@ function Shell({ children }: { children: React.ReactNode }) {
       
       <div style={{ paddingTop: hasBanner ? "40px" : "0px" }}>
         <Suspense fallback={null}>
-          <Navbar portal={isPortalRoute} className={hasBanner ? "top-[40px]" : "top-0"} />
+          <Navbar portal={isPortalRoute} className={`cem-navbar-shell ${hasBanner ? "top-[40px]" : "top-0"}`} />
         </Suspense>
-        <div className={`relative z-10 min-h-screen ${isFullBleedRoute ? "pt-20" : "pt-24 pb-12"}`}>
+        <div className={`relative z-10 min-h-screen ${isFullBleedRoute ? "pt-20" : isLanding ? "pt-16 pb-12 sm:pt-20" : "pt-24 pb-12"}`}>
           {children}
         </div>
-        {!isPortalRoute && <SiteFooter />}
+        {!isPortalRoute && <ScrollReveal as="div"><SiteFooter /></ScrollReveal>}
       </div>
     </>
   )
@@ -168,6 +170,14 @@ function Shell({ children }: { children: React.ReactNode }) {
 
 export default function RootClient({ children }: { children: React.ReactNode }) {
   const [showLoader, setShowLoader] = useState(true)
+
+  const handleLoaderComplete = useCallback(() => {
+    try {
+      sessionStorage.setItem("cem_portal_booted", "1")
+    } catch {}
+    document.body.dataset.cemLoaderComplete = "true"
+    setShowLoader(false)
+  }, [])
 
   useEffect(() => {
     try {
@@ -179,6 +189,7 @@ export default function RootClient({ children }: { children: React.ReactNode }) 
       } else {
         const alreadyBooted = sessionStorage.getItem("cem_portal_booted")
         if (alreadyBooted) {
+          document.body.dataset.cemLoaderComplete = "true"
           setShowLoader(false)
           return
         }
@@ -188,22 +199,10 @@ export default function RootClient({ children }: { children: React.ReactNode }) 
     }
 
     // Deterministic safety fallback
-    const safety = setTimeout(() => {
-      try {
-        sessionStorage.setItem("cem_portal_booted", "1")
-      } catch {}
-      setShowLoader(false)
-    }, 3500)
+    const safety = setTimeout(handleLoaderComplete, 3500)
 
     return () => clearTimeout(safety)
-  }, [])
-
-  const handleLoaderComplete = () => {
-    try {
-      sessionStorage.setItem("cem_portal_booted", "1")
-    } catch {}
-    setShowLoader(false)
-  }
+  }, [handleLoaderComplete])
 
   return (
     <AuthProvider>

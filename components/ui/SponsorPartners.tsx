@@ -25,16 +25,15 @@ export interface Partner {
 export const OFFICIAL_PARTNERS: Partner[] = [
   {
     name: "The Hosteller",
-    logo: "/images/partners/the-hosteller.png",
+    logo: "/images/partners/the-hosteller-20261007.png",
     website: "https://www.thehosteller.com/",
     ariaLabel: "Visit The Hosteller",
     descriptor: "Official Stay Partner",
     featured: true,
-    tileBg: "#F7E731",
   },
   {
     name: "Unstop",
-    logo: "/images/partners/unstop.png",
+    logo: "/images/partners/unstop-20261007.png",
     website: "https://unstop.com/",
     ariaLabel: "Visit Unstop",
     descriptor: "Official Registration Platform",
@@ -42,19 +41,19 @@ export const OFFICIAL_PARTNERS: Partner[] = [
   },
   {
     name: "E-Cell MUJ",
-    logo: "/images/partners/ecell.png",
+    logo: "/images/partners/ecell-20261007.png",
     descriptor: "Entrepreneurship Cell · MUJ",
     requiresLightTile: true,
   },
   {
     name: "VickyBytes",
-    logo: "/images/partners/vickybytes.png",
+    logo: "/images/partners/vickybytes-20261007.png",
     descriptor: "Official Tech Partner",
     requiresLightTile: true,
   },
   {
     name: "HackerRank",
-    logo: "/images/partners/hackerrank.png",
+    logo: "/images/partners/hackerrank-20261007.png",
     website: "https://www.hackerrank.com/",
     ariaLabel: "Visit HackerRank",
     descriptor: "Official Coding Partner",
@@ -76,7 +75,7 @@ function LogoTile({ partner }: { partner: Partner }) {
         alt={partner.name}
         width={180}
         height={72}
-        className="h-10 w-auto object-contain"
+        className="h-14 w-auto max-w-full object-contain transition-transform duration-300 group-hover:scale-[1.04] sm:h-16"
         loading="lazy"
       />
     </div>
@@ -86,30 +85,28 @@ function LogoTile({ partner }: { partner: Partner }) {
 // ─── Featured Tile (The Hosteller) ───────────────────────────────────────────
 function FeaturedTile({ partner }: { partner: Partner }) {
   return (
-    <div
-      className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-6 sm:p-8"
-      style={{ backgroundColor: partner.tileBg ?? "var(--card)" }}
-    >
-      <div className="flex items-center justify-center sm:justify-start">
+    <div className="featured-partner-panel relative flex flex-col justify-between gap-6 p-6 sm:flex-row sm:items-center sm:p-8">
+      <div className="featured-partner-logo-plate flex items-center justify-center rounded-2xl bg-[#F4EBDD] p-5 sm:p-6 sm:justify-start">
         <Image
           src={partner.logo}
           alt={partner.name}
           width={360}
           height={120}
-          className="h-16 sm:h-20 w-auto object-contain"
+          className="h-16 w-auto object-contain sm:h-20"
           loading="lazy"
         />
       </div>
       <div className="flex flex-col gap-1 text-center sm:items-end sm:text-right">
-        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-black/55">
+        <span className="inline-flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#F4EBDD] sm:justify-end">
+          <span aria-hidden="true" className="h-px w-5 bg-[#B08A45]" />
           Featured Partner
         </span>
         {partner.descriptor && (
-          <span className="text-xs font-semibold text-black/80">{partner.descriptor}</span>
+          <span className="text-xs font-semibold text-[#F4EBDD]">{partner.descriptor}</span>
         )}
         {partner.website && (
-          <span className="mt-1 inline-flex items-center justify-center sm:justify-end gap-1 text-[11px] font-bold text-black/55 group-hover:text-black/75 transition-colors">
-            <ExternalLink size={11} aria-hidden="true" />
+          <span className="mt-1 inline-flex items-center justify-center gap-1 text-[11px] font-bold text-[#F4EBDD]/80 transition-colors sm:justify-end group-hover:text-[#F4EBDD]">
+            <ExternalLink className="featured-partner-external-icon" size={11} aria-hidden="true" />
             thehosteller.com
           </span>
         )}
@@ -132,7 +129,7 @@ export function SponsorPartners({
   return (
     <section
       aria-labelledby="partners-heading"
-      className={`rounded-3xl border border-border bg-surface-elevated p-6 shadow-sm sm:p-9 ${className}`}
+      className={`border-y border-border bg-surface-elevated/95 p-5 sm:border sm:p-8 ${className}`}
     >
       {/* Header */}
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
@@ -164,7 +161,7 @@ export function SponsorPartners({
               target="_blank"
               rel="noopener noreferrer"
               aria-label={featured.ariaLabel ?? `Visit ${featured.name}`}
-              className="group block overflow-hidden rounded-2xl border border-border transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="featured-partner-link group block overflow-hidden rounded-2xl border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <FeaturedTile partner={featured} />
             </a>
@@ -182,7 +179,7 @@ export function SponsorPartners({
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
             Supporting Partners
           </p>
-          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-px overflow-hidden border-y border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
             {supporting.map((partner) => {
               const tileClass =
                 "group block bg-card p-5 transition-[background-color] duration-200 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";

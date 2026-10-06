@@ -1,44 +1,49 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  color-scheme: light;
   --font-size: 16px;
   /* Light Theme: Warm Ivory Canvas, Sandstone, Terracotta, Jaipur Pink, Antique Brass, Technical Sapphire & Emerald */
-  --background: #F7F4EF;
-  --foreground: #141210;
-  --card: #FFFDF9;
-  --card-foreground: #141210;
-  --surface: #FFFDF9;
-  --surface-elevated: #FFFFFF;
-  --surface-muted: #EFE5D7;
-  --surface-inset: #EFE5D7;
-  --popover: #FFFDF9;
-  --popover-foreground: #141210;
+  --background: #F4EBDD;
+  --foreground: #24211D;
+  --card: #FBF7EF;
+  --card-foreground: #24211D;
+  --surface: #FBF7EF;
+  --surface-elevated: #FFFCF6;
+  --surface-muted: #E5D0B2;
+  --surface-inset: #E5D0B2;
+  --popover: #FBF7EF;
+  --popover-foreground: #24211D;
   --primary: #B95745;
   --primary-foreground: #FFFFFF;
   --secondary: #B08A45;
-  --secondary-foreground: #FFFFFF;
-  --muted: #EFE5D7;
-  --muted-foreground: #5C5349;
-  --accent: #EFE5D7;
-  --accent-foreground: #141210;
+  --secondary-foreground: #24211D;
+  --muted: #E5D0B2;
+  --muted-foreground: #61584E;
+  --accent: #E5D0B2;
+  --accent-foreground: #24211D;
   --destructive: #AE3E3C;
   --destructive-foreground: #FFFFFF;
   --success: #17664F;
   --warning: #C18A32;
-  --border: #D0BEA7;
-  --border-subtle: #E8DDCE;
-  --input: #FFFDF9;
-  --input-background: #FFFDF9;
+  --border: #CBB79A;
+  --border-subtle: #E5D0B2;
+  --input: #FFFCF6;
+  --input-background: #FFFCF6;
   --switch-background: #cbced4;
   --ring: #B95745;
-  --radius: 0.625rem;
-  --sidebar: #FFFDF9;
-  --sidebar-foreground: #141210;
+  --radius: 1rem;
+  --surface-radius-large: 1.5rem;
+  --surface-radius-primary: 1.125rem;
+  --surface-radius-secondary: 0.875rem;
+  --surface-radius-compact: 0.75rem;
+  --sidebar: #FBF7EF;
+  --sidebar-foreground: #24211D;
   --sidebar-primary: #B95745;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #EFE5D7;
-  --sidebar-accent-foreground: #141210;
-  --sidebar-border: #D0BEA7;
+  --sidebar-accent: #E5D0B2;
+  --sidebar-accent-foreground: #24211D;
+  --sidebar-border: #CBB79A;
   --sidebar-ring: #B95745;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
@@ -50,17 +55,20 @@
   --jaipur-secondary-light: #D2AC68;
   --jaipur-gold: #B08A45;
   --jaipur-gold-light: #D2AC68;
-  --jaipur-card: #FFFDF9;
+  --jaipur-card: #FBF7EF;
   --jaipur-pink: #C97878;
-  --jaipur-terracotta: #A64B3E;
+  --jaipur-terracotta: #B95745;
   --royal-blue: #174A86;
-  --sapphire: #174A86;
+  --sapphire: #0F3570;
   --emerald: #17664F;
-  --ochre: #B08A45;
-  --ink: #141210;
+  --ochre: #C18A32;
+  --ink: #24211D;
+  --featured-partner-bg: #C56552;
+  --featured-partner-border: #D7826F;
 }
 
 .dark {
+  color-scheme: dark;
   /* Dark Theme: deep charcoal with restrained wine undertones, not espresso brown. */
   --background: #151617;
   --foreground: #F4EBDD;
@@ -112,13 +120,17 @@
   --jaipur-pink: #C97878;
   --jaipur-terracotta: #B95745;
   --royal-blue: #174A86;
-  --sapphire: #123D73;
-  --emerald: #17604D;
-  --ochre: #B88A45;
+  --sapphire: #0F3570;
+  --emerald: #17664F;
+  --ochre: #C18A32;
   --ink: #151617;
+  --featured-partner-bg: #8F463A;
+  --featured-partner-border: #B76858;
 }
 
 @theme inline {
+  --font-sans: Inter, "Segoe UI", Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -173,6 +185,8 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
 }
 
 @layer base {
